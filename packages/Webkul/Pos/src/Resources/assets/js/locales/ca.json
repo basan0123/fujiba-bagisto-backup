@@ -1,0 +1,617 @@
+{
+    "pos": {
+        "title": "Bagisto POS",
+        "page_not_found": {
+            "title": "Alguna cosa falta.",
+            "message": "Ho sentim, no podem trobar aquesta pàgina. Trobaràs molt per explorar a la pàgina principal.",
+            "back_btn_title": "Torna a la pàgina principal"
+        },
+        "login_form": {
+            "title": "Iniciar Sessió",
+            "user_name": "Nom d'Usuari",
+            "user_name_placeholder": "Introdueix el Nom d'Usuari",
+            "password": "Contrasenya",
+            "password_placeholder": "Introdueix la Contrasenya",
+            "remember_password": "Recorda la Contrasenya",
+            "login_btn_title": "Inicia Sessió"
+        },
+        "footer": {
+            "warning": "Webkul no autoritza cap venedor de tercers a revendre els mòduls de Webkul.",
+            "copyright": "© Copyright 2010-2023, Webkul Software (Registrat a l'Índia/EUA). Tots els drets reservats."
+        },
+        "layout": {
+            "header": {
+                "title": "Bagisto POS",
+                "search_products": "Cerca productes...",
+                "hold_orders": "Comandes en espera",
+                "barcode_form": {
+                    "title": "Introdueix el codi de barres",
+                    "barcode_placeholder": "Introdueix el codi de barres del producte",
+                    "cancel_btn_title": "Cancel·la",
+                    "proceed_btn_title": "Continua"
+                },
+                "product_create_form": {
+                    "title": "Afegeix un nou producte",
+                    "name": "Nom",
+                    "sku": "SKU",
+                    "price": "Preu",
+                    "weight": "Pes",
+                    "quantity": "Quantitat",
+                    "cancel_btn_title": "Cancel·la",
+                    "proceed_btn_title": "Continua"
+                }
+            },
+            "sidebar": {
+                "home": "Inici",
+                "customers": "Clients",
+                "cashier": "Caixer",
+                "orders": "Comandes",
+                "products": "Productes",
+                "reports": "Informes",
+                "settings": "Configuració",
+                "logout": "Tanca la sessió"
+            },
+            "main": {
+                "cash_drawer": {
+                    "title": "Caixa",
+                    "opening_drawer_amount": "Import d'Obertura de la Caixa",
+                    "remarks": "Observacions",
+                    "remarks_placeholder": "Introdueix observacions per al tancament del taulell.",
+                    "open_drawer": "Obrir Caixa"
+                }
+            }
+        },
+        "common": {
+            "cart": {
+                "add": "Afegeix",
+                "add_customer": "Afegeix client",
+                "booking_from": "Reserva des de",
+                "booking_till": "Reserva fins a",
+                "closed": "Tancat",
+                "create_success": "Carret creat amb èxit.",
+                "discount": "Descompte",
+                "discount_applied": "S'ha aplicat un descompte del {percentage}%",
+                "downloads": "Descàrregues",
+                "event_expired": "Aquest esdeveniment ha caducat.",
+                "event_from": "Esdeveniment des de",
+                "event_ticket": "Entrada de l'esdeveniment",
+                "event_till": "Esdeveniment fins a",
+                "hold_order": "Posa la comanda en espera",
+                "hold_order_success": "La comanda s'ha posat en espera amb èxit.",
+                "inventory_warning": "La quantitat sol·licitada no està disponible.",
+                "missing_links": "Falten enllaços descarregables per a aquest producte.",
+                "missing_options": "Falten opcions per a aquest producte.",
+                "no_customer_selected": "No s'ha seleccionat cap client.",
+                "note": "Nota",
+                "payable_amount": "Import a pagar",
+                "proceed": "Continua",
+                "product_add_success": "Producte afegit al carret amb èxit!",
+                "product_remove_success": "Producte eliminat del carret amb èxit!",
+                "qty_missing": "Almenys un producte ha de tenir més d'1 unitat.",
+                "invalid_file_extension": "S'ha trobat una extensió de fitxer no vàlida.",
+                "quantity": "Quantitat",
+                "remove_cart": "Elimina el carret",
+                "remove_success": "Carret eliminat amb èxit.",
+                "rent_from": "Lloguer des de",
+                "rent_till": "Lloguer fins a",
+                "rent_type": "Tipus de lloguer",
+                "select_hourly_duration": "Selecciona una durada d'una hora.",
+                "selected_products_simple": "Els productes seleccionats han de ser de tipus simple.",
+                "special_note": "Petició/notes especials",
+                "subtotal": "Subtotal",
+                "tax": "Impost",
+                "update_success": "Carret actualitzat amb èxit.",
+                "order_note_form": {
+                    "title": "Nota de la Comanda",
+                    "note_placeholder": "Introdueix una nota per a la comanda",
+                    "cancel_btn_title": "Cancel·la",
+                    "proceed_btn_title": "Continua",
+                    "create_success": "Nota de la comanda afegida amb èxit.",
+                    "remove_success": "Nota de la comanda eliminada amb èxit."
+                }
+            },
+            "flash_messages": {
+                "close": "Tancar",
+                "error_message": "Alguna cosa ha anat malament! Si us plau, torna-ho a provar.",
+                "offline_error": "Avís, estàs en mode fora de línia",
+                "offline_mode": "Avís: Estàs fora de línia. Funcionalitat limitada disponible",
+                "online_mode": "Connexió restaurada. Ja tornes a estar en línia"
+            },
+            "offline_loader": {
+                "title": "Avís, estàs en mode fora de línia",
+                "description": "Els detalls estaran disponibles quan es restableixi la connexió.",
+                "reconnecting": "Reconnectant..."
+            },
+            "confirm_modal": {
+                "title": "Estàs segur?",
+                "description": "Estàs segur que vols realitzar aquesta acció?",
+                "disagree_btn_title": "No hi estic d'acord",
+                "agree_btn_title": "Hi estic d'acord"
+            },
+            "pagination": {
+                "showing": "S'estan mostrant {count} de {total} resultats",
+                "page": "Pàgina {current} de {total}"
+            }
+        },
+        "home": {
+            "title": "Inici",
+            "print_confirmation_title": "Confirmació d'Impressió?",
+            "print_confirm_message": "Vols imprimir el rebut de l'última comanda?",
+            "items_in_cart": "{count} articles al carret.",
+            "view_cart_btn": "Veure Carret",
+            "categories": {
+                "all": "Tots"
+            },
+            "products": {
+                "view": {
+                    "qty": "{qty} Quantitat",
+                    "add_to_cart": "Afegeix al Carret",
+                    "total_amount": "Import Total",
+                    "type": {
+                        "simple": {
+                            "customizable_options": {
+                                "none": "Cap",
+                                "total_amount": "Import Total"
+                            }
+                        },
+                        "booking": {
+                            "location": "Ubicació",
+                            "view_on_map": "Veure al Mapa",
+                            "default": {
+                                "slot_duration_in_minutes": "{minutes} Minuts",
+                                "slot_duration": "Durada del Franja"
+                            },
+                            "appointment": {
+                                "closed": "Tancat",
+                                "see_details": "Veure Detalls",
+                                "slot_duration": "Durada del Franja",
+                                "slot_duration_in_minutes": "{minutes} Minuts",
+                                "today_availability": "Disponibilitat d'Avui"
+                            },
+                            "event": {
+                                "book_your_ticket": "Reserva la teva Entrada",
+                                "per_ticket_price_ca": "{price} per entrada",
+                                "title": "Esdeveniment el :"
+                            },
+                            "rental": {
+                                "choose_rent_option": "Tria l'Opció de Lloguer",
+                                "daily_basis": "Base Diària",
+                                "from": "Des de",
+                                "hourly_basis": "Base Horària",
+                                "rent_an_item": "Lloga un Article",
+                                "select_date": "Selecciona Data",
+                                "select_rent_time": "Selecciona Hora de Lloguer",
+                                "select_slot": "Selecciona Franja",
+                                "select_time_slot": "Selecciona Franja Horària",
+                                "slot": "Franja",
+                                "no_slots_available": "No hi ha franges disponibles",
+                                "to": "Fins a"
+                            },
+                            "table": {
+                                "book_a_table": "Reserva una Taula",
+                                "closed": "Tancat",
+                                "slot_duration": "Durada del Franja",
+                                "slot_duration_in_minutes": "{minutes} Minuts",
+                                "slots_for_all_days": "Mostra per a tots els dies",
+                                "special_notes": "Sol·licitud/Notes Especials",
+                                "today_availability": "Disponibilitat d'Avui"
+                            },
+                            "slots": {
+                                "book_an_appointment": "Reserva una Cita",
+                                "date": "Data",
+                                "no_slots_available": "No hi ha franges disponibles",
+                                "select_slot": "Selecciona Franja",
+                                "title": "Franja"
+                            }
+                        },
+                        "bundle": {
+                            "total_amount": "Import Total",
+                            "none": "No hi ha Opcions de Paquet Disponibles"
+                        },
+                        "configurable": {
+                            "select_option": "Selecciona Opcions",
+                            "select_above_option": "Si us plau, selecciona primer les opcions anteriors.",
+                            "price": "Preu de la Variant Seleccionada"
+                        },
+                        "downloadable": {
+                            "samples": "Mostres",
+                            "links": "Enllaços"
+                        },
+                        "grouped": {
+                            "name": "Nom"
+                        }
+                    }
+                },
+                "no_barcode_product": "No s'ha trobat cap producte amb aquest codi de barres."
+            }
+        },
+        "customers": {
+            "add_btn": "Afegir nou client",
+            "change_btn": "Canviar client",
+            "change_success": "Client canviat correctament.",
+            "delete_success": "Client eliminat correctament.",
+            "customers": "Clients",
+            "delete_btn": "Eliminar",
+            "edit_btn": "Editar",
+            "no_current_customer": "No s'ha trobat cap client.",
+            "no_customers_found": "No s'han trobat clients.",
+            "offline_customers": "Clients fora de línia",
+            "search_customers": "Cercar clients...",
+            "select_btn": "Selecciona el client",
+            "title": "Clients",
+            "create": {
+                "title": "Afegeix Nou Client",
+                "back_btn_title": "Enrere",
+                "first_name": "Nom",
+                "last_name": "Cognom",
+                "email": "Correu Electrònic",
+                "phone_number": "Número de Telèfon",
+                "address": "Adreça",
+                "city": "Ciutat",
+                "state": "Estat",
+                "select_state": "Selecciona Estat",
+                "country": "País",
+                "select_country": "Selecciona País",
+                "pin_code": "Codi Postal",
+                "save_btn_title": "Afegeix Client",
+                "phone_already_exist": "El telèfon ja està registrat.",
+                "email_already_exist": "El correu electrònic ja està registrat.",
+                "create_success": "Client creat amb èxit."
+            },
+            "edit": {
+                "title": "Edita Client",
+                "back_btn_title": "Enrere",
+                "first_name": "Nom",
+                "last_name": "Cognom",
+                "email": "Correu Electrònic",
+                "phone_number": "Número de Telèfon",
+                "address": "Adreça",
+                "city": "Ciutat",
+                "state": "Estat",
+                "select_state": "Selecciona Estat",
+                "country": "País",
+                "select_country": "Selecciona País",
+                "pin_code": "Codi Postal",
+                "save_btn_title": "Actualitza Client",
+                "phone_already_exist": "El telèfon ja està registrat.",
+                "email_already_exist": "El correu electrònic ja està registrat.",
+                "update_success": "Client actualitzat amb èxit."
+            }
+        },
+        "cashier": {
+            "title": "Caixer",
+            "cash_drawer": {
+                "title": "Caixa",
+                "drawer_amount_summary": "Resum de l'Import de la Caixa",
+                "opening_drawer_amount": "Import d'Obertura de la Caixa",
+                "cash_payment_sale": "Venda amb Pagament en Efectiu",
+                "other_payment_sale": "Venda amb Altres Mètodes de Pagament",
+                "expected_drawer_amount": "Import Esperat a la Caixa",
+                "difference": "Diferència",
+                "remarks": "Observacions",
+                "remarks_placeholder": "Introdueix observacions per al tancament del taulell.",
+                "close_drawer": "Tanca la Caixa"
+            },
+            "today_sale": {
+                "title": "Venda d'Avui",
+                "opening_drawer_amount": "Import d'Obertura de la Caixa",
+                "cash_payment_sale": "Venda amb Pagament en Efectiu",
+                "other_payment_sale": "Venda amb Altres Mètodes de Pagament",
+                "sale_history": "Historial de Vendes",
+                "filters": "Filtres",
+                "order_id": "ID de la Comanda",
+                "time": "Hora",
+                "order_total": "Total de la Comanda",
+                "payment_mode": "Mètode de Pagament",
+                "no_records": "No s'han trobat registres.",
+                "no_records_desc": "L'historial de vendes apareixerà aquí un cop s'hagin realitzat transaccions.",
+                "drawer": {
+                    "title": "Filtre",
+                    "order_id": "ID de la Comanda",
+                    "time": "Hora",
+                    "order_total": "Total de la Comanda",
+                    "payment_mode": "Mètode de Pagament",
+                    "select_payment_mode": "Selecciona Mètode de Pagament",
+                    "pos_cash": "Pagament en Efectiu",
+                    "pos_card": "Pagament amb Targeta",
+                    "pos_split": "Pagament Dividit",
+                    "filter_btn_title": "Aplica el Filtre"
+                }
+            },
+            "sale_history": {
+                "title": "Historial de Vendes",
+                "filters": "Filtres",
+                "date": "Data",
+                "cash_payments": "Pagaments en Efectiu",
+                "other_payments": "Altres Pagaments",
+                "total_sale": "Venda Total",
+                "drawer_note": "Nota de la Caixa",
+                "no_records": "No s'han trobat registres.",
+                "no_records_desc": "L'historial de vendes apareixerà aquí un cop s'hagin realitzat transaccions.",
+                "drawer": {
+                    "title": "Filtre",
+                    "date": "Data",
+                    "cash_payment": "Pagament en Efectiu",
+                    "other_payment": "Altres Pagaments",
+                    "total_sale": "Venda Total",
+                    "filter_btn_title": "Aplica el Filtre"
+                }
+            }
+        },
+        "orders": {
+            "title": "Comandes",
+            "history": {
+                "title": "Historial",
+                "search_orders": "Cerca ID de Comanda o Nom del Client...",
+                "filters": "Filtres",
+                "order_id": "ID de la Comanda",
+                "date": "Data",
+                "total_sales": "Vendes Totals",
+                "subtotal": "Subtotal",
+                "tax": "Impost",
+                "no_records": "No s'han trobat registres.",
+                "no_records_desc": "L'historial de vendes apareixerà aquí un cop s'hagin realitzat transaccions.",
+                "return_btn": "Tornar",
+                "order_status": {
+                    "title": "Estat",
+                    "completed": "Completat",
+                    "returned": "Tornat"
+                }
+            },
+            "hold": {
+                "title": "Comandes en Espera",
+                "note": "Nota",
+                "resume": "Reprèn",
+                "remove": "Elimina",
+                "remove_success": "Comanda eliminada amb èxit.",
+                "resume_success": "Comanda reprès amb èxit.",
+                "resume_error": "Si us plau, processa primer el carret actual.",
+                "no_orders": "No s'han trobat comandes."
+            },
+            "offline": {
+                "title": "Comandes Fora de Línia",
+                "sync_order": "Sincronitza Comanda",
+                "sync_all_orders": "Sincronitza Totes les Comandes",
+                "search_order_id": "Cerca ID de Comanda...",
+                "order_id": "ID de la Comanda",
+                "date": "Data",
+                "no_orders": "No s'han trobat comandes fora de línia.",
+                "sync_success": "Comanda sincronitzada amb èxit.",
+                "return": "Retorn",
+                "returned": "Retornat",
+                "return_success": "Comanda retornada amb èxit."
+            },
+            "info": {
+                "order_id": "ID de la Comanda",
+                "subtotal": "Subtotal",
+                "tax": "Impost",
+                "discount": "Descompte",
+                "grand_total": "Total General",
+                "cash": "Efectiu",
+                "balance": "Canvi",
+                "no_order_selected": "No s'ha seleccionat cap comanda per previsualitzar o imprimir la factura."
+            },
+            "print": {
+                "btn_title": "Imprimeix Factura",
+                "cashier": "Caixer",
+                "change": "Canvi",
+                "contact_info": "Informació de Contacte",
+                "customer": "Client",
+                "customer_care": "Atenció al Client",
+                "date": "Data",
+                "discount": "Descompte",
+                "email": "Correu Electrònic",
+                "grand_total": "Total General",
+                "item": "Producte",
+                "name": "Nom",
+                "no_receipt": "No hi ha rebut disponible per a aquest establiment.",
+                "order_id": "ID de la Comanda",
+                "phone": "Telèfon",
+                "price": "Preu",
+                "qty": "Quantitat",
+                "subtotal": "Subtotal",
+                "tax": "Impost",
+                "total": "Total",
+                "total_qty": "Quantitat Total",
+                "website": "Lloc Web"
+            }
+        },
+        "products": {
+            "title": "Productes",
+            "low_stock_products": {
+                "title": "Productes amb Poc Estoc",
+                "qty": "{qty} Quantitat",
+                "purchase_request": "Sol·licitud de Compra",
+                "send_request_btn": "Envia Sol·licitud",
+                "no_purchase_request": "No s'ha trobat cap sol·licitud de compra.",
+                "no_products": "No s'han trobat productes amb poc estoc.",
+                "items_in_request": "{count} articles a la sol·licitud de compra.",
+                "view_btn_title": "Veure",
+                "request": {
+                    "title": "Envia Sol·licitud de Quantitat",
+                    "requested_quantity": "Quantitat Sol·licitada",
+                    "comment": "Comentari",
+                    "comment_placeholder": "Introdueix un comentari",
+                    "add_btn_title": "Afegeix Producte",
+                    "cancel_btn_title": "Cancel·la",
+                    "already_exist": "El producte ja existeix a la llista de sol·licituds."
+                }
+            },
+            "requested_products": {
+                "title": "Productes Sol·licitats",
+                "search_products": "Cerca Productes...",
+                "qty": "Quantitat: {qty}",
+                "pending": "Pendent",
+                "received": "Rebut",
+                "declined": "Rebutjat",
+                "no_products": "No s'ha trobat cap sol·licitud de producte."
+            },
+            "settings": {
+                "title": "Configuració",
+                "minimum_qty": "Quantitat Mínima",
+                "save_btn_title": "Desa",
+                "save_success": "Configuració desada amb èxit."
+            }
+        },
+        "reports": {
+            "title": "Informes",
+            "day": "Dia",
+            "week": "Setmana",
+            "month": "Mes"
+        },
+        "settings": {
+            "title": "Configuració",
+            "profile": {
+                "title": "Perfil",
+                "first_name": "Nom",
+                "last_name": "Cognom",
+                "email": "Correu electrònic",
+                "old_password": "Contrasenya antiga",
+                "new_password": "Nova contrasenya",
+                "confirm_password": "Confirma la contrasenya",
+                "update_btn_title": "Actualitza el perfil"
+            },
+            "sync": {
+                "completed": "Completat",
+                "customers": "Clients",
+                "deselect_all": "Desselecciona-ho tot",
+                "entities": "Entitats",
+                "entities_desc": "Selecciona les entitats que vols sincronitzar amb el servidor.",
+                "fetching": "Recuperant...",
+                "orders": "Comandes",
+                "products": "Productes",
+                "ready": "Preparat",
+                "records": "Registres",
+                "select_all": "Selecciona-ho tot",
+                "start_syncing": "Inicia la sincronització",
+                "sync_btn_title": "Sincronitza ara",
+                "title": "Sincronització"
+            },
+            "shortcuts": {
+                "title": "Dreceres",
+                "description": "Combinacions de teclat que et permeten realitzar accions ràpidament.",
+                "sections": {
+                    "header": "Capçalera",
+                    "menu": "Menú",
+                    "customer": "Client",
+                    "cart": "Carret"
+                },
+                "items": {
+                    "open_barcode": {
+                        "action": "Obre el Mode Codi de Barres",
+                        "description": "Canvia a l'escaneig de codis de barres"
+                    },
+                    "open_product_modal": {
+                        "action": "Obre el Modal de Creació de Producte",
+                        "description": "Afegeix ràpidament un nou producte"
+                    },
+                    "fullscreen": {
+                        "action": "Activa/Desactiva Pantalla Completa",
+                        "description": "Entra/Sur de la pantalla completa"
+                    },
+                    "dark_mode": {
+                        "action": "Activa/Desactiva Mode Fosc",
+                        "description": "Canvia el tema"
+                    },
+                    "hold_orders": {
+                        "action": "Posa Comandes en Espera",
+                        "description": "Gestiona les comandes retingudes"
+                    },
+                    "home": {
+                        "action": "Ves a l'Inici",
+                        "description": "Navega a la pàgina principal"
+                    },
+                    "customers": {
+                        "action": "Ves a Clients",
+                        "description": "Obre la secció de clients"
+                    },
+                    "cashier": {
+                        "action": "Ves al Caixer",
+                        "description": "Accedeix al caixer del TPV"
+                    },
+                    "orders": {
+                        "action": "Ves a Comandes",
+                        "description": "Consulta l'historial de comandes"
+                    },
+                    "products": {
+                        "action": "Ves a Productes",
+                        "description": "Gestiona els productes"
+                    },
+                    "reports": {
+                        "action": "Ves a Informes",
+                        "description": "Visualitza les analítiques"
+                    },
+                    "settings": {
+                        "action": "Ves a Configuració",
+                        "description": "Ajusta les preferències"
+                    },
+                    "create_customer": {
+                        "action": "Crea un Nou Client",
+                        "description": "Afegeix un client"
+                    },
+                    "edit_customer": {
+                        "action": "Edita el Client Actual",
+                        "description": "Actualitza la informació del client seleccionat"
+                    },
+                    "delete_customer": {
+                        "action": "Elimina el Client Actual",
+                        "description": "Elimina el client seleccionat"
+                    },
+                    "change_customer": {
+                        "action": "Canvia el Client Actual",
+                        "description": "Selecciona un client diferent"
+                    },
+                    "add_note": {
+                        "action": "Afegeix una Nota",
+                        "description": "Adjunta una nota a la comanda"
+                    },
+                    "remove_note": {
+                        "action": "Elimina la Nota",
+                        "description": "Suprimeix la nota del carret"
+                    },
+                    "checkout": {
+                        "action": "Procedeix al Pagament",
+                        "description": "Inicia el procés de pagament"
+                    },
+                    "hold_order": {
+                        "action": "Posa la Comanda en Espera",
+                        "description": "Posa la comanda en espera"
+                    }
+                }
+            },
+            "regional": {
+                "title": "Regional",
+                "locale": "Locale",
+                "select_locale": "Selecciona la llengua",
+                "currency": "Moneda",
+                "select_currency": "Selecciona la moneda",
+                "save_btn_title": "Desa"
+            },
+            "save_success": "Configuració desada correctament."
+        },
+        "payment": {
+            "title": "Pagament",
+            "back": "Enrere",
+            "order_details": "Detalls de la Comanda",
+            "subtotal": "Subtotal",
+            "tax": "Impost",
+            "discount": "Descompte",
+            "grand_total": "Total General",
+            "payable_amount": "Import a Pagar",
+            "received": "Rebut",
+            "remaining": "Restant",
+            "pos_cash": "Efectiu",
+            "pos_card": "Targeta",
+            "pos_split": "Dividit",
+            "cancel": "Cancel·la",
+            "card_details": "Detalls de la Targeta",
+            "bank": "Banc",
+            "select_bank": "Selecciona Banc",
+            "other": "Altres",
+            "confirm_payment": "Confirma el Pagament",
+            "empty_cart": "El carret està buit!",
+            "amount_exceeded": "L'import a pagar ha estat superat!",
+            "order_placed": "Comanda realitzada amb èxit."
+        }
+    }
+}

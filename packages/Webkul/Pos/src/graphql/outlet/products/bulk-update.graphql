@@ -1,0 +1,28 @@
+#outlet/products/bulk-update.graphql
+
+extend type Mutation @guard(with: ["pos_user"]) {
+    bulkUpdateOutletProducts(
+        input: bulkUpdateOutletProductsInput! @spread
+    ): bulkUpdateOutletProductsResult
+        @field(resolver: "Webkul\\Pos\\Mutations\\Outlet\\ProductMutation@bulkUpdateProducts")
+}
+
+input bulkUpdateOutletProductsInput {
+    products: [bulkUpdateProductItem!]!
+}
+
+input bulkUpdateProductItem {
+    id: ID!
+    name: String
+    price: Float
+    quantity: Int
+    weight: Float
+    status: Int
+    posStatus: Int
+}
+
+type bulkUpdateOutletProductsResult {
+    success: Boolean!
+    updated: Int!
+    message: String
+}

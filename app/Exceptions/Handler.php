@@ -1,0 +1,43 @@
+<?php
+namespace App\Exceptions;
+
+use Illuminate\Auth\AuthenticationException;
+use Illuminate\Http\Request;
+use Webkul\RestApi\Exceptions\Handler as RestApiHandler;
+
+/**
+ * Extends Webkul/RestApi's exception handler (which itself extends
+ * Webkul/Core's). Both upstream registers shop/admin redirects on
+ * AuthenticationException; neither knows about /superadmin/*. Without this
+ * override, an unauthenticated request to /superadmin/* gets redirected to
+ * the customer login page.
+ *
+ * Strategy: register our super-admin renderable BEFORE calling parent so
+ * Laravel walks our renderable first (Laravel iterates renderables in
+ * registration order; first non-null match wins).
+ *
+ * For non-super-admin paths we return null and fall through to the upstream
+ * shop/admin logic.
+ */
+class Handler extends RestApiHandler
+{
+    public function register(): void
+    {
+        if (config('app.debug')) {
+            return;
+        }
+
+        // Register our super-admin renderable BEFORE parent so it wins for /superadmin/*.
+        $this->renderable(function (AuthenticationException $exception, Request $request) {
+            if (! str_starts_with(ltrim($request->path(), '/'), 'superadmin')) {
+                return null; // fall through to other renderables
+            }
+            if ($request->wantsJson()) {
+                return response()->json(['error' => 'Unauthenticated.'], 401);
+            }
+            return redirect()->guest(route('superadmin.login'));
+        });
+
+        parent::register();
+    }
+}

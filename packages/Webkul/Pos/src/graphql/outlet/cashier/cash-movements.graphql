@@ -1,0 +1,35 @@
+#outlet\cashier\cash-movements.graphql
+
+extend type Mutation @guard(with: ["pos_user"]) {
+    recordCashMovement(
+        input: CashMovementInput! @spread
+    ): CashMovementResult @field(resolver: "Webkul\\Pos\\Mutations\\Outlet\\CashMovementMutation@recordCashMovement")
+}
+
+input CashMovementInput {
+    type: String!
+    category: String!
+    description: String!
+    amount: Float!
+    movementDate: String @rename(attribute: "movement_date")
+    referenceNumber: String @rename(attribute: "reference_number")
+}
+
+type CashMovementType {
+    id: ID!
+    type: String
+    category: String
+    description: String
+    amount: Float
+    currency: String
+    movementDate: String @rename(attribute: "movement_date")
+    referenceNumber: String @rename(attribute: "reference_number")
+    createdAt: String @rename(attribute: "created_at")
+}
+
+type CashMovementResult {
+    success: Boolean!
+    message: String
+    errors: String
+    movement: CashMovementType
+}

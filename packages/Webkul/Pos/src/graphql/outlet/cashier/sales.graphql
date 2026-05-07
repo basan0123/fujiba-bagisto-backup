@@ -1,0 +1,67 @@
+#outlet\cashier\today-sale.graphql
+
+extend type Query @guard(with: ["pos_user"]) {
+    getTodaySales(
+        first: Int!,
+        page: Int!
+        filters: TodaySalesFilterInput @spread
+    ): TodaySalesResponse @field(resolver: "Webkul\\Pos\\Queries\\Cashier\\CashierQuery@getTodaySales")
+
+    getSaleHistory(
+        first: Int!,
+        page: Int!
+        filters: SaleHistoryFilterInput @spread
+    ): SaleHistoryResponse @field(resolver: "Webkul\\Pos\\Queries\\Cashier\\CashierQuery@getSaleHistory")
+}
+
+input SaleHistoryFilterInput {
+    dateFrom: String @rename(attribute: "date_from")
+    dateTo: String @rename(attribute: "date_to")
+    cashPayment: [NumericFilterInput!] @rename(attribute: "cash_payment")
+    otherPayment: [NumericFilterInput!] @rename(attribute: "other_payment")
+    totalSale: [NumericFilterInput!] @rename(attribute: "total_sale")
+}
+
+input TodaySalesFilterInput {
+    orderId: [NumericFilterInput] @rename(attribute: "order_id")
+    time: [NumericFilterInput]
+    orderTotal: [NumericFilterInput] @rename(attribute: "order_total")
+    paymentMode: [NumericFilterInput] @rename(attribute: "payment_mode")
+}
+
+input NumericFilterInput {
+    operator: String!
+    value: String!
+}
+
+type TodaySalesResponse {
+    paginatorInfo: PaginatorInfo!
+    todaySale: TodaySale @rename(attribute: "today_sale")
+    data: [TodaySalesOrder]!
+}
+
+type TodaySale {
+    openingAmount: String @rename(attribute: "opening_amount")
+    cashPaymentSale: String @rename(attribute: "cash_payment_sale")
+    otherPaymentSale: String @rename(attribute: "other_payment_sale")
+}
+
+type TodaySalesOrder {
+    orderId: Int @rename(attribute: "order_id")
+    orderTotal: String @rename(attribute: "order_total")
+    paymentMode: String @rename(attribute: "payment_mode")
+    createdAt: String @rename(attribute: "created_at")
+}
+
+type SaleHistoryResponse {
+    paginatorInfo: PaginatorInfo!
+    data: [SaleHistory!]
+}
+
+type SaleHistory {
+    date: String
+    cashPayment: String @rename(attribute: "cash_payment")
+    otherPayment: String @rename(attribute: "other_payment")
+    totalSale: String @rename(attribute: "total_sale")
+    drawerNote: String @rename(attribute: "drawer_note")
+}

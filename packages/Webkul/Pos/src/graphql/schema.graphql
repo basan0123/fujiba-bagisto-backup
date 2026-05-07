@@ -1,0 +1,8 @@
+#import outlet/agent/*.graphql
+#import outlet/cashier/*.graphql
+#import outlet/common/*.graphql
+#import outlet/customers/*.graphql
+#import outlet/home/*.graphql
+#import outlet/orders/*.graphql
+#import outlet/products/*.graphql
+#import outlet/reports/*.graphql

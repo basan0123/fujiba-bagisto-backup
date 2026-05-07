@@ -1,0 +1,33 @@
+extend type Query @guard(with: ["pos_user"]) {
+    getSaleReport(
+        startDate: String @rename(attribute: "start_date")
+        endDate: String @rename(attribute: "end_date")
+    ): SalesReportResult @field(resolver: "Webkul\\Pos\\Queries\\Reports\\SalesReportQuery")
+}
+
+type SalesReportResult {
+    reports: SalesReport
+}
+
+type SalesReport {
+    ordersCount: Report @rename(attribute: "orders_count")
+    avgOrderValue: Report @rename(attribute: "avg_order_value")
+    avgItemsPerOrder: Report @rename(attribute: "avg_items_per_order")
+    discountOffers: Report @rename(attribute: "discount_offers")
+    otherPayments: Report @rename(attribute: "other_payments")
+    cashPayments: Report @rename(attribute: "cash_payments")
+}
+
+type Report {
+    name: String
+    total: String
+    progress: String
+    goingUp: Boolean
+    series: [SalesReportSeries]
+    labels: [String]
+}
+
+type SalesReportSeries {
+    name: String
+    data: [Float]
+}

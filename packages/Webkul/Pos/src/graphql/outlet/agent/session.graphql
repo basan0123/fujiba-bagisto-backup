@@ -1,0 +1,111 @@
+#outlet\agent\session Related APIs
+extend type Query {
+    fetchCurrentAgent: Agent @guard(with: ["pos"]) @field(resolver: "Webkul\\Pos\\Mutations\\Outlet\\Agent\\SessionMutation@currentAgent")
+}
+
+extend type Mutation {
+    agentLogin(
+        input: AgentLoginInput! @spread
+    ): AgentLoginResult @field(resolver: "Webkul\\Pos\\Mutations\\Outlet\\Agent\\SessionMutation@login")
+
+    agentLogout: StatusResponse @guard(with: ["pos_user"]) @field(resolver: "Webkul\\Pos\\Mutations\\Outlet\\Agent\\SessionMutation@logout")
+}
+
+input AgentLoginInput {
+    username: String!
+    password: String!
+    remember: Boolean
+}
+
+type AgentLoginResult {
+    success: Boolean
+    errors: String
+    message: String
+    accessToken: String @rename(attribute: "access_token")
+    agent: Agent
+}
+
+type Agent {
+    id: Int!
+    outletId: Int! @rename(attribute: "outlet_id")
+    username: String!
+    firstName: String! @rename(attribute: "firstname")
+    lastName: String! @rename(attribute: "lastname")
+    email: String!
+    image: String
+    imageUrl: String @rename(attribute: "image_url")
+    reportType: String @rename(attribute: "report_type")
+    status: Int!
+    trainingMode: Boolean @rename(attribute: "training_mode")
+    trainingPrintReceipt: Boolean @rename(attribute: "training_print_receipt")
+    createdAt: String @rename(attribute: "created_at")
+    updatedAt: String @rename(attribute: "updated_at")
+    outlet: Outlet @hasOne (relation: "outlet")
+    banks: [Bank] @hasMany (relation: "banks")
+}
+
+type Outlet {
+    id: Int!
+    name: String!
+    email: String
+    phone: String
+    website: String
+    customerCareNumber: String @rename(attribute: "customer_care_number")
+    gstNumber: String @rename(attribute: "gst_number")
+    lowStockQty: Int @rename(attribute: "low_stock_qty")
+    address: String
+    country: String
+    state: String
+    city: String
+    postcode: String
+    status: Int
+    receiptId: String @rename(attribute: "receipt_id")
+    inventorySourceId: Int @rename(attribute: "inventory_source_id")
+    createdAt: String @rename(attribute: "created_at")
+    updatedAt: String @rename(attribute: "updated_at")
+    receipt: Receipt @hasOne (relation: "receipt")
+    inventorySource: InventorySource @belongsTo (relation: "inventory_source")
+    agent: Agent @belongsTo (relation: "pos_user")
+}
+
+type Bank {
+    id: Int!
+    name: String!
+}
+
+type Receipt {
+    id: Int!
+    title: String!
+    status: Int
+    displayOutletName: Int @rename(attribute: "display_outlet_name")
+    showOrderBarcode: Int @rename(attribute: "show_order_barcode")
+    showPrintConfirmation: Int @rename(attribute: "show_print_confirmation")
+    displayDate: Int @rename(attribute: "display_date")
+    displayOrderId: Int @rename(attribute: "display_order_id")
+    orderIdLabel: String @rename(attribute: "order_id_label")
+    displayCustomerName: Int @rename(attribute: "display_customer_name")
+    displaySubTotal: Int @rename(attribute: "display_sub_total")
+    subTotalLabel: String @rename(attribute: "sub_total_label")
+    displayDiscount: Int @rename(attribute: "display_discount")
+    discountLabel: String @rename(attribute: "discount_label")
+    displayTax: Int @rename(attribute: "display_tax")
+    taxLabel: String @rename(attribute: "tax_label")
+    displayCreditAmount: Int @rename(attribute: "display_credit_amount")
+    creditAmountLabel: String @rename(attribute: "credit_amount_label")
+    displayChangeAmount: Int @rename(attribute: "display_change_amount")
+    creditChangeLabel: String @rename(attribute: "credit_change_label")
+    displayCashierName: Int @rename(attribute: "display_cashier_name")
+    cashierLabel: String @rename(attribute: "cashier_label")
+    displayOutletAddress: Int @rename(attribute: "display_outlet_address")
+    grandTotalLabel: String @rename(attribute: "grand_total_label")
+    displayLogo: Int @rename(attribute: "display_logo")
+    logo: String
+    logoUrl: String @rename(attribute: "logo_url")
+    logoWidth: String @rename(attribute: "logo_width")
+    logoHeight: String @rename(attribute: "logo_height")
+    logoAlt: String @rename(attribute: "logo_alt")
+    headerContent: String @rename(attribute: "header_content")
+    footerContent: String @rename(attribute: "footer_content")
+    createdAt: String @rename(attribute: "created_at")
+    updatedAt: String @rename(attribute: "updated_at")
+}

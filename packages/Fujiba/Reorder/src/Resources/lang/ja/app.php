@@ -1,0 +1,57 @@
+<?php
+
+return [
+    'menu' => [
+        'inventory' => '在庫管理',
+        'reorder'   => '発注サポート',
+    ],
+    'acl' => [
+        'inventory' => '在庫管理',
+        'reorder'   => '発注サポート',
+    ],
+    'page' => [
+        'title'     => '発注サポート',
+        'channel'   => 'チャネル',
+        'lead-time' => 'リードタイム',
+        'window'    => '売上集計期間',
+    ],
+    'ui' => [
+        'search-ph'       => '商品名・SKUで検索',
+        'sort-buyat-asc'  => '最終仕入れ ↑',
+        'sort-buyat-desc' => '最終仕入れ ↓',
+        'image'           => '画像',
+        'name'            => '商品名',
+        'stock'           => '在庫',
+        'buy-at'          => '最終仕入れ',
+        'cost'            => '原価',
+        'sale'            => '販売数',
+        'waste'           => '廃棄',
+        'suggested'       => '推奨発注数',
+        'wish-qty'        => '希望発注数',
+        'subtotal'        => '小計',
+        'total'           => '合計',
+        'clipboard'       => '発注リスト',
+        'clip-empty'      => '商品が選択されていません',
+        'empty'           => '商品がありません',
+        'cancel'          => 'キャンセル',
+        'add'             => '追加',
+        'save'            => '保存',
+        'print'           => 'ラベル印刷',
+        'saved'           => '保存済み',
+    ],
+    'labels' => [
+        'title'           => '発注ラベル',
+        'print'           => '印刷',
+        'missing-barcode' => 'バーコード未設定の商品ID',
+    ],
+    'config' => [
+        'title'                 => '発注サポート',
+        'info'                  => '発注推奨量の計算に使用する設定。',
+        'lead-time-days'        => 'リードタイム（日）',
+        'lead-time-days-info'   => '発注から入荷までの平均日数。',
+        'sales-window-days'     => '売上集計期間（日）',
+        'sales-window-days-info'=> '平均日販を計算する期間（日数）。',
+        'safety-stock'          => '安全在庫',
+        'safety-stock-info'     => '推奨発注数に加算する余裕在庫。',
+    ],
+];

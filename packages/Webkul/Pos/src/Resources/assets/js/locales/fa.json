@@ -1,0 +1,617 @@
+{
+    "pos": {
+        "title": "پوز Bagisto",
+        "page_not_found": {
+            "title": "چیزی کم است.",
+            "message": "متاسفیم، نمی‌توانیم آن صفحه را پیدا کنیم. می‌توانید چیزهای زیادی را در صفحه اصلی کشف کنید.",
+            "back_btn_title": "بازگشت به صفحه اصلی"
+        },
+        "login_form": {
+            "title": "ورود",
+            "user_name": "نام کاربری",
+            "user_name_placeholder": "نام کاربری را وارد کنید",
+            "password": "رمز عبور",
+            "password_placeholder": "رمز عبور را وارد کنید",
+            "remember_password": "مرا به خاطر بسپار",
+            "login_btn_title": "ورود"
+        },
+        "footer": {
+            "warning": "وبکول اجازه نمی‌دهد هیچ فروشنده‌ی شخص ثالثی را برای بازفروشی ماژول‌های وبکول مجاز کند.",
+            "copyright": "© کپی رایت 2010-2023، نرم‌افزار وبکول (ثبت شده در هند/آمریکا). همه حقوق محفوظ است."
+        },
+        "layout": {
+            "header": {
+                "title": "پوز Bagisto",
+                "search_products": "جستجوی محصولات...",
+                "hold_orders": "سفارشات نگهداری شده",
+                "barcode_form": {
+                    "title": "وارد کردن بارکد",
+                    "barcode_placeholder": "بارکد محصول را وارد کنید",
+                    "cancel_btn_title": "لغو",
+                    "proceed_btn_title": "ادامه"
+                },
+                "product_create_form": {
+                    "title": "اضافه کردن محصول جدید",
+                    "name": "نام",
+                    "sku": "شناسه محصول",
+                    "price": "قیمت",
+                    "weight": "وزن",
+                    "quantity": "تعداد",
+                    "cancel_btn_title": "لغو",
+                    "proceed_btn_title": "ادامه"
+                }
+            },
+            "sidebar": {
+                "home": "خانه",
+                "customers": "مشتریان",
+                "cashier": "صندوقدار",
+                "orders": "سفارشات",
+                "products": "محصولات",
+                "reports": "گزارش‌ها",
+                "settings": "تنظیمات",
+                "logout": "خروج"
+            },
+            "main": {
+                "cash_drawer": {
+                    "title": "کشوی پول",
+                    "opening_drawer_amount": "مقدار باز کردن کشو",
+                    "remarks": "یادداشت‌ها",
+                    "remarks_placeholder": "یادداشت‌های بستن کانتر را وارد کنید.",
+                    "open_drawer": "باز کردن کشو"
+                }
+            }
+        },
+        "common": {
+            "cart": {
+                "add": "افزودن",
+                "add_customer": "افزودن مشتری",
+                "booking_from": "رزرو از",
+                "booking_till": "رزرو تا",
+                "closed": "بسته",
+                "create_success": "سبد خرید با موفقیت ایجاد شد.",
+                "discount": "تخفیف",
+                "discount_applied": "تخفیف {percentage}% اعمال شد",
+                "downloads": "دانلودها",
+                "event_expired": "این رویداد منقضی شده است.",
+                "event_from": "رویداد از",
+                "event_ticket": "بلیط رویداد",
+                "event_till": "رویداد تا",
+                "hold_order": "نگه داشتن سفارش",
+                "hold_order_success": "سفارش با موفقیت نگه داشته شد.",
+                "inventory_warning": "مقدار درخواستی موجود نیست.",
+                "missing_links": "لینک‌های قابل دانلود برای این محصول وجود ندارد.",
+                "missing_options": "گزینه‌های این محصول ناقص است.",
+                "no_customer_selected": "هیچ مشتری‌ای انتخاب نشده است.",
+                "note": "یادداشت",
+                "payable_amount": "مبلغ قابل پرداخت",
+                "proceed": "ادامه",
+                "product_add_success": "محصول با موفقیت به سبد خرید اضافه شد!",
+                "product_remove_success": "محصول با موفقیت از سبد خرید حذف شد!",
+                "qty_missing": "حداقل یکی از محصولات باید تعداد بیش از ۱ داشته باشد.",
+                "invalid_file_extension": "پسوند فایل نامعتبر است.",
+                "quantity": "تعداد",
+                "remove_cart": "حذف سبد خرید",
+                "remove_success": "سبد خرید با موفقیت حذف شد.",
+                "rent_from": "اجاره از",
+                "rent_till": "اجاره تا",
+                "rent_type": "نوع اجاره",
+                "select_hourly_duration": "مدت زمان یک ساعته را انتخاب کنید.",
+                "selected_products_simple": "محصولات انتخاب‌شده باید از نوع ساده باشند.",
+                "special_note": "درخواست ویژه / یادداشت‌ها",
+                "subtotal": "جمع جزئی",
+                "tax": "مالیات",
+                "update_success": "سبد خرید با موفقیت به‌روزرسانی شد.",
+                "order_note_form": {
+                    "title": "یادداشت سفارش",
+                    "note_placeholder": "یادداشت سفارش را وارد کنید",
+                    "cancel_btn_title": "لغو",
+                    "proceed_btn_title": "ادامه",
+                    "create_success": "یادداشت سفارش با موفقیت اضافه شد.",
+                    "remove_success": "یادداشت سفارش با موفقیت حذف شد."
+                }
+            },
+            "flash_messages": {
+                "close": "بستن",
+                "error_message": "مشکلی پیش آمد! لطفاً دوباره تلاش کنید.",
+                "offline_error": "هشدار، شما در حالت آفلاین هستید",
+                "offline_mode": "هشدار: شما آفلاین هستید. امکانات محدود در دسترس است",
+                "online_mode": "اتصال برقرار شد. شما دوباره آنلاین هستید"
+            },
+            "offline_loader": {
+                "title": "هشدار، شما در حالت آفلاین هستید",
+                "description": "جزئیات پس از بازیابی اتصال قابل دسترسی خواهند بود.",
+                "reconnecting": "در حال اتصال مجدد..."
+            },
+            "confirm_modal": {
+                "title": "آیا مطمئن هستید؟",
+                "description": "آیا مطمئن هستید که می‌خواهید این اقدام را انجام دهید؟",
+                "disagree_btn_title": "مخالفت",
+                "agree_btn_title": "موافقت"
+            },
+            "pagination": {
+                "showing": "نمایش {count} از {total} نتیجه",
+                "page": "صفحه {current} از {total}"
+            }
+        },
+        "home": {
+            "title": "خانه",
+            "print_confirmation_title": "تأیید چاپ؟",
+            "print_confirm_message": "آیا می‌خواهید رسید آخرین سفارش را چاپ کنید؟",
+            "items_in_cart": "{count} مورد در سبد خرید.",
+            "view_cart_btn": "مشاهده سبد خرید",
+            "categories": {
+                "all": "همه"
+            },
+            "products": {
+                "view": {
+                    "qty": "{qty} تعداد",
+                    "add_to_cart": "افزودن به سبد خرید",
+                    "total_amount": "مبلغ کل",
+                    "type": {
+                        "simple": {
+                            "customizable_options": {
+                                "none": "هیچ",
+                                "total_amount": "مبلغ کل"
+                            }
+                        },
+                        "booking": {
+                            "location": "مکان",
+                            "view_on_map": "مشاهده روی نقشه",
+                            "default": {
+                                "slot_duration_in_minutes": "{minutes} دقیقه",
+                                "slot_duration": "مدت زمان اسلات"
+                            },
+                            "appointment": {
+                                "closed": "بسته",
+                                "see_details": "مشاهده جزئیات",
+                                "slot_duration": "مدت زمان اسلات",
+                                "slot_duration_in_minutes": "{minutes} دقیقه",
+                                "today_availability": "دسترسی امروز"
+                            },
+                            "event": {
+                                "book_your_ticket": "رزرو بلیط شما",
+                                "per_ticket_price_fa": "{price} برای هر بلیت",
+                                "title": "رویداد در :"
+                            },
+                            "rental": {
+                                "choose_rent_option": "انتخاب گزینه اجاره",
+                                "daily_basis": "بر اساس روزانه",
+                                "from": "از",
+                                "hourly_basis": "بر اساس ساعتی",
+                                "rent_an_item": "اجاره یک آیتم",
+                                "select_date": "انتخاب تاریخ",
+                                "select_rent_time": "انتخاب زمان اجاره",
+                                "select_slot": "انتخاب اسلات",
+                                "select_time_slot": "انتخاب زمان اسلات",
+                                "slot": "اسلات",
+                                "no_slots_available": "هیچ اسلاتی موجود نیست",
+                                "to": "تا"
+                            },
+                            "table": {
+                                "book_a_table": "رزرو یک میز",
+                                "closed": "بسته",
+                                "slot_duration": "مدت زمان اسلات",
+                                "slot_duration_in_minutes": "{minutes} دقیقه",
+                                "slots_for_all_days": "نمایش برای همه روزها",
+                                "special_notes": "درخواست/یادداشت‌های ویژه",
+                                "today_availability": "دسترسی امروز"
+                            },
+                            "slots": {
+                                "book_an_appointment": "رزرو یک وقت ملاقات",
+                                "date": "تاریخ",
+                                "no_slots_available": "هیچ اسلاتی موجود نیست",
+                                "select_slot": "انتخاب اسلات",
+                                "title": "اسلات"
+                            }
+                        },
+                        "bundle": {
+                            "total_amount": "مبلغ کل",
+                            "none": "هیچ گزینه بسته‌ای موجود نیست"
+                        },
+                        "configurable": {
+                            "select_option": "انتخاب گزینه‌ها",
+                            "select_above_option": "لطفاً ابتدا گزینه‌های بالا را انتخاب کنید.",
+                            "price": "قیمت واریانت انتخاب شده"
+                        },
+                        "downloadable": {
+                            "samples": "نمونه‌ها",
+                            "links": "لینک‌ها"
+                        },
+                        "grouped": {
+                            "name": "نام"
+                        }
+                    }
+                },
+                "no_barcode_product": "هیچ محصولی با این بارکد یافت نشد."
+            }
+        },
+        "customers": {
+            "add_btn": "افزودن مشتری جدید",
+            "change_btn": "تغییر مشتری",
+            "change_success": "مشتری با موفقیت تغییر یافت.",
+            "delete_success": "مشتری با موفقیت حذف شد.",
+            "customers": "مشتریان",
+            "delete_btn": "حذف",
+            "edit_btn": "ویرایش",
+            "no_current_customer": "هیچ مشتری‌ای یافت نشد.",
+            "no_customers_found": "هیچ مشتری‌ای یافت نشد.",
+            "offline_customers": "مشتریان آفلاین",
+            "search_customers": "جستجوی مشتری...",
+            "select_btn": "انتخاب مشتری",
+            "title": "مشتریان",
+            "create": {
+                "title": "افزودن مشتری جدید",
+                "back_btn_title": "بازگشت",
+                "first_name": "نام",
+                "last_name": "نام خانوادگی",
+                "email": "ایمیل",
+                "phone_number": "شماره تلفن",
+                "address": "آدرس",
+                "city": "شهر",
+                "state": "استان",
+                "select_state": "انتخاب استان",
+                "country": "کشور",
+                "select_country": "انتخاب کشور",
+                "pin_code": "کد پستی",
+                "save_btn_title": "افزودن مشتری",
+                "phone_already_exist": "این شماره تلفن قبلاً ثبت شده است.",
+                "email_already_exist": "این ایمیل قبلاً ثبت شده است.",
+                "create_success": "مشتری با موفقیت ایجاد شد."
+            },
+            "edit": {
+                "title": "ویرایش مشتری",
+                "back_btn_title": "بازگشت",
+                "first_name": "نام",
+                "last_name": "نام خانوادگی",
+                "email": "ایمیل",
+                "phone_number": "شماره تلفن",
+                "address": "آدرس",
+                "city": "شهر",
+                "state": "استان",
+                "select_state": "انتخاب استان",
+                "country": "کشور",
+                "select_country": "انتخاب کشور",
+                "pin_code": "کد پستی",
+                "save_btn_title": "به‌روزرسانی مشتری",
+                "phone_already_exist": "این شماره تلفن قبلاً ثبت شده است.",
+                "email_already_exist": "این ایمیل قبلاً ثبت شده است.",
+                "update_success": "مشتری با موفقیت به‌روزرسانی شد."
+            }
+        },
+        "cashier": {
+            "title": "صندوق‌دار",
+            "cash_drawer": {
+                "title": "کشوی نقدی",
+                "drawer_amount_summary": "خلاصه مبلغ کشو",
+                "opening_drawer_amount": "مبلغ افتتاحیه کشو",
+                "cash_payment_sale": "فروش پرداخت نقدی",
+                "other_payment_sale": "فروش پرداخت دیگر",
+                "expected_drawer_amount": "مبلغ انتظاری کشو",
+                "difference": "تفاوت",
+                "remarks": "توضیحات",
+                "remarks_placeholder": "توضیحات بستن میز کانتر را وارد کنید.",
+                "close_drawer": "بستن کشو"
+            },
+            "today_sale": {
+                "title": "فروش امروز",
+                "opening_drawer_amount": "مبلغ افتتاحیه کشو",
+                "cash_payment_sale": "فروش پرداخت نقدی",
+                "other_payment_sale": "فروش پرداخت دیگر",
+                "sale_history": "تاریخچه فروش",
+                "filters": "فیلترها",
+                "order_id": "شماره سفارش",
+                "time": "زمان",
+                "order_total": "مجموع سفارش",
+                "payment_mode": "نحوه پرداخت",
+                "no_records": "سجلی پیدا نشد.",
+                "no_records_desc": "سابقه فروش پس از انجام تراکنش‌ها در اینجا نمایش داده خواهد شد.",
+                "drawer": {
+                    "title": "فیلتر",
+                    "order_id": "شناسه سفارش",
+                    "time": "زمان",
+                    "order_total": "مجموع سفارش",
+                    "payment_mode": "روش پرداخت",
+                    "select_payment_mode": "انتخاب روش پرداخت",
+                    "pos_cash": "پرداخت نقدی",
+                    "pos_card": "پرداخت با کارت",
+                    "pos_split": "پرداخت تقسیم شده",
+                    "filter_btn_title": "اعمال فیلتر"
+                }
+            },
+            "sale_history": {
+                "title": "تاریخچه فروش",
+                "filters": "فیلترها",
+                "date": "تاریخ",
+                "cash_payments": "پرداخت‌های نقدی",
+                "other_payments": "پرداخت‌های دیگر",
+                "total_sale": "مجموع فروش",
+                "drawer_note": "یادداشت کشو",
+                "no_records": "سجلی پیدا نشد.",
+                "no_records_desc": "سابقه فروش پس از انجام تراکنش‌ها در اینجا نمایش داده خواهد شد.",
+                "drawer": {
+                    "title": "فیلتر",
+                    "date": "تاریخ",
+                    "cash_payment": "پرداخت نقدی",
+                    "other_payment": "پرداخت دیگر",
+                    "total_sale": "کل فروش",
+                    "filter_btn_title": "اعمال فیلتر"
+                }
+            }
+        },
+        "orders": {
+            "title": "سفارشات",
+            "history": {
+                "title": "تاریخچه",
+                "search_orders": "جستجوی شماره سفارش یا نام مشتری...",
+                "filters": "فیلترها",
+                "order_id": "شماره سفارش",
+                "date": "تاریخ",
+                "total_sales": "مجموع فروش",
+                "subtotal": "جمع جزئی",
+                "tax": "مالیات",
+                "no_records": "سجلی پیدا نشد.",
+                "no_records_desc": "سابقه فروش پس از انجام تراکنش‌ها در اینجا نمایش داده خواهد شد.",
+                "return_btn": "بازگشت",
+                "order_status": {
+                    "title": "وضعیت",
+                    "completed": "تکمیل شده",
+                    "returned": "برگشت داده شده"
+                }
+            },
+            "hold": {
+                "title": "سفارشات در انتظار",
+                "note": "یادداشت",
+                "resume": "ادامه",
+                "remove": "حذف",
+                "remove_success": "سفارش با موفقیت حذف شد.",
+                "resume_success": "سفارش با موفقیت از سر گرفته شد.",
+                "resume_error": "لطفاً ابتدا سبد خرید فعلی را پردازش کنید.",
+                "no_orders": "هیچ سفارشی یافت نشد."
+            },
+            "offline": {
+                "title": "سفارشات آفلاین",
+                "sync_order": "همگام‌سازی سفارش",
+                "sync_all_orders": "همگام‌سازی تمام سفارش‌ها",
+                "search_order_id": "جستجوی شماره سفارش...",
+                "order_id": "شماره سفارش",
+                "date": "تاریخ",
+                "no_orders": "هیچ سفارشی آفلاین یافت نشد.",
+                "sync_success": "سفارش با موفقیت همگام‌سازی شد.",
+                "return": "بازگشت",
+                "returned": "بازگردانده شد",
+                "return_success": "سفارش با موفقیت بازگردانده شد."
+            },
+            "info": {
+                "order_id": "شماره سفارش",
+                "subtotal": "جمع جزئی",
+                "tax": "مالیات",
+                "discount": "تخفیف",
+                "grand_total": "مجموع کل",
+                "cash": "نقدی",
+                "balance": "مانده",
+                "no_order_selected": "هیچ سفارشی برای پیش‌نمایش یا چاپ فاکتور انتخاب نشده است."
+            },
+            "print": {
+                "btn_title": "چاپ فاکتور",
+                "cashier": "صندوقدار",
+                "change": "باقی‌مانده",
+                "contact_info": "اطلاعات تماس",
+                "customer": "مشتری",
+                "customer_care": "خدمات مشتری",
+                "date": "تاریخ",
+                "discount": "تخفیف",
+                "email": "ایمیل",
+                "grand_total": "جمع کل",
+                "item": "محصول",
+                "name": "نام",
+                "no_receipt": "رسیدی برای این فروشگاه موجود نیست.",
+                "order_id": "شناسه سفارش",
+                "phone": "تلفن",
+                "price": "قیمت",
+                "qty": "تعداد",
+                "subtotal": "جمع فرعی",
+                "tax": "مالیات",
+                "total": "جمع",
+                "total_qty": "مجموع تعداد",
+                "website": "وب‌سایت"
+            }
+        },
+        "products": {
+            "title": "محصولات",
+            "low_stock_products": {
+                "title": "محصولات با موجودی کم",
+                "qty": "{qty} تعداد",
+                "purchase_request": "درخواست خرید",
+                "send_request_btn": "ارسال درخواست",
+                "no_purchase_request": "درخواستی برای خرید پیدا نشد.",
+                "no_products": "محصولات با موجودی کم پیدا نشد.",
+                "items_in_request": "{count} مورد در درخواست خرید.",
+                "view_btn_title": "مشاهده",
+                "request": {
+                    "title": "ارسال درخواست مقدار",
+                    "requested_quantity": "مقدار درخواست شده",
+                    "comment": "نظر",
+                    "comment_placeholder": "نظر خود را وارد کنید",
+                    "add_btn_title": "افزودن محصول",
+                    "cancel_btn_title": "لغو",
+                    "already_exist": "محصول قبلاً در لیست درخواست‌ها وجود دارد."
+                }
+            },
+            "requested_products": {
+                "title": "محصولات درخواست شده",
+                "search_products": "جستجوی محصولات...",
+                "qty": "تعداد:- {qty}",
+                "pending": "در انتظار",
+                "received": "دریافت شده",
+                "declined": "رد شده",
+                "no_products": "درخواستی برای محصول پیدا نشد."
+            },
+            "settings": {
+                "title": "تنظیمات",
+                "minimum_qty": "حداقل تعداد",
+                "save_btn_title": "ذخیره",
+                "save_success": "تنظیمات با موفقیت ذخیره شد."
+            }
+        },
+        "reports": {
+            "title": "گزارش‌ها",
+            "day": "روز",
+            "week": "هفته",
+            "month": "ماه"
+        },
+        "settings": {
+            "title": "تنظیمات",
+            "profile": {
+                "title": "پروفایل",
+                "first_name": "نام",
+                "last_name": "نام خانوادگی",
+                "email": "ایمیل",
+                "old_password": "رمز عبور قدیمی",
+                "new_password": "رمز عبور جدید",
+                "confirm_password": "تأیید رمز عبور",
+                "update_btn_title": "به‌روزرسانی پروفایل"
+            },
+            "sync": {
+                "completed": "تکمیل شد",
+                "customers": "مشتریان",
+                "deselect_all": "لغو انتخاب همه",
+                "entities": "موجودیت‌ها",
+                "entities_desc": "موجودیت‌هایی را که می‌خواهید با سرور همگام‌سازی کنید انتخاب کنید.",
+                "fetching": "در حال دریافت...",
+                "orders": "سفارشات",
+                "products": "محصولات",
+                "ready": "آماده",
+                "records": "رکوردها",
+                "select_all": "انتخاب همه",
+                "start_syncing": "شروع همگام‌سازی",
+                "sync_btn_title": "همگام‌سازی کن",
+                "title": "همگام‌سازی"
+            },
+            "shortcuts": {
+                "title": "میانبرها",
+                "description": "ترکیب‌های صفحه‌کلید که به شما امکان انجام سریع اقدامات را می‌دهد.",
+                "sections": {
+                    "header": "سربرگ",
+                    "menu": "منو",
+                    "customer": "مشتری",
+                    "cart": "سبد خرید"
+                },
+                "items": {
+                    "open_barcode": {
+                        "action": "باز کردن حالت بارکد",
+                        "description": "تغییر به اسکن بارکد"
+                    },
+                    "open_product_modal": {
+                        "action": "باز کردن فرم افزودن محصول",
+                        "description": "افزودن سریع محصول جدید"
+                    },
+                    "fullscreen": {
+                        "action": "تغییر حالت تمام‌صفحه",
+                        "description": "ورود/خروج به حالت تمام‌صفحه"
+                    },
+                    "dark_mode": {
+                        "action": "تغییر حالت تیره",
+                        "description": "تغییر تم"
+                    },
+                    "hold_orders": {
+                        "action": "سفارشات نگهداری شده",
+                        "description": "مدیریت سفارش‌های معلق"
+                    },
+                    "home": {
+                        "action": "رفتن به خانه",
+                        "description": "رفتن به صفحه اصلی"
+                    },
+                    "customers": {
+                        "action": "رفتن به مشتریان",
+                        "description": "باز کردن بخش مشتریان"
+                    },
+                    "cashier": {
+                        "action": "رفتن به صندوق‌دار",
+                        "description": "دسترسی به صندوق فروش"
+                    },
+                    "orders": {
+                        "action": "رفتن به سفارشات",
+                        "description": "مشاهده تاریخچه سفارشات"
+                    },
+                    "products": {
+                        "action": "رفتن به محصولات",
+                        "description": "مدیریت محصولات"
+                    },
+                    "reports": {
+                        "action": "رفتن به گزارش‌ها",
+                        "description": "مشاهده تحلیل‌ها"
+                    },
+                    "settings": {
+                        "action": "رفتن به تنظیمات",
+                        "description": "تنظیم ترجیحات"
+                    },
+                    "create_customer": {
+                        "action": "ایجاد مشتری جدید",
+                        "description": "افزودن مشتری"
+                    },
+                    "edit_customer": {
+                        "action": "ویرایش مشتری فعلی",
+                        "description": "به‌روزرسانی اطلاعات مشتری انتخاب‌شده"
+                    },
+                    "delete_customer": {
+                        "action": "حذف مشتری فعلی",
+                        "description": "حذف مشتری انتخاب‌شده"
+                    },
+                    "change_customer": {
+                        "action": "تغییر مشتری فعلی",
+                        "description": "انتخاب مشتری دیگر"
+                    },
+                    "add_note": {
+                        "action": "افزودن یادداشت",
+                        "description": "افزودن یادداشت به سفارش"
+                    },
+                    "remove_note": {
+                        "action": "حذف یادداشت",
+                        "description": "حذف یادداشت از سبد خرید"
+                    },
+                    "checkout": {
+                        "action": "ادامه به پرداخت",
+                        "description": "شروع فرآیند پرداخت"
+                    },
+                    "hold_order": {
+                        "action": "نگهداری سفارش",
+                        "description": "قرار دادن سفارش در حالت انتظار"
+                    }
+                }
+            },
+            "regional": {
+                "title": "منطقه‌ای",
+                "locale": "محلی‌سازی",
+                "select_locale": "انتخاب محل",
+                "currency": "ارز",
+                "select_currency": "انتخاب ارز",
+                "save_btn_title": "ذخیره"
+            },
+            "save_success": "تنظیمات با موفقیت ذخیره شد."
+        },
+        "payment": {
+            "title": "پرداخت",
+            "back": "بازگشت",
+            "order_details": "جزئیات سفارش",
+            "subtotal": "جمع جزئی",
+            "tax": "مالیات",
+            "discount": "تخفیف",
+            "grand_total": "مجموع کل",
+            "payable_amount": "مبلغ قابل پرداخت",
+            "received": "دریافتی",
+            "remaining": "مانده",
+            "pos_cash": "نقدی",
+            "pos_card": "کارت",
+            "pos_split": "تقسیم",
+            "cancel": "لغو",
+            "card_details": "جزئیات کارت",
+            "bank": "بانک",
+            "select_bank": "انتخاب بانک",
+            "other": "سایر",
+            "confirm_payment": "تأیید پرداخت",
+            "empty_cart": "سبد خرید خالی است!",
+            "amount_exceeded": "مبلغ پرداختی بیش از حد است!",
+            "order_placed": "سفارش با موفقیت ثبت شد."
+        }
+    }
+}

@@ -1,0 +1,617 @@
+{
+    "pos": {
+        "title": "बैगिस्तो पीओएस",
+        "page_not_found": {
+            "title": "कुछ गायब है।",
+            "message": "क्षमा करें, हम उस पृष्ठ को ढूँढ नहीं पा रहे हैं। आपको होम पेज पर बहुत कुछ एक्सप्लोर करने को मिलेगा।",
+            "back_btn_title": "होमपेज पर वापस जाएं"
+        },
+        "login_form": {
+            "title": "लॉगिन",
+            "user_name": "उपयोगकर्ता नाम",
+            "user_name_placeholder": "उपयोगकर्ता नाम दर्ज करें",
+            "password": "पासवर्ड",
+            "password_placeholder": "पासवर्ड दर्ज करें",
+            "remember_password": "पासवर्ड याद रखें",
+            "login_btn_title": "लॉगिन"
+        },
+        "footer": {
+            "warning": "वेबकुल किसी तृतीय पक्ष विक्रेताओं को वेबकुल मॉड्यूलों को पुनः विक्रय करने की अधिकारी नहीं बनाता है।",
+            "copyright": "© कॉपीराइट 2010-2023, वेबकुल सॉफ्टवेयर (भारत / अमेरिका में पंजीकृत)। सर्वाधिकार सुरक्षित।"
+        },
+        "layout": {
+            "header": {
+                "title": "बैगिस्तो पीओएस",
+                "search_products": "उत्पाद खोजें...",
+                "hold_orders": "आदेश रोकें",
+                "barcode_form": {
+                    "title": "बारकोड दर्ज करें",
+                    "barcode_placeholder": "उत्पाद का बारकोड दर्ज करें",
+                    "cancel_btn_title": "रद्द करें",
+                    "proceed_btn_title": "आगे बढ़ें"
+                },
+                "product_create_form": {
+                    "title": "नया उत्पाद जोड़ें",
+                    "name": "नाम",
+                    "sku": "SKU",
+                    "price": "कीमत",
+                    "weight": "वजन",
+                    "quantity": "मात्रा",
+                    "cancel_btn_title": "रद्द करें",
+                    "proceed_btn_title": "आगे बढ़ें"
+                }
+            },
+            "sidebar": {
+                "home": "होम",
+                "customers": "ग्राहक",
+                "cashier": "कैशियर",
+                "orders": "आदेश",
+                "products": "उत्पाद",
+                "reports": "रिपोर्ट",
+                "settings": "सेटिंग्स",
+                "logout": "लॉगआउट"
+            },
+            "main": {
+                "cash_drawer": {
+                    "title": "कैश ड्रावर",
+                    "opening_drawer_amount": "ड्रावर खोलने की राशि",
+                    "remarks": "टिप्पणियाँ",
+                    "remarks_placeholder": "काउंटर बंद करने की टिप्पणियाँ दर्ज करें।",
+                    "open_drawer": "ड्रावर खोलें"
+                }
+            }
+        },
+        "common": {
+            "cart": {
+                "add": "जोड़ें",
+                "add_customer": "ग्राहक जोड़ें",
+                "booking_from": "बुकिंग से",
+                "booking_till": "बुकिंग तक",
+                "closed": "बंद",
+                "create_success": "कार्ट सफलतापूर्वक बनाया गया।",
+                "discount": "छूट",
+                "discount_applied": "{percentage}% की छूट लागू की गई",
+                "downloads": "डाउनलोड",
+                "event_expired": "यह इवेंट समाप्त हो गया है।",
+                "event_from": "इवेंट से",
+                "event_ticket": "इवेंट टिकट",
+                "event_till": "इवेंट तक",
+                "hold_order": "ऑर्डर होल्ड करें",
+                "hold_order_success": "ऑर्डर सफलतापूर्वक होल्ड किया गया।",
+                "inventory_warning": "अनुरोधित मात्रा उपलब्ध नहीं है।",
+                "missing_links": "इस उत्पाद के लिए डाउनलोड लिंक अनुपलब्ध हैं।",
+                "missing_options": "इस उत्पाद के विकल्प अनुपलब्ध हैं।",
+                "no_customer_selected": "कोई ग्राहक चयनित नहीं है।",
+                "note": "नोट",
+                "payable_amount": "देय राशि",
+                "proceed": "आगे बढ़ें",
+                "product_add_success": "उत्पाद सफलतापूर्वक कार्ट में जोड़ा गया!",
+                "product_remove_success": "उत्पाद सफलतापूर्वक कार्ट से हटाया गया!",
+                "qty_missing": "कम से कम एक उत्पाद की मात्रा 1 से अधिक होनी चाहिए।",
+                "invalid_file_extension": "अमान्य फ़ाइल एक्सटेंशन पाया गया।",
+                "quantity": "मात्रा",
+                "remove_cart": "कार्ट हटाएँ",
+                "remove_success": "कार्ट सफलतापूर्वक हटाया गया।",
+                "rent_from": "किराया शुरू",
+                "rent_till": "किराया समाप्त",
+                "rent_type": "किराये का प्रकार",
+                "select_hourly_duration": "एक घंटे की अवधि चुनें।",
+                "selected_products_simple": "चयनित उत्पाद साधारण प्रकार के होने चाहिए।",
+                "special_note": "विशेष अनुरोध / नोट्स",
+                "subtotal": "उप-योग",
+                "tax": "कर",
+                "update_success": "कार्ट सफलतापूर्वक अपडेट किया गया।",
+                "order_note_form": {
+                    "title": "आदेश नोट",
+                    "note_placeholder": "आदेश नोट दर्ज करें",
+                    "cancel_btn_title": "रद्द करें",
+                    "proceed_btn_title": "आगे बढ़ें",
+                    "create_success": "आदेश नोट सफलतापूर्वक जोड़ा गया।",
+                    "remove_success": "आदेश नोट सफलतापूर्वक हटा दिया गया।"
+                }
+            },
+            "flash_messages": {
+                "close": "बंद करें",
+                "error_message": "कुछ गलत हो गया! कृपया पुनः प्रयास करें।",
+                "offline_error": "चेतावनी, आप ऑफ़लाइन मोड में हैं",
+                "offline_mode": "चेतावनी: आप ऑफ़लाइन हैं। सीमित कार्यक्षमता उपलब्ध",
+                "online_mode": "कनेक्शन बहाल हो गया है। आप फिर से ऑनलाइन हैं"
+            },
+            "offline_loader": {
+                "title": "चेतावनी, आप ऑफ़लाइन मोड में हैं",
+                "description": "आपका कनेक्शन बहाल होने पर विवरण उपलब्ध होंगे।",
+                "reconnecting": "पुनः कनेक्ट किया जा रहा है..."
+            },
+            "confirm_modal": {
+                "title": "क्या आपको यकीन है?",
+                "description": "क्या आप इस कार्रवाई को करना चाहते हैं?",
+                "disagree_btn_title": "असहमत",
+                "agree_btn_title": "सहमत"
+            },
+            "pagination": {
+                "showing": "{total} में से {count} परिणाम दिखा रहे हैं",
+                "page": "पृष्ठ {current} का {total}"
+            }
+        },
+        "home": {
+            "title": "होम",
+            "print_confirmation_title": "प्रिंट की पुष्टि?",
+            "print_confirm_message": "क्या आप अंतिम ऑर्डर की रसीद प्रिंट करना चाहते हैं?",
+            "items_in_cart": "कार्ट में {count} आइटम्स हैं।",
+            "view_cart_btn": "कार्ट देखें",
+            "categories": {
+                "all": "सभी"
+            },
+            "products": {
+                "view": {
+                    "qty": "{qty} मात्रा",
+                    "add_to_cart": "कार्ट में जोड़ें",
+                    "total_amount": "कुल राशि",
+                    "type": {
+                        "simple": {
+                            "customizable_options": {
+                                "none": "कोई नहीं",
+                                "total_amount": "कुल राशि"
+                            }
+                        },
+                        "booking": {
+                            "location": "स्थान",
+                            "view_on_map": "मानचित्र पर देखें",
+                            "default": {
+                                "slot_duration_in_minutes": "{minutes} मिनट",
+                                "slot_duration": "स्लॉट अवधि"
+                            },
+                            "appointment": {
+                                "closed": "बंद",
+                                "see_details": "विवरण देखें",
+                                "slot_duration": "स्लॉट अवधि",
+                                "slot_duration_in_minutes": "{minutes} मिनट",
+                                "today_availability": "आज की उपलब्धता"
+                            },
+                            "event": {
+                                "book_your_ticket": "अपना टिकट बुक करें",
+                                "per_ticket_price_hi": "{price} प्रति टिकट",
+                                "title": "इवेंट पर :"
+                            },
+                            "rental": {
+                                "choose_rent_option": "किराए का विकल्प चुनें",
+                                "daily_basis": "दैनिक आधार",
+                                "from": "से",
+                                "hourly_basis": "घंटे के आधार पर",
+                                "rent_an_item": "एक वस्तु किराए पर लें",
+                                "select_date": "तारीख चुनें",
+                                "select_rent_time": "किराए का समय चुनें",
+                                "select_slot": "स्लॉट चुनें",
+                                "select_time_slot": "समय स्लॉट चुनें",
+                                "slot": "स्लॉट",
+                                "no_slots_available": "कोई स्लॉट उपलब्ध नहीं है",
+                                "to": "तक"
+                            },
+                            "table": {
+                                "book_a_table": "एक टेबल बुक करें",
+                                "closed": "बंद",
+                                "slot_duration": "स्लॉट अवधि",
+                                "slot_duration_in_minutes": "{minutes} मिनट",
+                                "slots_for_all_days": "सभी दिनों के लिए दिखाएं",
+                                "special_notes": "विशेष अनुरोध/नोट्स",
+                                "today_availability": "आज की उपलब्धता"
+                            },
+                            "slots": {
+                                "book_an_appointment": "एक अपॉइंटमेंट बुक करें",
+                                "date": "तारीख",
+                                "no_slots_available": "कोई स्लॉट उपलब्ध नहीं है",
+                                "select_slot": "स्लॉट चुनें",
+                                "title": "स्लॉट"
+                            }
+                        },
+                        "bundle": {
+                            "total_amount": "कुल राशि",
+                            "none": "कोई बंडल विकल्प उपलब्ध नहीं है"
+                        },
+                        "configurable": {
+                            "select_option": "विकल्प चुनें",
+                            "select_above_option": "कृपया पहले ऊपर दिए गए विकल्प चुनें।",
+                            "price": "चयनित वैरिएंट की कीमत"
+                        },
+                        "downloadable": {
+                            "samples": "नमूने",
+                            "links": "लिंक"
+                        },
+                        "grouped": {
+                            "name": "नाम"
+                        }
+                    }
+                },
+                "no_barcode_product": "इस बारकोड के साथ कोई उत्पाद नहीं मिला।"
+            }
+        },
+        "customers": {
+            "add_btn": "नया ग्राहक जोड़ें",
+            "change_btn": "ग्राहक बदलें",
+            "change_success": "ग्राहक सफलतापूर्वक बदला गया।",
+            "delete_success": "ग्राहक सफलतापूर्वक हटाया गया।",
+            "customers": "ग्राहक",
+            "delete_btn": "हटाएं",
+            "edit_btn": "संपादित करें",
+            "no_current_customer": "कोई ग्राहक नहीं मिला।",
+            "no_customers_found": "कोई ग्राहक नहीं मिला।",
+            "offline_customers": "ऑफ़लाइन ग्राहक",
+            "search_customers": "ग्राहकों को खोजें...",
+            "select_btn": "ग्राहक चुनें",
+            "title": "ग्राहक",
+            "create": {
+                "title": "नया ग्राहक जोड़ें",
+                "back_btn_title": "वापस",
+                "first_name": "पहला नाम",
+                "last_name": "अंतिम नाम",
+                "email": "ईमेल",
+                "phone_number": "फोन नंबर",
+                "address": "पता",
+                "city": "शहर",
+                "state": "राज्य",
+                "select_state": "राज्य चुनें",
+                "country": "देश",
+                "select_country": "देश चुनें",
+                "pin_code": "पिन कोड",
+                "save_btn_title": "ग्राहक जोड़ें",
+                "phone_already_exist": "फोन पहले से ही लिया जा चुका है।",
+                "email_already_exist": "ईमेल पहले से ही लिया जा चुका है।",
+                "create_success": "ग्राहक को सफलतापूर्वक बनाया गया।"
+            },
+            "edit": {
+                "title": "ग्राहक संपादित करें",
+                "back_btn_title": "वापस",
+                "first_name": "पहला नाम",
+                "last_name": "अंतिम नाम",
+                "email": "ईमेल",
+                "phone_number": "फोन नंबर",
+                "address": "पता",
+                "city": "शहर",
+                "state": "राज्य",
+                "select_state": "राज्य चुनें",
+                "country": "देश",
+                "select_country": "देश चुनें",
+                "pin_code": "पिन कोड",
+                "save_btn_title": "ग्राहक अपडेट करें",
+                "phone_already_exist": "फोन पहले से ही लिया जा चुका है।",
+                "email_already_exist": "ईमेल पहले से ही लिया जा चुका है।",
+                "update_success": "ग्राहक को सफलतापूर्वक अपडेट किया गया।"
+            }
+        },
+        "cashier": {
+            "title": "कैशियर",
+            "cash_drawer": {
+                "title": "कैश ड्रायर",
+                "drawer_amount_summary": "कैश ड्रायर राशि सारांश",
+                "opening_drawer_amount": "कैश ड्रायर खोलने की राशि",
+                "cash_payment_sale": "नकद भुगतान बिक्री",
+                "other_payment_sale": "अन्य भुगतान बिक्री",
+                "expected_drawer_amount": "अपेक्षित कैश ड्रायर राशि",
+                "difference": "अंतर",
+                "remarks": "टिप्पणियाँ",
+                "remarks_placeholder": "काउंटर समापन टिप्पणियाँ दर्ज करें।",
+                "close_drawer": "कैश ड्रायर बंद करें"
+            },
+            "today_sale": {
+                "title": "आज की बिक्री",
+                "opening_drawer_amount": "कैश ड्रायर खोलने की राशि",
+                "cash_payment_sale": "नकद भुगतान बिक्री",
+                "other_payment_sale": "अन्य भुगतान बिक्री",
+                "sale_history": "बिक्री इतिहास",
+                "filters": "फ़िल्टर",
+                "order_id": "आदेश आईडी",
+                "time": "समय",
+                "order_total": "आदेश कुल",
+                "payment_mode": "भुगतान मोड",
+                "no_records": "कोई रिकॉर्ड नहीं मिला।",
+                "no_records_desc": "लेन-देन होने के बाद बिक्री इतिहास यहाँ दिखाई देगा।",
+                "drawer": {
+                    "title": "फ़िल्टर",
+                    "order_id": "आर्डर आईडी",
+                    "time": "समय",
+                    "order_total": "आर्डर कुल",
+                    "payment_mode": "भुगतान मोड",
+                    "select_payment_mode": "भुगतान मोड चुनें",
+                    "pos_cash": "नकद भुगतान",
+                    "pos_card": "कार्ड भुगतान",
+                    "pos_split": "विभाजित भुगतान",
+                    "filter_btn_title": "फ़िल्टर लागू करें"
+                }
+            },
+            "sale_history": {
+                "title": "बिक्री इतिहास",
+                "filters": "फ़िल्टर",
+                "date": "तारीख",
+                "cash_payments": "नकद भुगतान",
+                "other_payments": "अन्य भुगतान",
+                "total_sale": "कुल बिक्री",
+                "drawer_note": "कैश ड्रायर नोट",
+                "no_records": "कोई रिकॉर्ड नहीं मिला।",
+                "no_records_desc": "लेन-देन होने के बाद बिक्री इतिहास यहाँ दिखाई देगा।",
+                "drawer": {
+                    "title": "फ़िल्टर",
+                    "date": "तारीख",
+                    "cash_payment": "नकद भुगतान",
+                    "other_payment": "अन्य भुगतान",
+                    "total_sale": "कुल बिक्री",
+                    "filter_btn_title": "फ़िल्टर लागू करें"
+                }
+            }
+        },
+        "orders": {
+            "title": "ऑर्डर",
+            "history": {
+                "title": "इतिहास",
+                "search_orders": "आदेश आईडी या ग्राहक का नाम खोजें...",
+                "filters": "फ़िल्टर",
+                "order_id": "आदेश आईडी",
+                "date": "तारीख",
+                "total_sales": "कुल बिक्री",
+                "subtotal": "उप-योग",
+                "tax": "कर",
+                "no_records": "कोई रिकॉर्ड नहीं मिला।",
+                "no_records_desc": "लेन-देन होने के बाद बिक्री इतिहास यहाँ दिखाई देगा।",
+                "return_btn": "वापसी",
+                "order_status": {
+                    "title": "स्थिति",
+                    "completed": "पूरा हुआ",
+                    "returned": "वापस किया गया"
+                }
+            },
+            "hold": {
+                "title": "रोकथाम पर ऑर्डर",
+                "note": "नोट",
+                "resume": "पुनः प्रारंभ करें",
+                "remove": "हटाएँ",
+                "remove_success": "ऑर्डर सफलतापूर्वक हटा दिया गया।",
+                "resume_success": "ऑर्डर सफलतापूर्वक पुनः प्रारंभ किया गया।",
+                "resume_error": "कृपया पहले वर्तमान कार्ट को प्रोसेस करें।",
+                "no_orders": "कोई ऑर्डर नहीं मिला।"
+            },
+            "offline": {
+                "title": "ऑफ़लाइन आदेश",
+                "sync_order": "आदेश समन्वय",
+                "sync_all_orders": "सभी आदेश सिंक करें",
+                "search_order_id": "आदेश आईडी खोजें...",
+                "order_id": "आदेश आईडी",
+                "date": "तारीख",
+                "no_orders": "कोई ऑफलाइन ऑर्डर नहीं मिला।",
+                "sync_success": "ऑर्डर सफलतापूर्वक सिंक हो गया।",
+                "return": "वापसी",
+                "returned": "वापस किया गया",
+                "return_success": "ऑर्डर सफलतापूर्वक वापस किया गया।"
+            },
+            "info": {
+                "order_id": "आदेश आईडी",
+                "subtotal": "उप-योग",
+                "tax": "कर",
+                "discount": "डिस्काउंट",
+                "grand_total": "कुल योग",
+                "cash": "नकद",
+                "balance": "शेष राशि",
+                "no_order_selected": "कोई आदेश पूर्वावलोकन या चालान प्रिंट करने के लिए चयनित नहीं किया गया है।"
+            },
+            "print": {
+                "btn_title": "चालान प्रिंट करें",
+                "cashier": "कैशियर",
+                "change": "बकाया",
+                "contact_info": "संपर्क जानकारी",
+                "customer": "ग्राहक",
+                "customer_care": "ग्राहक सेवा",
+                "date": "तारीख",
+                "discount": "छूट",
+                "email": "ईमेल",
+                "grand_total": "कुल योग",
+                "item": "उत्पाद",
+                "name": "नाम",
+                "no_receipt": "इस आउटलेट के लिए कोई रसीद उपलब्ध नहीं है।",
+                "order_id": "ऑर्डर आईडी",
+                "phone": "फ़ोन",
+                "price": "मूल्य",
+                "qty": "मात्रा",
+                "subtotal": "उप-योग",
+                "tax": "कर",
+                "total": "कुल",
+                "total_qty": "कुल मात्रा",
+                "website": "वेबसाइट"
+            }
+        },
+        "products": {
+            "title": "उत्पाद",
+            "low_stock_products": {
+                "title": "कम स्टॉक उत्पाद",
+                "qty": "{qty} मात्रा",
+                "purchase_request": "खरीद अनुरोध",
+                "send_request_btn": "अनुरोध भेजें",
+                "no_purchase_request": "कोई खरीद अनुरोध नहीं मिला।",
+                "no_products": "कोई कम स्टॉक वाला उत्पाद नहीं मिला।",
+                "items_in_request": "खरीद अनुरोध में {count} आइटम।",
+                "view_btn_title": "देखें",
+                "request": {
+                    "title": "मात्रा अनुरोध भेजें",
+                    "requested_quantity": "अनुरोधित मात्रा",
+                    "comment": "टिप्पणी",
+                    "comment_placeholder": "टिप्पणी दर्ज करें",
+                    "add_btn_title": "उत्पाद जोड़ें",
+                    "cancel_btn_title": "रद्द करें",
+                    "already_exist": "उत्पाद पहले से ही अनुरोध सूची में है।"
+                }
+            },
+            "requested_products": {
+                "title": "अनुरोधित उत्पाद",
+                "search_products": "उत्पाद खोजें...",
+                "qty": "मात्रा:- {qty}",
+                "pending": "लंबित",
+                "received": "प्राप्त",
+                "declined": "अस्वीकृत",
+                "no_products": "कोई उत्पाद अनुरोध नहीं मिला।"
+            },
+            "settings": {
+                "title": "सेटिंग्स",
+                "minimum_qty": "न्यूनतम मात्रा",
+                "save_btn_title": "सहेजें",
+                "save_success": "उत्पाद सेटिंग्स सफलतापूर्वक सहेजी गई।"
+            }
+        },
+        "reports": {
+            "title": "रिपोर्ट",
+            "day": "दिन",
+            "week": "सप्ताह",
+            "month": "महीना"
+        },
+        "settings": {
+            "title": "सेटिंग्स",
+            "profile": {
+                "title": "प्रोफ़ाइल",
+                "first_name": "पहला नाम",
+                "last_name": "अंतिम नाम",
+                "email": "ईमेल",
+                "old_password": "पुराना पासवर्ड",
+                "new_password": "नया पासवर्ड",
+                "confirm_password": "पासवर्ड पुष्टि करें",
+                "update_btn_title": "प्रोफ़ाइल अपडेट करें"
+            },
+            "sync": {
+                "completed": "पूर्ण",
+                "customers": "ग्राहक",
+                "deselect_all": "सभी चयन रद्द करें",
+                "entities": "इकाइयाँ",
+                "entities_desc": "उन इकाइयों को चुनें जिन्हें आप सर्वर के साथ सिंक करना चाहते हैं।",
+                "fetching": "लाया जा रहा है...",
+                "orders": "ऑर्डर",
+                "products": "उत्पाद",
+                "ready": "तैयार",
+                "records": "रिकॉर्ड",
+                "select_all": "सभी चयन करें",
+                "start_syncing": "सिंक शुरू करें",
+                "sync_btn_title": "अभी सिंक करें",
+                "title": "सिंक"
+            },
+            "shortcuts": {
+                "title": "शॉर्टकट्स",
+                "description": "कीबोर्ड संयोजन जो आपको क्रियाएं जल्दी करने की अनुमति देते हैं।",
+                "sections": {
+                    "header": "हेडर",
+                    "menu": "मेनू",
+                    "customer": "ग्राहक",
+                    "cart": "कार्ट"
+                },
+                "items": {
+                    "open_barcode": {
+                        "action": "बारकोड मोड खोलें",
+                        "description": "बारकोड स्कैनिंग पर स्विच करें"
+                    },
+                    "open_product_modal": {
+                        "action": "नया उत्पाद जोड़ें मोडल खोलें",
+                        "description": "जल्दी से नया उत्पाद जोड़ें"
+                    },
+                    "fullscreen": {
+                        "action": "फुलस्क्रीन टॉगल करें",
+                        "description": "फुलस्क्रीन में जाएं/बाहर निकलें"
+                    },
+                    "dark_mode": {
+                        "action": "डार्क मोड टॉगल करें",
+                        "description": "थीम बदलें"
+                    },
+                    "hold_orders": {
+                        "action": "आदेश रोकें",
+                        "description": "लंबित ऑर्डर प्रबंधित करें"
+                    },
+                    "home": {
+                        "action": "होम पर जाएं",
+                        "description": "होम पेज पर जाएं"
+                    },
+                    "customers": {
+                        "action": "ग्राहकों पर जाएं",
+                        "description": "ग्राहक अनुभाग खोलें"
+                    },
+                    "cashier": {
+                        "action": "कैशियर पर जाएं",
+                        "description": "पीओएस कैशियर खोलें"
+                    },
+                    "orders": {
+                        "action": "ऑर्डर पर जाएं",
+                        "description": "ऑर्डर इतिहास देखें"
+                    },
+                    "products": {
+                        "action": "उत्पादों पर जाएं",
+                        "description": "उत्पाद प्रबंधित करें"
+                    },
+                    "reports": {
+                        "action": "रिपोर्ट्स पर जाएं",
+                        "description": "एनालिटिक्स देखें"
+                    },
+                    "settings": {
+                        "action": "सेटिंग्स पर जाएं",
+                        "description": "प्राथमिकताएं समायोजित करें"
+                    },
+                    "create_customer": {
+                        "action": "नया ग्राहक बनाएं",
+                        "description": "ग्राहक जोड़ें"
+                    },
+                    "edit_customer": {
+                        "action": "वर्तमान ग्राहक संपादित करें",
+                        "description": "चयनित ग्राहक जानकारी अपडेट करें"
+                    },
+                    "delete_customer": {
+                        "action": "वर्तमान ग्राहक हटाएं",
+                        "description": "चयनित ग्राहक हटाएं"
+                    },
+                    "change_customer": {
+                        "action": "वर्तमान ग्राहक बदलें",
+                        "description": "अलग ग्राहक चुनें"
+                    },
+                    "add_note": {
+                        "action": "नोट जोड़ें",
+                        "description": "ऑर्डर में नोट जोड़ें"
+                    },
+                    "remove_note": {
+                        "action": "नोट हटाएं",
+                        "description": "कार्ट से नोट हटाएं"
+                    },
+                    "checkout": {
+                        "action": "चेकआउट पर जाएं",
+                        "description": "भुगतान प्रक्रिया शुरू करें"
+                    },
+                    "hold_order": {
+                        "action": "आदेश रोकें",
+                        "description": "आदेश को होल्ड पर रखें"
+                    }
+                }
+            },
+            "regional": {
+                "title": "क्षेत्रीय",
+                "locale": "स्थान",
+                "select_locale": "स्थान चुनें",
+                "currency": "मुद्रा",
+                "select_currency": "मुद्रा चुनें",
+                "save_btn_title": "सहेजें"
+            },
+            "save_success": "सेटिंग्स सफलतापूर्वक सहेजी गईं।"
+        },
+        "payment": {
+            "title": "भुगतान",
+            "back": "वापस",
+            "order_details": "आदेश विवरण",
+            "subtotal": "उप-योग",
+            "tax": "कर",
+            "discount": "डिस्काउंट",
+            "grand_total": "कुल योग",
+            "payable_amount": "भुगतान योग्य राशि",
+            "received": "प्राप्त",
+            "remaining": "शेष",
+            "pos_cash": "नकद",
+            "pos_card": "कार्ड",
+            "pos_split": "विभाजित",
+            "cancel": "रद्द करें",
+            "card_details": "कार्ड विवरण",
+            "bank": "बैंक",
+            "select_bank": "बैंक चुनें",
+            "other": "अन्य",
+            "confirm_payment": "भुगतान की पुष्टि करें",
+            "empty_cart": "खाली कार्ट",
+            "amount_exceeded": "देय राशि अधिक हो गई है!",
+            "order_placed": "ऑर्डर सफलतापूर्वक दिया गया है।"
+        }
+    }
+}

@@ -1,0 +1,43 @@
+#outlet\cashier\waste.graphql
+
+extend type Query @guard(with: ["pos_user"]) {
+    getWasteEntries: [WasteEntryType] @field(resolver: "Webkul\\Pos\\Queries\\Cashier\\WasteQuery@getWasteEntries")
+}
+
+extend type Mutation @guard(with: ["pos_user"]) {
+    recordWaste(
+        input: WasteInput! @spread
+    ): WasteResult @field(resolver: "Webkul\\Pos\\Mutations\\Outlet\\WasteMutation@recordWaste")
+}
+
+input WasteInput {
+    productId: Int @rename(attribute: "product_id")
+    productName: String! @rename(attribute: "product_name")
+    productSku: String @rename(attribute: "product_sku")
+    quantity: Int!
+    unitCost: Float @rename(attribute: "unit_cost")
+    reason: String!
+    notes: String
+    wastedAt: String @rename(attribute: "wasted_at")
+}
+
+type WasteEntryType {
+    id: ID!
+    productName: String @rename(attribute: "product_name")
+    productSku: String @rename(attribute: "product_sku")
+    quantity: Int
+    unitCost: Float @rename(attribute: "unit_cost")
+    totalCost: Float @rename(attribute: "total_cost")
+    reason: String
+    notes: String
+    status: String
+    wastedAt: String @rename(attribute: "wasted_at")
+    createdAt: String @rename(attribute: "created_at")
+}
+
+type WasteResult {
+    success: Boolean!
+    message: String
+    errors: String
+    entry: WasteEntryType
+}

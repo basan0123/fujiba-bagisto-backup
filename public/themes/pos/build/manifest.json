@@ -1,0 +1,74 @@
+{
+  "node_modules/vue3-apexcharts/dist/apexcharts.ssr.esm-fe46cd2d.js": {
+    "file": "assets/apexcharts.ssr.esm-fe46cd2d-CEIEYvuU.js",
+    "name": "apexcharts.ssr.esm-fe46cd2d",
+    "src": "node_modules/vue3-apexcharts/dist/apexcharts.ssr.esm-fe46cd2d.js",
+    "isDynamicEntry": true
+  },
+  "src/Resources/assets/css/admin.css": {
+    "file": "assets/admin-C6eQOEyF.css",
+    "src": "src/Resources/assets/css/admin.css",
+    "isEntry": true
+  },
+  "src/Resources/assets/css/shop.css": {
+    "file": "assets/shop-Cov0W4XK.css",
+    "src": "src/Resources/assets/css/shop.css",
+    "isEntry": true
+  },
+  "src/Resources/assets/fonts/admin.woff": {
+    "file": "assets/admin-HcSkZKOp.woff",
+    "src": "src/Resources/assets/fonts/admin.woff"
+  },
+  "src/Resources/assets/fonts/shop.woff": {
+    "file": "assets/shop-FTN318EN.woff",
+    "src": "src/Resources/assets/fonts/shop.woff"
+  },
+  "src/Resources/assets/images/favicon.ico": {
+    "file": "assets/favicon--PZ4cBiP.ico",
+    "src": "src/Resources/assets/images/favicon.ico"
+  },
+  "src/Resources/assets/images/icon-192.png": {
+    "file": "assets/icon-192-B5ar47TH.png",
+    "src": "src/Resources/assets/images/icon-192.png"
+  },
+  "src/Resources/assets/images/icon-512.png": {
+    "file": "assets/icon-512-BQ7Cbu73.png",
+    "src": "src/Resources/assets/images/icon-512.png"
+  },
+  "src/Resources/assets/images/logo.png": {
+    "file": "assets/logo-D5m9rjCn.png",
+    "src": "src/Resources/assets/images/logo.png"
+  },
+  "src/Resources/assets/images/product-placeholder.webp": {
+    "file": "assets/product-placeholder-INODB-G2.webp",
+    "src": "src/Resources/assets/images/product-placeholder.webp"
+  },
+  "src/Resources/assets/images/user-placeholder.png": {
+    "file": "assets/user-placeholder-C_FiyGd9.png",
+    "src": "src/Resources/assets/images/user-placeholder.png"
+  },
+  "src/Resources/assets/js/admin.js": {
+    "file": "assets/admin-l0sNRNKZ.js",
+    "name": "admin",
+    "src": "src/Resources/assets/js/admin.js",
+    "isEntry": true
+  },
+  "src/Resources/assets/js/shop.js": {
+    "file": "assets/shop-C6CJzmws.js",
+    "name": "shop",
+    "src": "src/Resources/assets/js/shop.js",
+    "isEntry": true,
+    "dynamicImports": [
+      "node_modules/vue3-apexcharts/dist/apexcharts.ssr.esm-fe46cd2d.js",
+      "node_modules/vue3-apexcharts/dist/apexcharts.ssr.esm-fe46cd2d.js"
+    ],
+    "css": [
+      "assets/shop-BXDElDPe.css"
+    ],
+    "assets": [
+      "assets/logo-D5m9rjCn.png",
+      "assets/product-placeholder-INODB-G2.webp",
+      "assets/user-placeholder-C_FiyGd9.png"
+    ]
+  }
+}

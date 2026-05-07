@@ -1,0 +1,39 @@
+{
+  "name": "pos",
+  "private": true,
+  "version": "2.3.0",
+  "type": "module",
+  "scripts": {
+    "dev": "vite",
+    "build": "vite build",
+    "publish": "vite build --mode publish",
+    "preview": "vite preview"
+  },
+  "dependencies": {
+    "@apollo/client": "^3.11.8",
+    "@vee-validate/i18n": "^4.13.2",
+    "@vee-validate/rules": "^4.13.2",
+    "@vue/apollo-composable": "^4.2.1",
+    "apexcharts": "^4.1.0",
+    "flatpickr": "^4.6.13",
+    "graphql": "^16.9.0",
+    "idb": "^8.0.0",
+    "mitt": "^3.0.1",
+    "qrcode.vue": "^3.9.0",
+    "vee-validate": "^4.13.2",
+    "vite": "^6.3.5",
+    "vue": "^3.5.10",
+    "vue-i18n": "^9.14.1",
+    "vue-router": "^4.4.5",
+    "vue3-apexcharts": "^1.8.0"
+  },
+  "devDependencies": {
+    "@vitejs/plugin-vue": "^5.1.4",
+    "autoprefixer": "^10.4.20",
+    "laravel-vite-plugin": "^1.2.0",
+    "postcss": "^8.4.47",
+    "tailwindcss": "^3.4.13",
+    "vite": "^6.3.5",
+    "vite-plugin-pwa": "^1.1.0"
+  }
+}

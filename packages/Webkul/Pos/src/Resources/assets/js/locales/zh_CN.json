@@ -1,0 +1,617 @@
+{
+    "pos": {
+        "title": "Bagisto POS",
+        "page_not_found": {
+            "title": "缺少了一些东西。",
+            "message": "抱歉，我们找不到该页面。您可以在主页上找到许多可探索的内容。",
+            "back_btn_title": "返回主页"
+        },
+        "login_form": {
+            "title": "登录",
+            "user_name": "用户名",
+            "user_name_placeholder": "请输入用户名",
+            "password": "密码",
+            "password_placeholder": "请输入密码",
+            "remember_password": "记住密码",
+            "login_btn_title": "登录"
+        },
+        "footer": {
+            "warning": "Webkul不授权任何第三方销售商重新销售Webkul模块。",
+            "copyright": "版权所有 © 2010-2023，Webkul Software（注册于印度/美国）。保留所有权利。"
+        },
+        "layout": {
+            "header": {
+                "title": "Bagisto POS",
+                "search_products": "搜索产品...",
+                "hold_orders": "暂存订单",
+                "barcode_form": {
+                    "title": "输入条形码",
+                    "barcode_placeholder": "输入产品的条形码",
+                    "cancel_btn_title": "取消",
+                    "proceed_btn_title": "继续"
+                },
+                "product_create_form": {
+                    "title": "添加新产品",
+                    "name": "名称",
+                    "sku": "SKU",
+                    "price": "价格",
+                    "weight": "重量",
+                    "quantity": "数量",
+                    "cancel_btn_title": "取消",
+                    "proceed_btn_title": "继续"
+                }
+            },
+            "sidebar": {
+                "home": "首页",
+                "customers": "顾客",
+                "cashier": "收银员",
+                "orders": "订单",
+                "products": "产品",
+                "reports": "报告",
+                "settings": "设置",
+                "logout": "退出登录"
+            },
+            "main": {
+                "cash_drawer": {
+                    "title": "现金抽屉",
+                    "opening_drawer_amount": "开抽屉金额",
+                    "remarks": "备注",
+                    "remarks_placeholder": "输入收银台关闭的备注。",
+                    "open_drawer": "打开抽屉"
+                }
+            }
+        },
+        "common": {
+            "cart": {
+                "add": "添加",
+                "add_customer": "添加客户",
+                "booking_from": "预订起始",
+                "booking_till": "预订截止",
+                "closed": "已关闭",
+                "create_success": "购物车创建成功。",
+                "discount": "折扣",
+                "discount_applied": "已应用 {percentage}% 的折扣",
+                "downloads": "下载",
+                "event_expired": "此活动已过期。",
+                "event_from": "活动起始",
+                "event_ticket": "活动门票",
+                "event_till": "活动截止",
+                "hold_order": "保留订单",
+                "hold_order_success": "订单已成功保留。",
+                "inventory_warning": "所请求的数量不可用。",
+                "missing_links": "此产品缺少可下载链接。",
+                "missing_options": "此产品缺少选项。",
+                "no_customer_selected": "未选择客户。",
+                "note": "备注",
+                "payable_amount": "应付金额",
+                "proceed": "继续",
+                "product_add_success": "产品已成功添加到购物车！",
+                "product_remove_success": "产品已成功从购物车移除！",
+                "qty_missing": "至少有一个产品数量应大于1。",
+                "invalid_file_extension": "发现无效的文件扩展名。",
+                "quantity": "数量",
+                "remove_cart": "移除购物车",
+                "remove_success": "购物车已成功移除。",
+                "rent_from": "租赁起始",
+                "rent_till": "租赁截止",
+                "rent_type": "租赁类型",
+                "select_hourly_duration": "请选择一个小时的时段。",
+                "selected_products_simple": "所选产品必须为简单类型。",
+                "special_note": "特殊请求 / 备注",
+                "subtotal": "小计",
+                "tax": "税费",
+                "update_success": "购物车已成功更新。",
+                "order_note_form": {
+                    "title": "订单备注",
+                    "note_placeholder": "输入订单备注",
+                    "cancel_btn_title": "取消",
+                    "proceed_btn_title": "继续",
+                    "create_success": "订单备注成功添加。",
+                    "remove_success": "订单备注成功删除。"
+                }
+            },
+            "flash_messages": {
+                "close": "关闭",
+                "error_message": "出了点问题！请再试一次。",
+                "offline_error": "警告，您处于离线模式",
+                "offline_mode": "警告：您已离线。可用功能有限",
+                "online_mode": "连接已恢复。您已重新上线"
+            },
+            "offline_loader": {
+                "title": "警告，您处于离线模式",
+                "description": "连接恢复后即可访问详细信息。",
+                "reconnecting": "正在重新连接..."
+            },
+            "confirm_modal": {
+                "title": "你确定吗？",
+                "description": "你确定要执行此操作吗？",
+                "disagree_btn_title": "不同意",
+                "agree_btn_title": "同意"
+            },
+            "pagination": {
+                "showing": "显示第 {count} 条，共 {total} 条结果",
+                "page": "第 {current} 页，共 {total} 页"
+            }
+        },
+        "home": {
+            "title": "首页",
+            "print_confirmation_title": "打印确认？",
+            "print_confirm_message": "您要打印上次订单的收据吗？",
+            "items_in_cart": "购物车中有 {count} 件商品。",
+            "view_cart_btn": "查看购物车",
+            "categories": {
+                "all": "所有"
+            },
+            "products": {
+                "view": {
+                    "qty": "{qty} 数量",
+                    "add_to_cart": "加入购物车",
+                    "total_amount": "总金额",
+                    "type": {
+                        "simple": {
+                            "customizable_options": {
+                                "none": "无",
+                                "total_amount": "总金额"
+                            }
+                        },
+                        "booking": {
+                            "location": "位置",
+                            "view_on_map": "在地图上查看",
+                            "default": {
+                                "slot_duration_in_minutes": "{minutes} 分钟",
+                                "slot_duration": "时段持续时间"
+                            },
+                            "appointment": {
+                                "closed": "关闭",
+                                "see_details": "查看详情",
+                                "slot_duration": "时段持续时间",
+                                "slot_duration_in_minutes": "{minutes} 分钟",
+                                "today_availability": "今日可用性"
+                            },
+                            "event": {
+                                "book_your_ticket": "预订您的票",
+                                "per_ticket_price_zh": "每张票 {price}",
+                                "title": "活动于："
+                            },
+                            "rental": {
+                                "choose_rent_option": "选择租赁选项",
+                                "daily_basis": "按日计费",
+                                "from": "从",
+                                "hourly_basis": "按小时计费",
+                                "rent_an_item": "租赁物品",
+                                "select_date": "选择日期",
+                                "select_rent_time": "选择租赁时间",
+                                "select_slot": "选择时段",
+                                "select_time_slot": "选择时间段",
+                                "slot": "时段",
+                                "no_slots_available": "无可用时段",
+                                "to": "到"
+                            },
+                            "table": {
+                                "book_a_table": "预订桌位",
+                                "closed": "关闭",
+                                "slot_duration": "时段持续时间",
+                                "slot_duration_in_minutes": "{minutes} 分钟",
+                                "slots_for_all_days": "显示所有天的时段",
+                                "special_notes": "特殊请求/备注",
+                                "today_availability": "今日可用性"
+                            },
+                            "slots": {
+                                "book_an_appointment": "预约",
+                                "date": "日期",
+                                "no_slots_available": "无可用时段",
+                                "select_slot": "选择时段",
+                                "title": "时段"
+                            }
+                        },
+                        "bundle": {
+                            "total_amount": "总金额",
+                            "none": "无可用捆绑选项"
+                        },
+                        "configurable": {
+                            "select_option": "选择选项",
+                            "select_above_option": "请先选择上方选项。",
+                            "price": "所选变体价格"
+                        },
+                        "downloadable": {
+                            "samples": "样本",
+                            "links": "链接"
+                        },
+                        "grouped": {
+                            "name": "名称"
+                        }
+                    }
+                },
+                "no_barcode_product": "未找到具有该条形码的产品。"
+            }
+        },
+        "customers": {
+            "add_btn": "添加新客户",
+            "change_btn": "更改客户",
+            "change_success": "客户更改成功。",
+            "delete_success": "客户删除成功。",
+            "customers": "客户",
+            "delete_btn": "删除",
+            "edit_btn": "编辑",
+            "no_current_customer": "未找到客户。",
+            "no_customers_found": "未找到任何客户。",
+            "offline_customers": "离线客户",
+            "search_customers": "搜索客户...",
+            "select_btn": "选择客户",
+            "title": "客户",
+            "create": {
+                "title": "添加新顾客",
+                "back_btn_title": "返回",
+                "first_name": "名字",
+                "last_name": "姓氏",
+                "email": "邮箱",
+                "phone_number": "电话号码",
+                "address": "地址",
+                "city": "城市",
+                "state": "州",
+                "select_state": "选择州",
+                "country": "国家",
+                "select_country": "选择国家",
+                "pin_code": "邮政编码",
+                "save_btn_title": "添加顾客",
+                "phone_already_exist": "该电话号码已被使用。",
+                "email_already_exist": "该邮箱已被使用。",
+                "create_success": "顾客创建成功。"
+            },
+            "edit": {
+                "title": "编辑顾客",
+                "back_btn_title": "返回",
+                "first_name": "名字",
+                "last_name": "姓氏",
+                "email": "邮箱",
+                "phone_number": "电话号码",
+                "address": "地址",
+                "city": "城市",
+                "state": "州",
+                "select_state": "选择州",
+                "country": "国家",
+                "select_country": "选择国家",
+                "pin_code": "邮政编码",
+                "save_btn_title": "更新顾客",
+                "phone_already_exist": "该电话号码已被使用。",
+                "email_already_exist": "该邮箱已被使用。",
+                "update_success": "顾客更新成功。"
+            }
+        },
+        "cashier": {
+            "title": "收银员",
+            "cash_drawer": {
+                "title": "现金抽屉",
+                "drawer_amount_summary": "抽屉金额汇总",
+                "opening_drawer_amount": "开启抽屉金额",
+                "cash_payment_sale": "现金支付销售",
+                "other_payment_sale": "其他支付销售",
+                "expected_drawer_amount": "预期抽屉金额",
+                "difference": "差额",
+                "remarks": "备注",
+                "remarks_placeholder": "输入柜台关闭备注。",
+                "close_drawer": "关闭抽屉"
+            },
+            "today_sale": {
+                "title": "今日销售",
+                "opening_drawer_amount": "开启抽屉金额",
+                "cash_payment_sale": "现金支付销售",
+                "other_payment_sale": "其他支付销售",
+                "sale_history": "销售历史",
+                "filters": "筛选",
+                "order_id": "订单号",
+                "time": "时间",
+                "order_total": "订单总额",
+                "payment_mode": "支付方式",
+                "no_records": "未找到记录。",
+                "no_records_desc": "交易完成后，销售记录将显示在此处。",
+                "drawer": {
+                    "title": "筛选",
+                    "order_id": "订单 ID",
+                    "time": "时间",
+                    "order_total": "订单总额",
+                    "payment_mode": "支付方式",
+                    "select_payment_mode": "选择支付方式",
+                    "pos_cash": "现金支付",
+                    "pos_card": "卡支付",
+                    "pos_split": "分开支付",
+                    "filter_btn_title": "应用筛选"
+                }
+            },
+            "sale_history": {
+                "title": "销售历史",
+                "filters": "筛选",
+                "date": "日期",
+                "cash_payments": "现金支付",
+                "other_payments": "其他支付",
+                "total_sale": "总销售额",
+                "drawer_note": "抽屉备注",
+                "no_records": "未找到记录。",
+                "no_records_desc": "交易完成后，销售记录将显示在此处。",
+                "drawer": {
+                    "title": "筛选",
+                    "date": "日期",
+                    "cash_payment": "现金支付",
+                    "other_payment": "其他支付",
+                    "total_sale": "总销售额",
+                    "filter_btn_title": "应用筛选"
+                }
+            }
+        },
+        "orders": {
+            "title": "订单",
+            "history": {
+                "title": "历史",
+                "search_orders": "搜索订单号或顾客姓名...",
+                "filters": "筛选",
+                "order_id": "订单号",
+                "date": "日期",
+                "total_sales": "总销售额",
+                "subtotal": "小计",
+                "tax": "税费",
+                "no_records": "未找到记录。",
+                "no_records_desc": "交易完成后，销售记录将显示在此处。",
+                "return_btn": "退货",
+                "order_status": {
+                    "title": "状态",
+                    "completed": "已完成",
+                    "returned": "已退货"
+                }
+            },
+            "hold": {
+                "title": "待处理订单",
+                "note": "备注",
+                "resume": "恢复",
+                "remove": "移除",
+                "remove_success": "订单成功移除。",
+                "resume_success": "订单成功恢复。",
+                "resume_error": "请先处理当前购物车。",
+                "no_orders": "没有找到订单。"
+            },
+            "offline": {
+                "title": "离线订单",
+                "sync_order": "同步订单",
+                "sync_all_orders": "同步所有订单",
+                "search_order_id": "搜索订单号...",
+                "order_id": "订单号",
+                "date": "日期",
+                "no_orders": "未找到离线订单。",
+                "sync_success": "订单已成功同步。",
+                "return": "退货",
+                "returned": "已退货",
+                "return_success": "订单已成功退货。"
+            },
+            "info": {
+                "order_id": "订单号",
+                "subtotal": "小计",
+                "tax": "税费",
+                "discount": "折扣",
+                "grand_total": "总计",
+                "cash": "现金",
+                "balance": "余额",
+                "no_order_selected": "未选择任何订单进行预览或打印发票。"
+            },
+            "print": {
+                "btn_title": "打印发票",
+                "cashier": "收银员",
+                "change": "找零",
+                "contact_info": "联系信息",
+                "customer": "客户",
+                "customer_care": "客户服务",
+                "date": "日期",
+                "discount": "折扣",
+                "email": "电子邮件",
+                "grand_total": "总计",
+                "item": "商品",
+                "name": "姓名",
+                "no_receipt": "该网点无可用收据。",
+                "order_id": "订单编号",
+                "phone": "电话",
+                "price": "价格",
+                "qty": "数量",
+                "subtotal": "小计",
+                "tax": "税费",
+                "total": "总额",
+                "total_qty": "总数量",
+                "website": "网站"
+            }
+        },
+        "products": {
+            "title": "产品",
+            "low_stock_products": {
+                "title": "低库存产品",
+                "qty": "{qty} 数量",
+                "purchase_request": "购买请求",
+                "send_request_btn": "发送请求",
+                "no_purchase_request": "未找到购买请求。",
+                "no_products": "未找到低库存产品。",
+                "items_in_request": "采购请求中有 {count} 件商品。",
+                "view_btn_title": "查看",
+                "request": {
+                    "title": "发送数量请求",
+                    "requested_quantity": "请求数量",
+                    "comment": "评论",
+                    "comment_placeholder": "输入评论",
+                    "add_btn_title": "添加产品",
+                    "cancel_btn_title": "取消",
+                    "already_exist": "该产品已经在请求列表中。"
+                }
+            },
+            "requested_products": {
+                "title": "请求的产品",
+                "search_products": "搜索产品...",
+                "qty": "数量:- {qty}",
+                "pending": "待处理",
+                "received": "已接收",
+                "declined": "已拒绝",
+                "no_products": "未找到产品请求。"
+            },
+            "settings": {
+                "title": "设置",
+                "minimum_qty": "最小数量",
+                "save_btn_title": "保存",
+                "save_success": "设置成功保存。"
+            }
+        },
+        "reports": {
+            "title": "报告",
+            "day": "日",
+            "week": "周",
+            "month": "月"
+        },
+        "settings": {
+            "title": "设置",
+            "profile": {
+                "title": "个人资料",
+                "first_name": "名字",
+                "last_name": "姓氏",
+                "email": "邮箱",
+                "old_password": "旧密码",
+                "new_password": "新密码",
+                "confirm_password": "确认密码",
+                "update_btn_title": "更新个人资料"
+            },
+            "sync": {
+                "completed": "已完成",
+                "customers": "客户",
+                "deselect_all": "取消全选",
+                "entities": "实体",
+                "entities_desc": "选择您要与服务器同步的实体。",
+                "fetching": "正在获取...",
+                "orders": "订单",
+                "products": "产品",
+                "ready": "准备就绪",
+                "records": "记录",
+                "select_all": "全选",
+                "start_syncing": "开始同步",
+                "sync_btn_title": "立即同步",
+                "title": "同步"
+            },
+            "shortcuts": {
+                "title": "快捷键",
+                "description": "允许您快速执行操作的键盘组合。",
+                "sections": {
+                    "header": "头部",
+                    "menu": "菜单",
+                    "customer": "顾客",
+                    "cart": "购物车"
+                },
+                "items": {
+                    "open_barcode": {
+                        "action": "打开条码模式",
+                        "description": "切换到条码扫描"
+                    },
+                    "open_product_modal": {
+                        "action": "打开产品创建窗口",
+                        "description": "快速添加新产品"
+                    },
+                    "fullscreen": {
+                        "action": "切换全屏",
+                        "description": "进入/退出全屏"
+                    },
+                    "dark_mode": {
+                        "action": "切换深色模式",
+                        "description": "切换主题"
+                    },
+                    "hold_orders": {
+                        "action": "暂存订单",
+                        "description": "管理已暂停的订单"
+                    },
+                    "home": {
+                        "action": "前往首页",
+                        "description": "导航到首页"
+                    },
+                    "customers": {
+                        "action": "前往顾客",
+                        "description": "打开顾客部分"
+                    },
+                    "cashier": {
+                        "action": "前往收银员",
+                        "description": "访问POS收银台"
+                    },
+                    "orders": {
+                        "action": "前往订单",
+                        "description": "查看订单历史"
+                    },
+                    "products": {
+                        "action": "前往产品",
+                        "description": "管理产品"
+                    },
+                    "reports": {
+                        "action": "前往报告",
+                        "description": "查看分析"
+                    },
+                    "settings": {
+                        "action": "前往设置",
+                        "description": "调整偏好设置"
+                    },
+                    "create_customer": {
+                        "action": "创建新顾客",
+                        "description": "添加顾客"
+                    },
+                    "edit_customer": {
+                        "action": "编辑当前顾客",
+                        "description": "更新所选顾客信息"
+                    },
+                    "delete_customer": {
+                        "action": "删除当前顾客",
+                        "description": "移除所选顾客"
+                    },
+                    "change_customer": {
+                        "action": "更换当前顾客",
+                        "description": "选择不同顾客"
+                    },
+                    "add_note": {
+                        "action": "添加备注",
+                        "description": "为订单添加备注"
+                    },
+                    "remove_note": {
+                        "action": "移除备注",
+                        "description": "从购物车删除备注"
+                    },
+                    "checkout": {
+                        "action": "前往结账",
+                        "description": "开始支付流程"
+                    },
+                    "hold_order": {
+                        "action": "暂存订单",
+                        "description": "将订单暂存"
+                    }
+                }
+            },
+            "regional": {
+                "title": "区域",
+                "locale": "语言环境",
+                "select_locale": "选择语言环境",
+                "currency": "货币",
+                "select_currency": "选择货币",
+                "save_btn_title": "保存"
+            },
+            "save_success": "设置已成功保存。"
+        },
+        "payment": {
+            "title": "支付",
+            "back": "返回",
+            "order_details": "订单详情",
+            "subtotal": "小计",
+            "tax": "税费",
+            "discount": "折扣",
+            "grand_total": "总计",
+            "payable_amount": "应付金额",
+            "received": "已收款",
+            "remaining": "剩余",
+            "pos_cash": "现金",
+            "pos_card": "卡",
+            "pos_split": "分割",
+            "cancel": "取消",
+            "card_details": "卡片详情",
+            "bank": "银行",
+            "select_bank": "选择银行",
+            "other": "其他",
+            "confirm_payment": "确认支付",
+            "empty_cart": "购物车为空！",
+            "amount_exceeded": "应付金额超出！",
+            "order_placed": "订单成功下达。"
+        }
+    }
+}

@@ -1,0 +1,66 @@
+#outlet/products/custom.graphql
+
+extend type Mutation @guard(with: ["pos_user"]) {
+    createOutletProduct(
+        input: createOutletProductInput! @spread
+    ): createOutletProductResult @field(resolver: "Webkul\\Pos\\Mutations\\Outlet\\ProductMutation@createProduct")
+
+    linkBarcodeToProduct(
+        input: linkBarcodeToProductInput! @spread
+    ): linkBarcodeToProductResult @field(resolver: "Webkul\\Pos\\Mutations\\Outlet\\ProductMutation@linkBarcode")
+
+    setOutletProductImage(
+        input: setOutletProductImageInput! @spread
+    ): outletProductImageResult @field(resolver: "Webkul\\Pos\\Mutations\\Outlet\\ProductMutation@setProductImage")
+
+    deleteOutletProductImage(
+        input: deleteOutletProductImageInput! @spread
+    ): outletProductImageResult @field(resolver: "Webkul\\Pos\\Mutations\\Outlet\\ProductMutation@deleteProductImage")
+}
+
+input setOutletProductImageInput {
+    productId: Int!
+    imageBase64: String!
+    imageName: String
+}
+
+input deleteOutletProductImageInput {
+    productId: Int!
+}
+
+type outletProductImageResult {
+    success: Boolean!
+    message: String
+    product: OutletProductResult
+}
+
+input createOutletProductInput {
+    name: String!
+    sku: String!
+    price: Float!
+    quantity: Int!
+    weight: Float
+    barcode: String
+    imageBase64: String
+    imageName: String
+}
+
+type createOutletProductResult {
+    success: Boolean!
+    errors: String
+    message: String
+    product: OutletProductResult
+}
+
+input linkBarcodeToProductInput {
+    productId: Int!
+    barcode: String!
+}
+
+type linkBarcodeToProductResult {
+    success: Boolean!
+    message: String
+    productId: Int
+    gtin: String
+    scanValue: String
+}

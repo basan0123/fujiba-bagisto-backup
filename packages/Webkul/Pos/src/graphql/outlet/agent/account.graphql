@@ -1,0 +1,42 @@
+#outlet\agent\account Related APIs
+extend type Mutation @guard(with: ["pos_user"]) {
+    updateProfile(
+        input: UpdateProfileInput! @spread
+    ): UpdateProfileResult @field(resolver: "Webkul\\Pos\\Mutations\\Outlet\\Agent\\AccountMutation@update")
+
+    setAgentTraining(
+        input: SetAgentTrainingInput! @spread
+    ): SetAgentTrainingResult @field(resolver: "Webkul\\Pos\\Mutations\\Outlet\\Agent\\AccountMutation@setTraining")
+}
+
+input SetAgentTrainingInput {
+    trainingMode: Boolean! @rename(attribute: "training_mode")
+    trainingPrintReceipt: Boolean! @rename(attribute: "training_print_receipt")
+}
+
+type SetAgentTrainingResult {
+    success: Boolean!
+    message: String
+    trainingMode: Boolean
+    trainingPrintReceipt: Boolean
+}
+
+input UpdateProfileInput {
+    firstName: String! @rename(attribute: "firstname")
+    lastName: String! @rename(attribute: "lastname")
+    email: String!
+    oldPassword: String @rename(attribute: "old_password")
+    newPassword: String @rename(attribute: "new_password")
+    newPasswordConfirmation: String @rename(attribute: "new_password_confirmation")
+    lowStockQty: Int @rename(attribute: "low_stock_qty")
+    uploadType: UploadType @rename(attribute: "upload_type")
+    imageUrl: String @rename(attribute: "image_url")
+    image: Upload
+}
+
+type UpdateProfileResult {
+    success: Boolean
+    errors: String
+    message: String
+    agent: Agent
+}

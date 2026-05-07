@@ -1,0 +1,15 @@
+User-agent: *
+Disallow: /admin
+Disallow: /admin/*
+Disallow: /customer/account
+Disallow: /customer/account/*
+Disallow: /checkout
+Disallow: /checkout/*
+Disallow: /cart
+Disallow: /search
+Disallow: /api/
+Disallow: /*?currency=
+Disallow: /*&currency=
+Allow: /
+
+Sitemap: https://snssale.com/sitemap.xml

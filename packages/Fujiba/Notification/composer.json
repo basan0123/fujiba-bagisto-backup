@@ -1,0 +1,19 @@
+{
+    "name": "fujiba/notification",
+    "description": "Multi-channel order notifications (email, messenger, future SNS) for Fujiba Elegance Emporium",
+    "type": "library",
+    "license": "proprietary",
+    "autoload": {
+        "psr-4": {
+            "Fujiba\\Notification\\": "src/"
+        }
+    },
+    "extra": {
+        "laravel": {
+            "providers": [
+                "Fujiba\\Notification\\Providers\\NotificationServiceProvider"
+            ]
+        }
+    },
+    "minimum-stability": "dev"
+}

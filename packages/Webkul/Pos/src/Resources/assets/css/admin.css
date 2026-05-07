@@ -1,0 +1,56 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@font-face {
+    font-family: "icomoon";
+    src: url("../fonts/admin.woff?jwnnow") format("woff");
+    font-weight: normal;
+    font-style: normal;
+    font-display: block;
+}
+
+@layer components {
+    [class^="pos-"],
+    [class*=" pos-"] {
+        /* use !important to prevent issues with browser extensions that change fonts */
+        font-family: "icomoon" !important;
+        speak: never;
+        font-style: normal;
+        font-weight: normal;
+        font-variant: normal;
+        text-transform: none;
+        line-height: 1;
+
+        /* Better Font Rendering =========== */
+        -webkit-font-smoothing: antialiased;
+        -moz-osx-font-smoothing: grayscale;
+    }
+
+    .pos-icon:before {
+        content: "\e952";
+    }
+
+    .pos-icon:not(.text-white) {
+        opacity: 0.5;
+    }
+
+    .dark .pos-icon {
+        color: white;
+        opacity: 1;
+    }
+
+    .pos-listing-icon:before {
+        content: "\e950";
+    }
+
+    .pos-barcode-icon:before {
+        content: "\e94f";
+        opacity: 0.6;
+    }
+
+    .dark .pos-barcode-icon {
+        color: #FFFFFF;
+        opacity: 1;
+    }
+}

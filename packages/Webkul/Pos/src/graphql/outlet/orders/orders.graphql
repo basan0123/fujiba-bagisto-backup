@@ -1,0 +1,46 @@
+#outlet\home\orders list related APIs
+extend type Query @guard(with: ["pos_user"]) {
+    getOrders (
+        first: Int,
+        page: Int
+    ): [OutletOrder!] @paginate(
+        type: "PAGINATOR",
+        builder: "Webkul\\Pos\\Queries\\Order\\OrderQuery@getOrders",
+        defaultCount: 10
+    )
+}
+
+extend type Mutation @guard(with: ["pos_user"]) {
+    returnOrder (
+        input: returnOrderInput! @spread
+    ): ReturnOrderResponse @field(resolver: "Webkul\\Pos\\Mutations\\Outlet\\ReturnMutation")
+}
+
+type OutletOrder {
+    id: Int!
+    barcodeUrl: String @rename(attribute: "barcode_url")
+    outlet: Outlet @belongsTo(relation: "outlet")
+    customerCredit: CustomerCredit @belongsTo(relation: "customerCredit")
+    order: Order
+}
+
+type CustomerCredit {
+    changeAmount: String @rename(attribute: "change_amount")
+    tenderedAmount: String @rename(attribute: "tendered_amount")
+}
+
+input returnOrderInput {
+    orderId: Int! @rename(attribute: "order_id")
+    items: [returnOrderItemInput!]!
+}
+
+input returnOrderItemInput {
+    itemId: Int! @rename(attribute: "item_id")
+    qty: Int!
+}
+
+type ReturnOrderResponse {
+    success: Boolean
+    message: String
+    outletOrder: OutletOrder @rename(attribute: "outlet_order")
+}

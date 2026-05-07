@@ -1,0 +1,617 @@
+{
+    "pos": {
+        "title": "نقطة البيع باجيستو",
+        "page_not_found": {
+            "title": "هناك شيء مفقود.",
+            "message": "عذرًا، لا يمكننا العثور على هذه الصفحة. ستجد الكثير لتستكشفه في الصفحة الرئيسية.",
+            "back_btn_title": "العودة إلى الصفحة الرئيسية"
+        },
+        "login_form": {
+            "title": "تسجيل الدخول",
+            "user_name": "اسم المستخدم",
+            "user_name_placeholder": "أدخل اسم المستخدم",
+            "password": "كلمة المرور",
+            "password_placeholder": "أدخل كلمة المرور",
+            "remember_password": "تذكر كلمة المرور",
+            "login_btn_title": "تسجيل الدخول"
+        },
+        "footer": {
+            "warning": "لا يسمح Webkul لأي بائعين من طرف ثالث بإعادة بيع وحدات Webkul.",
+            "copyright": "© حقوق الطبع والنشر 2010-2023، Webkul Software (مسجل في الهند/الولايات المتحدة). جميع الحقوق محفوظة."
+        },
+        "layout": {
+            "header": {
+                "title": "نقطة البيع باجيستو",
+                "search_products": "البحث عن المنتجات...",
+                "hold_orders": "طلبات معلقة",
+                "barcode_form": {
+                    "title": "أدخل الباركود",
+                    "barcode_placeholder": "أدخل باركود المنتج",
+                    "cancel_btn_title": "إلغاء",
+                    "proceed_btn_title": "متابعة"
+                },
+                "product_create_form": {
+                    "title": "إضافة منتج جديد",
+                    "name": "الاسم",
+                    "sku": "الرمز التعريفي للمنتج",
+                    "price": "السعر",
+                    "weight": "الوزن",
+                    "quantity": "الكمية",
+                    "cancel_btn_title": "إلغاء",
+                    "proceed_btn_title": "متابعة"
+                }
+            },
+            "sidebar": {
+                "home": "الصفحة الرئيسية",
+                "customers": "العملاء",
+                "cashier": "أمين الصندوق",
+                "orders": "الطلبات",
+                "products": "المنتجات",
+                "reports": "التقارير",
+                "settings": "الإعدادات",
+                "logout": "تسجيل الخروج"
+            },
+            "main": {
+                "cash_drawer": {
+                    "title": "خزانة النقود",
+                    "opening_drawer_amount": "مبلغ فتح الخزانة",
+                    "remarks": "ملاحظات",
+                    "remarks_placeholder": "أدخل ملاحظات إغلاق الكاونتر.",
+                    "open_drawer": "فتح الدرج"
+                }
+            }
+        },
+        "common": {
+            "cart": {
+                "add": "إضافة",
+                "add_customer": "إضافة عميل",
+                "booking_from": "الحجز من",
+                "booking_till": "الحجز حتى",
+                "closed": "مغلق",
+                "create_success": "تم إنشاء العربة بنجاح.",
+                "discount": "خصم",
+                "discount_applied": "تم تطبيق خصم بنسبة {percentage}٪",
+                "downloads": "التنزيلات",
+                "event_expired": "انتهى هذا الحدث.",
+                "event_from": "الحدث من",
+                "event_ticket": "تذكرة الحدث",
+                "event_till": "الحدث حتى",
+                "hold_order": "تعليق الطلب",
+                "hold_order_success": "تم تعليق الطلب بنجاح.",
+                "inventory_warning": "الكمية المطلوبة غير متوفرة.",
+                "missing_links": "روابط التنزيل مفقودة لهذا المنتج.",
+                "missing_options": "الخيارات مفقودة لهذا المنتج.",
+                "no_customer_selected": "لم يتم تحديد أي عميل.",
+                "note": "ملاحظة",
+                "payable_amount": "المبلغ المستحق",
+                "proceed": "متابعة",
+                "product_add_success": "تمت إضافة المنتج إلى العربة بنجاح!",
+                "product_remove_success": "تمت إزالة المنتج من العربة بنجاح!",
+                "qty_missing": "يجب أن يحتوي منتج واحد على الأقل على كمية أكبر من 1.",
+                "invalid_file_extension": "تم العثور على امتداد ملف غير صالح.",
+                "quantity": "الكمية",
+                "remove_cart": "إزالة العربة",
+                "remove_success": "تمت إزالة العربة بنجاح.",
+                "rent_from": "الإيجار من",
+                "rent_till": "الإيجار حتى",
+                "rent_type": "نوع الإيجار",
+                "select_hourly_duration": "حدد مدة زمنية لمدة ساعة واحدة.",
+                "selected_products_simple": "يجب أن تكون المنتجات المحددة من نوع المنتج البسيط.",
+                "special_note": "طلب خاص / ملاحظات",
+                "subtotal": "المجموع الفرعي",
+                "tax": "الضريبة",
+                "update_success": "تم تحديث العربة بنجاح.",
+                "order_note_form": {
+                    "title": "ملاحظة الطلب",
+                    "note_placeholder": "أدخل ملاحظة الطلب",
+                    "cancel_btn_title": "إلغاء",
+                    "proceed_btn_title": "متابعة",
+                    "create_success": "تمت إضافة ملاحظة الطلب بنجاح.",
+                    "remove_success": "تمت إزالة ملاحظة الطلب بنجاح."
+                }
+            },
+            "flash_messages": {
+                "close": "إغلاق",
+                "error_message": "حدث خطأ ما! يرجى المحاولة مرة أخرى.",
+                "offline_error": "تحذير، أنت في وضع غير متصل",
+                "offline_mode": "تحذير: أنت غير متصل. بعض الميزات محدودة",
+                "online_mode": "تمت استعادة الاتصال. لقد عدت إلى الاتصال"
+            },
+            "offline_loader": {
+                "title": "تحذير، أنت في وضع غير متصل",
+                "description": "ستصبح التفاصيل متاحة عند استعادة الاتصال.",
+                "reconnecting": "جارٍ إعادة الاتصال..."
+            },
+            "confirm_modal": {
+                "title": "هل أنت متأكد؟",
+                "description": "هل أنت متأكد أنك تريد القيام بهذا الإجراء؟",
+                "disagree_btn_title": "لا أوافق",
+                "agree_btn_title": "أوافق"
+            },
+            "pagination": {
+                "showing": "عرض {count} من {total} نتيجة",
+                "page": "الصفحة {current} من {total}"
+            }
+        },
+        "home": {
+            "title": "الرئيسية",
+            "print_confirmation_title": "تأكيد الطباعة؟",
+            "print_confirm_message": "هل تريد طباعة إيصال الطلب الأخير؟",
+            "items_in_cart": "{count} عناصر في العربة.",
+            "view_cart_btn": "عرض العربة",
+            "categories": {
+                "all": "الكل"
+            },
+            "products": {
+                "view": {
+                    "qty": "{qty} الكمية",
+                    "add_to_cart": "أضف إلى السلة",
+                    "total_amount": "المبلغ الإجمالي",
+                    "type": {
+                        "simple": {
+                            "customizable_options": {
+                                "none": "لا شيء",
+                                "total_amount": "المبلغ الإجمالي"
+                            }
+                        },
+                        "booking": {
+                            "location": "الموقع",
+                            "view_on_map": "عرض على الخريطة",
+                            "default": {
+                                "slot_duration_in_minutes": "{minutes} دقيقة",
+                                "slot_duration": "مدة الفتحة"
+                            },
+                            "appointment": {
+                                "closed": "مغلق",
+                                "see_details": "عرض التفاصيل",
+                                "slot_duration": "مدة الفتحة",
+                                "slot_duration_in_minutes": "{minutes} دقيقة",
+                                "today_availability": "التوفر اليوم"
+                            },
+                            "event": {
+                                "book_your_ticket": "احجز تذكرتك",
+                                "per_ticket_price_ar": "{price} لكل تذكرة",
+                                "title": "الحدث في :"
+                            },
+                            "rental": {
+                                "choose_rent_option": "اختر خيار الإيجار",
+                                "daily_basis": "على أساس يومي",
+                                "from": "من",
+                                "hourly_basis": "على أساس الساعة",
+                                "rent_an_item": "استئجار عنصر",
+                                "select_date": "اختر التاريخ",
+                                "select_rent_time": "اختر وقت الإيجار",
+                                "select_slot": "اختر الفتحة",
+                                "select_time_slot": "اختر فتحة الوقت",
+                                "slot": "الفتحة",
+                                "no_slots_available": "لا توجد فتحات متاحة",
+                                "to": "إلى"
+                            },
+                            "table": {
+                                "book_a_table": "احجز طاولة",
+                                "closed": "مغلق",
+                                "slot_duration": "مدة الفتحة",
+                                "slot_duration_in_minutes": "{minutes} دقيقة",
+                                "slots_for_all_days": "عرض لجميع الأيام",
+                                "special_notes": "طلب خاص/ملاحظات",
+                                "today_availability": "التوفر اليوم"
+                            },
+                            "slots": {
+                                "book_an_appointment": "احجز موعدًا",
+                                "date": "التاريخ",
+                                "no_slots_available": "لا توجد فتحات متاحة",
+                                "select_slot": "اختر الفتحة",
+                                "title": "الفتحة"
+                            }
+                        },
+                        "bundle": {
+                            "total_amount": "المبلغ الإجمالي",
+                            "none": "لا توجد خيارات حزمة متاحة"
+                        },
+                        "configurable": {
+                            "select_option": "اختر الخيارات",
+                            "select_above_option": "يرجى اختيار الخيارات أعلاه أولاً.",
+                            "price": "سعر المتغير المحدد"
+                        },
+                        "downloadable": {
+                            "samples": "عينات",
+                            "links": "روابط"
+                        },
+                        "grouped": {
+                            "name": "الاسم"
+                        }
+                    }
+                },
+                "no_barcode_product": "لم يتم العثور على منتج بهذا الرمز الشريطي."
+            }
+        },
+        "customers": {
+            "add_btn": "إضافة عميل جديد",
+            "change_btn": "تغيير العميل",
+            "change_success": "تم تغيير العميل بنجاح.",
+            "delete_success": "تم حذف العميل بنجاح.",
+            "customers": "العملاء",
+            "delete_btn": "حذف",
+            "edit_btn": "تعديل",
+            "no_current_customer": "لم يتم العثور على عميل.",
+            "no_customers_found": "لم يتم العثور على عملاء.",
+            "offline_customers": "العملاء غير المتصلين",
+            "search_customers": "ابحث عن العملاء...",
+            "select_btn": "اختر العميل",
+            "title": "العملاء",
+            "create": {
+                "title": "إضافة عميل جديد",
+                "back_btn_title": "رجوع",
+                "first_name": "الاسم الأول",
+                "last_name": "اسم العائلة",
+                "email": "البريد الإلكتروني",
+                "phone_number": "رقم الهاتف",
+                "address": "العنوان",
+                "city": "المدينة",
+                "state": "الولاية",
+                "select_state": "اختر الولاية",
+                "country": "الدولة",
+                "select_country": "اختر الدولة",
+                "pin_code": "الرمز البريدي",
+                "save_btn_title": "إضافة عميل",
+                "phone_already_exist": "رقم الهاتف موجود بالفعل.",
+                "email_already_exist": "البريد الإلكتروني موجود بالفعل.",
+                "create_success": "تم إنشاء العميل بنجاح."
+            },
+            "edit": {
+                "title": "تعديل العميل",
+                "back_btn_title": "رجوع",
+                "first_name": "الاسم الأول",
+                "last_name": "اسم العائلة",
+                "email": "البريد الإلكتروني",
+                "phone_number": "رقم الهاتف",
+                "address": "العنوان",
+                "city": "المدينة",
+                "state": "الولاية",
+                "select_state": "اختر الولاية",
+                "country": "الدولة",
+                "select_country": "اختر الدولة",
+                "pin_code": "الرمز البريدي",
+                "save_btn_title": "تحديث العميل",
+                "phone_already_exist": "رقم الهاتف موجود بالفعل.",
+                "email_already_exist": "البريد الإلكتروني موجود بالفعل.",
+                "update_success": "تم تحديث العميل بنجاح."
+            }
+        },
+        "cashier": {
+            "title": "أمين الصندوق",
+            "cash_drawer": {
+                "title": "درج النقود",
+                "drawer_amount_summary": "ملخص مبلغ الدرج",
+                "opening_drawer_amount": "مبلغ فتح الدرج",
+                "cash_payment_sale": "بيع نقدي",
+                "other_payment_sale": "بيع بوسائل أخرى",
+                "expected_drawer_amount": "المبلغ المتوقع في الدرج",
+                "difference": "الفارق",
+                "remarks": "ملاحظات",
+                "remarks_placeholder": "أدخل ملاحظات إغلاق العداد.",
+                "close_drawer": "إغلاق الدرج"
+            },
+            "today_sale": {
+                "title": "مبيعات اليوم",
+                "opening_drawer_amount": "مبلغ فتح الدرج",
+                "cash_payment_sale": "بيع نقدي",
+                "other_payment_sale": "بيع بوسائل أخرى",
+                "sale_history": "تاريخ المبيعات",
+                "filters": "الفلاتر",
+                "order_id": "معرف الطلب",
+                "time": "الوقت",
+                "order_total": "إجمالي الطلب",
+                "payment_mode": "طريقة الدفع",
+                "no_records": "لم يتم العثور على سجلات.",
+                "no_records_desc": "سيظهر سجل المبيعات هنا بمجرد إجراء المعاملات.",
+                "drawer": {
+                    "title": "تصفية",
+                    "order_id": "رقم الطلب",
+                    "time": "الوقت",
+                    "order_total": "إجمالي الطلب",
+                    "payment_mode": "طريقة الدفع",
+                    "select_payment_mode": "اختر طريقة الدفع",
+                    "pos_cash": "دفع نقدي",
+                    "pos_card": "دفع بالبطاقة",
+                    "pos_split": "دفع مقسم",
+                    "filter_btn_title": "تطبيق الفلتر"
+                }
+            },
+            "sale_history": {
+                "title": "تاريخ المبيعات",
+                "filters": "الفلاتر",
+                "date": "التاريخ",
+                "cash_payments": "المدفوعات النقدية",
+                "other_payments": "المدفوعات الأخرى",
+                "total_sale": "إجمالي المبيعات",
+                "drawer_note": "ملاحظة الدرج",
+                "no_records": "لم يتم العثور على سجلات.",
+                "no_records_desc": "سيظهر سجل المبيعات هنا بمجرد إجراء المعاملات.",
+                "drawer": {
+                    "title": "تصفية",
+                    "date": "تاريخ",
+                    "cash_payment": "دفع نقدي",
+                    "other_payment": "دفع آخر",
+                    "total_sale": "إجمالي المبيعات",
+                    "filter_btn_title": "تطبيق التصفية"
+                }
+            }
+        },
+        "orders": {
+            "title": "الطلبات",
+            "history": {
+                "title": "التاريخ",
+                "search_orders": "البحث عن معرف الطلب أو اسم العميل...",
+                "filters": "الفلاتر",
+                "order_id": "معرف الطلب",
+                "date": "التاريخ",
+                "total_sales": "إجمالي المبيعات",
+                "subtotal": "المجموع الفرعي",
+                "tax": "الضريبة",
+                "no_records": "لم يتم العثور على سجلات.",
+                "no_records_desc": "سيظهر سجل المبيعات هنا بمجرد إجراء المعاملات.",
+                "return_btn": "إرجاع",
+                "order_status": {
+                    "title": "الحالة",
+                    "completed": "مكتمل",
+                    "returned": "تم الإرجاع"
+                }
+            },
+            "hold": {
+                "title": "الطلبات المعلقة",
+                "note": "ملاحظة",
+                "resume": "استئناف",
+                "remove": "إزالة",
+                "remove_success": "تمت إزالة الطلب بنجاح.",
+                "resume_success": "تم استئناف الطلب بنجاح.",
+                "resume_error": "يرجى معالجة السلة الحالية أولاً.",
+                "no_orders": "لا توجد طلبات."
+            },
+            "offline": {
+                "title": "الطلبات غير المتصلة",
+                "sync_order": "مزامنة الطلب",
+                "sync_all_orders": "مزامنة جميع الطلبات",
+                "search_order_id": "البحث عن معرف الطلب...",
+                "order_id": "معرف الطلب",
+                "date": "التاريخ",
+                "no_orders": "لم يتم العثور على طلبات غير متصلة.",
+                "sync_success": "تم مزامنة الطلب بنجاح.",
+                "return": "إرجاع",
+                "returned": "تم الإرجاع",
+                "return_success": "تم إرجاع الطلب بنجاح."
+            },
+            "info": {
+                "order_id": "معرف الطلب",
+                "subtotal": "المجموع الفرعي",
+                "tax": "الضريبة",
+                "discount": "الخصم",
+                "grand_total": "المجموع الكلي",
+                "cash": "نقدي",
+                "balance": "الرصيد",
+                "no_order_selected": "لم يتم اختيار أي طلب لمعاينته أو طباعة الفاتورة."
+            },
+            "print": {
+                "btn_title": "طباعة الفاتورة",
+                "cashier": "أمين الصندوق",
+                "change": "الباقي",
+                "contact_info": "معلومات الاتصال",
+                "customer": "العميل",
+                "customer_care": "خدمة العملاء",
+                "date": "التاريخ",
+                "discount": "الخصم",
+                "email": "البريد الإلكتروني",
+                "grand_total": "الإجمالي الكلي",
+                "item": "المنتج",
+                "name": "الاسم",
+                "no_receipt": "لا توجد إيصال متاح لهذا المنفذ.",
+                "order_id": "رقم الطلب",
+                "phone": "الهاتف",
+                "price": "السعر",
+                "qty": "الكمية",
+                "subtotal": "الإجمالي الجزئي",
+                "tax": "الضريبة",
+                "total": "الإجمالي",
+                "total_qty": "إجمالي الكمية",
+                "website": "الموقع الإلكتروني"
+            }
+        },
+        "products": {
+            "title": "المنتجات",
+            "low_stock_products": {
+                "title": "منتجات ذات مخزون منخفض",
+                "qty": "{qty} الكمية",
+                "purchase_request": "طلب شراء",
+                "send_request_btn": "إرسال الطلب",
+                "no_purchase_request": "لم يتم العثور على طلب شراء.",
+                "no_products": "لم يتم العثور على منتجات ذات مخزون منخفض.",
+                "items_in_request": "{count} عنصر في طلب الشراء.",
+                "view_btn_title": "عرض",
+                "request": {
+                    "title": "إرسال طلب كمية",
+                    "requested_quantity": "الكمية المطلوبة",
+                    "comment": "تعليق",
+                    "comment_placeholder": "أدخل تعليق",
+                    "add_btn_title": "إضافة منتج",
+                    "cancel_btn_title": "إلغاء",
+                    "already_exist": "المنتج موجود بالفعل في قائمة الطلبات."
+                }
+            },
+            "requested_products": {
+                "title": "المنتجات المطلوبة",
+                "search_products": "البحث عن المنتجات...",
+                "qty": "الكمية:- {qty}",
+                "pending": "معلق",
+                "received": "تم الاستلام",
+                "declined": "تم رفضه",
+                "no_products": "لم يتم العثور على طلب المنتج."
+            },
+            "settings": {
+                "title": "الإعدادات",
+                "minimum_qty": "الحد الأدنى للكمية",
+                "save_btn_title": "حفظ",
+                "save_success": "تم حفظ الإعدادات بنجاح."
+            }
+        },
+        "reports": {
+            "title": "التقارير",
+            "day": "يوم",
+            "week": "أسبوع",
+            "month": "شهر"
+        },
+        "settings": {
+            "title": "الإعدادات",
+            "profile": {
+                "title": "الملف الشخصي",
+                "first_name": "الاسم الأول",
+                "last_name": "اسم العائلة",
+                "email": "البريد الإلكتروني",
+                "old_password": "كلمة المرور القديمة",
+                "new_password": "كلمة المرور الجديدة",
+                "confirm_password": "تأكيد كلمة المرور",
+                "update_btn_title": "تحديث الملف الشخصي"
+            },
+            "sync": {
+                "completed": "تم",
+                "customers": "العملاء",
+                "deselect_all": "إلغاء تحديد الكل",
+                "entities": "الكيانات",
+                "entities_desc": "حدد الكيانات التي تريد مزامنتها مع الخادم.",
+                "fetching": "جاري الجلب...",
+                "orders": "الطلبات",
+                "products": "المنتجات",
+                "ready": "جاهز",
+                "records": "السجلات",
+                "select_all": "تحديد الكل",
+                "start_syncing": "بدء المزامنة",
+                "sync_btn_title": "مزامنة الآن",
+                "title": "مزامنة"
+            },
+            "shortcuts": {
+                "title": "الاختصارات",
+                "description": "توليفات لوحة المفاتيح التي تتيح لك تنفيذ الإجراءات بسرعة.",
+                "sections": {
+                    "header": "رأس الصفحة",
+                    "menu": "القائمة",
+                    "customer": "العميل",
+                    "cart": "السلة"
+                },
+                "items": {
+                    "open_barcode": {
+                        "action": "فتح وضع الباركود",
+                        "description": "التحويل إلى وضع مسح الباركود"
+                    },
+                    "open_product_modal": {
+                        "action": "فتح نافذة إضافة منتج",
+                        "description": "إضافة منتج جديد بسرعة"
+                    },
+                    "fullscreen": {
+                        "action": "تبديل وضع ملء الشاشة",
+                        "description": "الدخول/الخروج من وضع ملء الشاشة"
+                    },
+                    "dark_mode": {
+                        "action": "تبديل الوضع الداكن",
+                        "description": "تغيير السمة"
+                    },
+                    "hold_orders": {
+                        "action": "الطلبات المعلقة",
+                        "description": "إدارة الطلبات المعلقة"
+                    },
+                    "home": {
+                        "action": "الانتقال إلى الرئيسية",
+                        "description": "الانتقال إلى الصفحة الرئيسية"
+                    },
+                    "customers": {
+                        "action": "الانتقال إلى العملاء",
+                        "description": "فتح قسم العملاء"
+                    },
+                    "cashier": {
+                        "action": "الانتقال إلى أمين الصندوق",
+                        "description": "الوصول إلى أمين الصندوق"
+                    },
+                    "orders": {
+                        "action": "الانتقال إلى الطلبات",
+                        "description": "عرض سجل الطلبات"
+                    },
+                    "products": {
+                        "action": "الانتقال إلى المنتجات",
+                        "description": "إدارة المنتجات"
+                    },
+                    "reports": {
+                        "action": "الانتقال إلى التقارير",
+                        "description": "عرض التحليلات"
+                    },
+                    "settings": {
+                        "action": "الانتقال إلى الإعدادات",
+                        "description": "تعديل التفضيلات"
+                    },
+                    "create_customer": {
+                        "action": "إضافة عميل جديد",
+                        "description": "إضافة عميل"
+                    },
+                    "edit_customer": {
+                        "action": "تعديل العميل الحالي",
+                        "description": "تحديث معلومات العميل المحدد"
+                    },
+                    "delete_customer": {
+                        "action": "حذف العميل الحالي",
+                        "description": "إزالة العميل المحدد"
+                    },
+                    "change_customer": {
+                        "action": "تغيير العميل الحالي",
+                        "description": "اختيار عميل مختلف"
+                    },
+                    "add_note": {
+                        "action": "إضافة ملاحظة",
+                        "description": "إرفاق ملاحظة بالطلب"
+                    },
+                    "remove_note": {
+                        "action": "إزالة الملاحظة",
+                        "description": "حذف الملاحظة من السلة"
+                    },
+                    "checkout": {
+                        "action": "المتابعة للدفع",
+                        "description": "بدء عملية الدفع"
+                    },
+                    "hold_order": {
+                        "action": "تعليق الطلب",
+                        "description": "وضع الطلب في الانتظار"
+                    }
+                }
+            },
+            "regional": {
+                "title": "إعدادات إقليمية",
+                "locale": "اللغة",
+                "select_locale": "اختر اللغة",
+                "currency": "العملة",
+                "select_currency": "اختر العملة",
+                "save_btn_title": "حفظ"
+            },
+            "save_success": "تم حفظ الإعدادات بنجاح."
+        },
+        "payment": {
+            "title": "الدفع",
+            "back": "رجوع",
+            "order_details": "تفاصيل الطلب",
+            "subtotal": "المجموع الفرعي",
+            "tax": "الضريبة",
+            "discount": "الخصم",
+            "grand_total": "المجموع الكلي",
+            "payable_amount": "المبلغ المستحق",
+            "received": "المستلم",
+            "remaining": "المتبقي",
+            "pos_cash": "نقد",
+            "pos_card": "بطاقة",
+            "pos_split": "تقسيم",
+            "cancel": "إلغاء",
+            "card_details": "تفاصيل البطاقة",
+            "bank": "بنك",
+            "select_bank": "اختر البنك",
+            "other": "آخر",
+            "confirm_payment": "تأكيد الدفع",
+            "empty_cart": "السلة فارغة!",
+            "amount_exceeded": "المبلغ المستحق تجاوز!",
+            "order_placed": "تم تقديم الطلب بنجاح."
+        }
+    }
+}

@@ -1,0 +1,57 @@
+<?php
+
+return [
+    'menu' => [
+        'inventory' => 'Inventory',
+        'reorder'   => 'Reorder',
+    ],
+    'acl' => [
+        'inventory' => 'Inventory',
+        'reorder'   => 'Reorder',
+    ],
+    'page' => [
+        'title'     => 'Reorder Support',
+        'channel'   => 'Channel',
+        'lead-time' => 'Lead time',
+        'window'    => 'Sales window',
+    ],
+    'ui' => [
+        'search-ph'       => 'Search by name or SKU',
+        'sort-buyat-asc'  => 'Buy at ↑',
+        'sort-buyat-desc' => 'Buy at ↓',
+        'image'           => 'Image',
+        'name'            => 'Name',
+        'stock'           => 'Stock',
+        'buy-at'          => 'Buy at',
+        'cost'            => 'Cost',
+        'sale'            => 'Sales',
+        'waste'           => 'Waste',
+        'suggested'       => 'Suggested',
+        'wish-qty'        => 'Wish qty',
+        'subtotal'        => 'Subtotal',
+        'total'           => 'Total',
+        'clipboard'       => 'Clipboard',
+        'clip-empty'      => 'No items picked',
+        'empty'           => 'No products',
+        'cancel'          => 'Cancel',
+        'add'             => 'Add',
+        'save'            => 'Save',
+        'print'           => 'Print labels',
+        'saved'           => 'Saved',
+    ],
+    'labels' => [
+        'title'           => 'Reorder labels',
+        'print'           => 'Print',
+        'missing-barcode' => 'Missing barcode for product IDs',
+    ],
+    'config' => [
+        'title'                 => 'Reorder (発注サポート)',
+        'info'                  => 'Inventory reorder suggestion thresholds.',
+        'lead-time-days'        => 'Lead time (days)',
+        'lead-time-days-info'   => 'Average days between placing an order and receiving stock.',
+        'sales-window-days'     => 'Sales window (days)',
+        'sales-window-days-info'=> 'Number of days used to compute average daily sales.',
+        'safety-stock'          => 'Safety stock',
+        'safety-stock-info'     => 'Extra buffer units added to the suggestion.',
+    ],
+];

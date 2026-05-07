@@ -1,0 +1,5 @@
+#outlet/products/low-stock.graphql Related APIs
+
+extend type Query @guard(with: ["pos_user"]) {
+    getLowStockProducts: [OutletProductResult] @field(resolver: "Webkul\\Pos\\Queries\\Products\\ProductQuery@getLowStockProducts")
+}

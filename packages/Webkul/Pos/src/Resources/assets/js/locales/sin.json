@@ -1,0 +1,617 @@
+{
+    "pos": {
+        "title": "බැගිස්ටෝ POS",
+        "page_not_found": {
+            "title": "කිසිවක් අඩුයි.",
+            "message": "සමාවන්න, අපට එම පිටුව සොයාගත නොහැක. ඔබට ප්‍රධාන පිටුවේ බොහෝ දේ පරීක්ෂා කළ හැක.",
+            "back_btn_title": "ප්‍රධාන පිටුවට ආපසු යන්න"
+        },
+        "login_form": {
+            "title": "පිවිසුම",
+            "user_name": "පරිශීලක නම",
+            "user_name_placeholder": "පරිශීලක නම ඇතුළත් කරන්න",
+            "password": "මුරපදය",
+            "password_placeholder": "මුරපදය ඇතුළත් කරන්න",
+            "remember_password": "මතකයක් පරීක්ෂා කරන්න",
+            "login_btn_title": "පිවිසෙන්න"
+        },
+        "footer": {
+            "warning": "Webkul වෙතින් කාර්යාලීය තැපැල් අනුමත නොපවතියි.",
+            "copyright": "© වර්ෂය 2010-2023, වෙබ්කල් මෘදුකාංග (රාජකාරියානුකූලව ලියැප්තු). සියලුම අත්රිකාවන් සඳහා සමානාය."
+        },
+        "layout": {
+            "header": {
+                "title": "බැගිස්ටෝ POS",
+                "search_products": "නිෂ්පාදන සොයන්න...",
+                "hold_orders": "රක්ෂා පත්‍ර",
+                "barcode_form": {
+                    "title": "බාර්කෝඩ් ඇතුලත් කරන්න",
+                    "barcode_placeholder": "නිෂ්පාදනේ බාර්කෝඩ් ඇතුලත් කරන්න",
+                    "cancel_btn_title": "අවලංගු කරන්න",
+                    "proceed_btn_title": "ඉදිරිපත් කරන්න"
+                },
+                "product_create_form": {
+                    "title": "නව නිෂ්පාදනයක් එක් කරන්න",
+                    "name": "නම",
+                    "sku": "SKU",
+                    "price": "වර්ගය",
+                    "weight": "බර",
+                    "quantity": "ප්‍රමාණය",
+                    "cancel_btn_title": "අවලංගු කරන්න",
+                    "proceed_btn_title": "සහාය"
+                }
+            },
+            "sidebar": {
+                "home": "මුල් පිටුව",
+                "customers": "ප්‍රජාතාන්තියන්",
+                "cashier": "මුදල් පත්‍රයක්",
+                "orders": "ඇණවුම්",
+                "products": "නිෂ්පාදන",
+                "reports": "වාර්තා",
+                "settings": "සැකසුම්",
+                "logout": "ඉවත් වන්න"
+            },
+            "main": {
+                "cash_drawer": {
+                    "title": "මුදල් කුඩ",
+                    "opening_drawer_amount": "කුඩ විවෘත රාශි",
+                    "remarks": "කමැත්ත",
+                    "remarks_placeholder": "අවසන් කවුන්ටර් සටහන් ඇතුළත් කරන්න.",
+                    "open_drawer": "කුඩ විවෘත කරන්න"
+                }
+            }
+        },
+        "common": {
+            "cart": {
+                "add": "එක් කරන්න",
+                "add_customer": "පාරිභෝගිකයෙක් එක් කරන්න",
+                "booking_from": "බුකින් සිට",
+                "booking_till": "බුකින් දක්වා",
+                "closed": "වසන්",
+                "create_success": "කාර්ට් සාර්ථකව නිර්මාණය කරන ලදී.",
+                "discount": "දැඩි වට්ටම",
+                "discount_applied": "{percentage}% වට්ටම අදාළ කර ඇත",
+                "downloads": "ඩවුන්ලෝඩ්",
+                "event_expired": "මෙම සිදුවීම කල් ඉකුත් වී ඇත.",
+                "event_from": "සිදුවීම සිට",
+                "event_ticket": "සිදුවීමේ ටිකට්පත",
+                "event_till": "සිදුවීම දක්වා",
+                "hold_order": "ඇණවුම තබන්න",
+                "hold_order_success": "ඇණවුම සාර්ථකව තබා ඇත.",
+                "inventory_warning": "අයදුම් කරන ලද ප්‍රමාණය ලබා ගත නොහැක.",
+                "missing_links": "මෙම නිෂ්පාදනය සඳහා ඩවුන්ලෝඩ් සබැඳි නැත.",
+                "missing_options": "මෙම නිෂ්පාදනය සඳහා විකල්ප නැත.",
+                "no_customer_selected": "කිසිදු පාරිභෝගිකයෙක් තෝරා නොමැත.",
+                "note": "සටහන",
+                "payable_amount": "ගෙවිය යුතු මුදල",
+                "proceed": "ඉදිරියට යන්න",
+                "product_add_success": "නිෂ්පාදනය කාර්ට් වෙත සාර්ථකව එකතු කරන ලදී!",
+                "product_remove_success": "නිෂ්පාදනය කාර්ට් වෙතින් සාර්ථකව ඉවත් කරන ලදී!",
+                "qty_missing": "අවම වශයෙන් එක් නිෂ්පාදනයක් 1 ට වඩා වැඩි ප්‍රමාණයක් තිබිය යුතුය.",
+                "invalid_file_extension": "අවලංගු ගොනු දිගු කිරීමක් හමුවිණි.",
+                "quantity": "ප්‍රමාණය",
+                "remove_cart": "කාර්ට් ඉවත් කරන්න",
+                "remove_success": "කාර්ට් සාර්ථකව ඉවත් කරන ලදී.",
+                "rent_from": "භාඩු සිට",
+                "rent_till": "භාඩු දක්වා",
+                "rent_type": "භාඩු වර්ගය",
+                "select_hourly_duration": "පැය එකක කාල පරාසය තෝරන්න.",
+                "selected_products_simple": "තෝරාගත් නිෂ්පාදන සරල වර්ගයේ විය යුතුය.",
+                "special_note": "විශේෂ ඉල්ලීම/සටහන්",
+                "subtotal": "උප එකතුව",
+                "tax": "වැසි",
+                "update_success": "කාර්ට් සාර්ථකව යාවත්කාලීන කරන ලදී.",
+                "order_note_form": {
+                    "title": "ඇණවුම් සටහන",
+                    "note_placeholder": "ඇණවුමේ සටහන ඇතුලත් කරන්න",
+                    "cancel_btn_title": "අවලංගු කරන්න",
+                    "proceed_btn_title": "ඉදිරිපත් කරන්න",
+                    "create_success": "ඇණවුම් සටහන සාර්ථකව එකතු කරන ලදි.",
+                    "remove_success": "ඇණවුම් සටහන සාර්ථකව අස්සේ යුතුවයි."
+                }
+            },
+            "flash_messages": {
+                "close": "වසන්න",
+                "error_message": "කිසියම් දෝෂයක් ඇතිවීය! කරුණාකර නැවත උත්සාහ කරන්න.",
+                "offline_error": "අවවාදයයි, ඔබ නොබැඳී ප්‍රකාරයේ පවතී",
+                "offline_mode": "අවවාදයයි: ඔබ නොබැඳී ඇත. සීමිත කාර්ය සාධනයක් පමණක් ඇත",
+                "online_mode": "සම්බන්ධතාවය ප්‍රතිස්ථාපනය විය. ඔබ නැවත එක්කෙනා ලෙස සම්බන්ධ වී ඇත"
+            },
+            "offline_loader": {
+                "title": "අවවාදයයි, ඔබ නොබැඳී ප්‍රකාරයේ පවතී",
+                "description": "ඔබගේ සම්බන්ධතාවය ප්‍රතිස්ථාපනය වූ පසු විස්තර ලබා ගත හැකි වේ.",
+                "reconnecting": "ප්‍රතිසම්බන්ධ වීමින්..."
+            },
+            "confirm_modal": {
+                "title": "ඔබට විශ්වාසද?",
+                "description": "මෙම ක්‍රියාව ඉටු කිරීමට ඔබට විශ්වාසද?",
+                "disagree_btn_title": "අදහස් නොගැසීම",
+                "agree_btn_title": "අනුමත කරන්න"
+            },
+            "pagination": {
+                "showing": "{total} න් {count} ප්‍රතිඵල පෙන්වමින්",
+                "page": "{total} කින් {current} වැනි පිටුව"
+            }
+        },
+        "home": {
+            "title": "මුල් පිටුව",
+            "print_confirmation_title": "මුද්‍රණ තහවුරු කිරීම?",
+            "print_confirm_message": "අවසන් ඇනවුමේ රිසිට් පත මුද්‍රණය කිරීමට ඔබ කැමතිද?",
+            "items_in_cart": "කරට්ටුවේ {count} අයිතම.",
+            "view_cart_btn": "කරට්ටුව බලන්න",
+            "categories": {
+                "all": "සියලු"
+            },
+            "products": {
+                "view": {
+                    "qty": "{qty} ප්‍රමාණය",
+                    "add_to_cart": "කරත්තයට එක් කරන්න",
+                    "total_amount": "මුළු මුදල",
+                    "type": {
+                        "simple": {
+                            "customizable_options": {
+                                "none": "කිසිවක් නැත",
+                                "total_amount": "මුළු මුදල"
+                            }
+                        },
+                        "booking": {
+                            "location": "ස්ථානය",
+                            "view_on_map": "සිතියමේ බලන්න",
+                            "default": {
+                                "slot_duration_in_minutes": "{minutes} මිනිත්තු",
+                                "slot_duration": "ස්ලොට් කාලය"
+                            },
+                            "appointment": {
+                                "closed": "වසා ඇත",
+                                "see_details": "විස්තර බලන්න",
+                                "slot_duration": "ස්ලොට් කාලය",
+                                "slot_duration_in_minutes": "{minutes} මිනිත්තු",
+                                "today_availability": "අද ලබාගත හැකියාව"
+                            },
+                            "event": {
+                                "book_your_ticket": "ඔබේ ටිකට්පත වෙන්කරන්න",
+                                "per_ticket_price_si": "ප්‍රති ටිකට්පතකට {price}",
+                                "title": "සිදුවීම :"
+                            },
+                            "rental": {
+                                "choose_rent_option": "කිරුනු විකල්පය තෝරන්න",
+                                "daily_basis": "දිනපතා",
+                                "from": "සිට",
+                                "hourly_basis": "පැය පදනම",
+                                "rent_an_item": "අයිතමයක් කුලියට ගන්න",
+                                "select_date": "දිනය තෝරන්න",
+                                "select_rent_time": "කුලියට ගන්නා කාලය තෝරන්න",
+                                "select_slot": "ස්ලොට් තෝරන්න",
+                                "select_time_slot": "කාල ස්ලොට් තෝරන්න",
+                                "slot": "ස්ලොට්",
+                                "no_slots_available": "ස්ලොට් ලබාගත නොහැක",
+                                "to": "දක්වා"
+                            },
+                            "table": {
+                                "book_a_table": "මේසයක් වෙන්කරන්න",
+                                "closed": "වසා ඇත",
+                                "slot_duration": "ස්ලොට් කාලය",
+                                "slot_duration_in_minutes": "{minutes} මිනිත්තු",
+                                "slots_for_all_days": "සියලු දින සඳහා පෙන්වන්න",
+                                "special_notes": "විශේෂ ඉල්ලීම්/සටහන්",
+                                "today_availability": "අද ලබාගත හැකියාව"
+                            },
+                            "slots": {
+                                "book_an_appointment": "අපොයින්ට්මන්ට් එකක් වෙන්කරන්න",
+                                "date": "දිනය",
+                                "no_slots_available": "ස්ලොට් ලබාගත නොහැක",
+                                "select_slot": "ස්ලොට් තෝරන්න",
+                                "title": "ස්ලොට්"
+                            }
+                        },
+                        "bundle": {
+                            "total_amount": "මුළු මුදල",
+                            "none": "බන්ඩල් විකල්ප ලබාගත නොහැක"
+                        },
+                        "configurable": {
+                            "select_option": "විකල්ප තෝරන්න",
+                            "select_above_option": "කරුණාකර මීට පෙර විකල්ප තෝරන්න.",
+                            "price": "තෝරාගත් විකල්පයේ මිල"
+                        },
+                        "downloadable": {
+                            "samples": "නියැදි",
+                            "links": "සබැඳි"
+                        },
+                        "grouped": {
+                            "name": "නම"
+                        }
+                    }
+                },
+                "no_barcode_product": "මෙම තීරුකේතය සහිත නිෂ්පාදනයක් සොයාගෙන නැත."
+            }
+        },
+        "customers": {
+            "add_btn": "නව ගනුදෙනුකරු එක් කරන්න",
+            "change_btn": "ගනුදෙනුකරු වෙනස් කරන්න",
+            "change_success": "ගනුදෙනුකරු සාර්ථකව වෙනස් විය.",
+            "delete_success": "ගනුදෙනුකරු සාර්ථකව මකන ලදී.",
+            "customers": "ගනුදෙනුකරුවන්",
+            "delete_btn": "මකන්න",
+            "edit_btn": "සංස්කරණය කරන්න",
+            "no_current_customer": "ගනුදෙනුකරු සොයාගෙන නැත.",
+            "no_customers_found": "ගනුදෙනුකරුවන් කිසිවෙකු සොයාගෙන නැත.",
+            "offline_customers": "නොසම්බන්ධිත ගනුදෙනුකරුවන්",
+            "search_customers": "ගනුදෙනුකරුවන් සොයන්න...",
+            "select_btn": "පාරිකයා තෝරන්න",
+            "title": "ගනුදෙනුකරුවන්",
+            "create": {
+                "title": "නව ප්‍රජාතාන් එකතු කරන්න",
+                "back_btn_title": "ආපසු",
+                "first_name": "මුල් නම",
+                "last_name": "අවසන් නම",
+                "email": "ඊමේල්",
+                "phone_number": "දුරකථන අංකය",
+                "address": "ලිපිනය",
+                "city": "නගරය",
+                "state": "පළාත",
+                "select_state": "පළාත තෝරන්න",
+                "country": "රට",
+                "select_country": "රට තෝරන්න",
+                "pin_code": "පින් කේතය",
+                "save_btn_title": "ප්‍රජාතාන් එකතු කරන්න",
+                "phone_already_exist": "දුරකථන අංකය දැනටමත් පවතියි.",
+                "email_already_exist": "ඊමේල් ලිපිනය දැනටමත් පවතියි.",
+                "create_success": "ප්‍රජාතාන් සාර්ථකව සාදන ලදී."
+            },
+            "edit": {
+                "title": "ප්‍රජාතාන් සංස්කරණය කරන්න",
+                "back_btn_title": "ආපසු",
+                "first_name": "මුල් නම",
+                "last_name": "අවසන් නම",
+                "email": "ඊමේල්",
+                "phone_number": "දුරකථන අංකය",
+                "address": "ලිපිනය",
+                "city": "නගරය",
+                "state": "පළාත",
+                "select_state": "පළාත තෝරන්න",
+                "country": "රට",
+                "select_country": "රට තෝරන්න",
+                "pin_code": "පින් කේතය",
+                "save_btn_title": "ප්‍රජාතාන් යාවත්කාලීන කරන්න",
+                "phone_already_exist": "දුරකථන අංකය දැනටමත් පවතියි.",
+                "email_already_exist": "ඊමේල් ලිපිනය දැනටමත් පවතියි.",
+                "update_success": "ප්‍රජාතාන් සාර්ථකව යාවත්කාලීන කරන ලදී."
+            }
+        },
+        "cashier": {
+            "title": "කියුපන්කරු",
+            "cash_drawer": {
+                "title": "මුදල් ඩ්‍රෝවරය",
+                "drawer_amount_summary": "ඩ්‍රෝවර මුල් සාරාංශය",
+                "opening_drawer_amount": "ඩ්‍රෝවර ආරම්භක මුල් මුදල",
+                "cash_payment_sale": "මුදල් ගෙවීම් විකුණුම",
+                "other_payment_sale": "වෙනත් ගෙවීම් විකුණුම",
+                "expected_drawer_amount": "අපරාධ ඩ්‍රෝවර මුල් මුදල",
+                "difference": "වෙනස්කම",
+                "remarks": "විවේචන",
+                "remarks_placeholder": "කවදතාව සතුව අයිතියක් ඇතුලත් කරන්න.",
+                "close_drawer": "ඩ්‍රෝවරය වසා දමන්න"
+            },
+            "today_sale": {
+                "title": "අදහස් විකුණුම්",
+                "opening_drawer_amount": "ඩ්‍රෝවර ආරම්භක මුල් මුදල",
+                "cash_payment_sale": "මුදල් ගෙවීම් විකුණුම",
+                "other_payment_sale": "වෙනත් ගෙවීම් විකුණුම",
+                "sale_history": "විකුණුම් ඉතිහාසය",
+                "filters": "වෙනස්කම්",
+                "order_id": "ඇණවුම් අංකය",
+                "time": "වේලාව",
+                "order_total": "ඇණවුම් එකතුව",
+                "payment_mode": "ගෙවීම් කපාංකය",
+                "no_records": "සටහන් කිසිවක් සොයාගත නොහැක.",
+                "no_records_desc": "ගනුදෙනු සිදු වූ පසු විකුණුම් ඉතිහාසය මෙහි පෙන්වනු ඇත.",
+                "drawer": {
+                    "title": "පෙරහන්",
+                    "order_id": "ඇණවුම් හැඳුනුම්පත",
+                    "time": "සමය",
+                    "order_total": "ඇණවුම් එකතුව",
+                    "payment_mode": "ගෙවීම් මාර්ගය",
+                    "select_payment_mode": "ගෙවීම් මාර්ගය තෝරන්න",
+                    "pos_cash": "මුදල් ගෙවීම්",
+                    "pos_card": "කාර්ඩ් ගෙවීම්",
+                    "pos_split": "විභජන ගෙවීම්",
+                    "filter_btn_title": "පෙරහන් යෙදුම්"
+                }
+            },
+            "sale_history": {
+                "title": "විකුණුම් ඉතිහාසය",
+                "filters": "වෙනස්කම්",
+                "date": "දිනය",
+                "cash_payments": "මුදල් ගෙවීම්",
+                "other_payments": "වෙනත් ගෙවීම්",
+                "total_sale": "මුළු විකුණුම්",
+                "drawer_note": "ඩ්‍රෝවර සටහන",
+                "no_records": "සටහන් කිසිවක් සොයාගත නොහැක.",
+                "no_records_desc": "ගනුදෙනු සිදු වූ පසු විකුණුම් ඉතිහාසය මෙහි පෙන්වනු ඇත.",
+                "drawer": {
+                    "title": "ආපසුම",
+                    "date": "දිනය",
+                    "cash_payment": "නගදු ගෙවීම",
+                    "other_payment": "වෙනත් ගෙවීම",
+                    "total_sale": "මුළු විකිණීම",
+                    "filter_btn_title": "පිවිසෙන්න"
+                }
+            }
+        },
+        "orders": {
+            "title": "ඇණවුම්",
+            "history": {
+                "title": "ඉතිහාසය",
+                "search_orders": "ඇණවුම් අංකය හෝ ප්‍රජාතාන්තියේ නම සොයන්න...",
+                "filters": "වෙනස්කම්",
+                "order_id": "ඇණවුම් අංකය",
+                "date": "දිනය",
+                "total_sales": "මුළු විකුණුම්",
+                "subtotal": "උප එකතුව",
+                "tax": "බද්ධ එකතුව",
+                "no_records": "සටහන් කිසිවක් සොයාගත නොහැක.",
+                "no_records_desc": "ගනුදෙනු සිදු වූ පසු විකුණුම් ඉතිහාසය මෙහි පෙන්වනු ඇත.",
+                "return_btn": "ආපසු ලබාදීම",
+                "order_status": {
+                    "title": "තත්ත්වය",
+                    "completed": "සම්පූර්ණයි",
+                    "returned": "ආපසු ලබාදී ඇත"
+                }
+            },
+            "hold": {
+                "title": "ප්‍රතිඵලයේ ඇණවුම්",
+                "note": "සටහන",
+                "resume": "නැවත ආරම්භ කරන්න",
+                "remove": "ඉවත් කරන්න",
+                "remove_success": "ඇණවුම සාර්ථකව ඉවත් කරනු ලැබීය.",
+                "resume_success": "ඇණවුම සාර්ථකව නැවත ආරම්භ කරන ලදී.",
+                "resume_error": "කරුණාකර ප්‍රථමයෙන් වත්මන් කරත්තය සැකසන්න.",
+                "no_orders": "ඇණවුම් කිසිවක් සොයා ගත නොහැක."
+            },
+            "offline": {
+                "title": "නොමිලේ ඇණවුම්",
+                "sync_order": "ආදේශ සන්කේතනය",
+                "sync_all_orders": "සියල්ල ඇණවුම් සිංහලයන් කරන්න",
+                "search_order_id": "ඇණවුම් අංකය සොයන්න...",
+                "order_id": "ඇණවුම් අංකය",
+                "date": "දිනය",
+                "no_orders": "කිසිදු අංශබාහී ඇණවුමක් සොයාගත නොහැක.",
+                "sync_success": "ඇනවුම සාර්ථකව සම්මුඛ කිරීමකට ලක්විය.",
+                "return": "ආපසු ලබාදීම",
+                "returned": "ආපසු ලබාදුන්",
+                "return_success": "ඇණවුම සාර්ථකව ආපසු ලබාදුනි."
+            },
+            "info": {
+                "order_id": "ඇණවුම් අංකය",
+                "subtotal": "උප එකතුව",
+                "tax": "බද්ධ එකතුව",
+                "discount": "වට්ටම්",
+                "grand_total": "සම්පූර්ණ එකතුව",
+                "cash": "මුදල්",
+                "balance": "ඉතිරි",
+                "no_order_selected": "පෙරදසුන බලන්න හෝ ඉන්වොයිසය මුද්‍රණය සඳහා නියමිත ආරෙවක් තෝරා නොමැත."
+            },
+            "print": {
+                "btn_title": "ඉන්වොයිසය මුද්‍රණය කරන්න",
+                "cashier": "ගිණුම්කරු",
+                "change": "ඉතිරි මුදල",
+                "contact_info": "සම්බන්ධතා තොරතුරු",
+                "customer": "පාරිභෝගිකයා",
+                "customer_care": "පාරිභෝගික සේවා",
+                "date": "දිනය",
+                "discount": "වට්ටම්",
+                "email": "ඊ-තැපෑල",
+                "grand_total": "මුළු එකතුව",
+                "item": "නිෂ්පාදන",
+                "name": "නම",
+                "no_receipt": "මෙම වෙළඳසැල සඳහා රිසිට්පතක් නොමැත.",
+                "order_id": "ඇණවුම් අංකය",
+                "phone": "දුරකථනය",
+                "price": "මිල",
+                "qty": "ප්‍රමාණය",
+                "subtotal": "අනු එකතුව",
+                "tax": "බද්ද",
+                "total": "එකතුව",
+                "total_qty": "මුළු ප්‍රමාණය",
+                "website": "වෙබ් අඩවිය"
+            }
+        },
+        "products": {
+            "title": "නිෂ්පාදන",
+            "low_stock_products": {
+                "title": "අඩු සම්භාරය ඇති නිෂ්පාදන",
+                "qty": "{qty} ප්‍රමාණය",
+                "purchase_request": "ගැණුම් ඉල්ලීම",
+                "send_request_btn": "ඉල්ලීම යවන්න",
+                "no_purchase_request": "ගැණුම් ඉල්ලීමක් සොයා ගත නොහැක.",
+                "no_products": "අඩු තොග පරිමාණයක් සහිත නිෂ්පාදන කිසිවක් සොයාගත නොහැක.",
+                "items_in_request": "මිලදී ගැනීමේ ඉල්ලීම්හි {count} අයිතම.",
+                "view_btn_title": "බලන්න",
+                "request": {
+                    "title": "ප්‍රමාණ ඉල්ලීම යවන්න",
+                    "requested_quantity": "ඉල්ලුම් කළ ප්‍රමාණය",
+                    "comment": "සටහන",
+                    "comment_placeholder": "සටහන ඇතුලත් කරන්න",
+                    "add_btn_title": "නිෂ්පාදන එකතු කරන්න",
+                    "cancel_btn_title": "විතිය",
+                    "already_exist": "නිෂ්පාදනය ඉල්ලීම් ලැයිස්තුවේ ඇත."
+                }
+            },
+            "requested_products": {
+                "title": "ඉල්ලීමේ නිෂ්පාදන",
+                "search_products": "නිෂ්පාදන සොයන්න...",
+                "qty": "ප්‍රමාණය:- {qty}",
+                "pending": "අනුමැතිය",
+                "received": "ලබා දී",
+                "declined": "ප්‍රතික්ෂේප",
+                "no_products": "කෝටියක් සඳහා කිසිදු අයැදුමක් සොයාගත නොහැකි විය."
+            },
+            "settings": {
+                "title": "සැකසුම්",
+                "minimum_qty": "අවම ප්‍රමාණය",
+                "save_btn_title": "සුරකින්න",
+                "save_success": "සැකසුම් සාර්ථකව සුරකින්නා ලදි."
+            }
+        },
+        "reports": {
+            "title": "වාර්තා",
+            "day": "දිනය",
+            "week": "සතිය",
+            "month": "මාසය"
+        },
+        "settings": {
+            "title": "සැකසුම්",
+            "profile": {
+                "title": "පැතිකඩ",
+                "first_name": "මුල් නම",
+                "last_name": "අවසන් නම",
+                "email": "ඊමේල්",
+                "old_password": "පැරණි මුරපදය",
+                "new_password": "නව මුරපදය",
+                "confirm_password": "මුරපදය තහවුරු කරන්න",
+                "update_btn_title": "පැතිකඩ යාවත්කාලීන කරන්න"
+            },
+            "sync": {
+                "completed": "සම්පූර්ණයි",
+                "customers": "ගනුදෙනුකරුවන්",
+                "deselect_all": "සියල්ල අහෝසි කරන්න",
+                "entities": "ඒකක",
+                "entities_desc": "සේවාදායකය සමඟ සම්මුඛ කිරීම සඳහා ඔබට අවශ්‍ය ඒකක තෝරන්න.",
+                "fetching": "පිටවීම...",
+                "orders": "ඇණවුම්",
+                "products": "නිෂ්පාදන",
+                "ready": "සූදානම්",
+                "records": "සටහන්",
+                "select_all": "සියල්ල තෝරන්න",
+                "start_syncing": "සම්මුඛ කිරීම ආරම්භ කරන්න",
+                "sync_btn_title": "දැන් සම්මුඛ කරන්න",
+                "title": "සම්මුඛ කිරීම"
+            },
+            "shortcuts": {
+                "title": "කෙටි මාර්ග",
+                "description": "ක්‍රියා ඉක්මනින් සිදු කිරීමට ඔබට ඉඩ සලසන යතුරුපුවරු සංයෝජන.",
+                "sections": {
+                    "header": "ශීර්ෂය",
+                    "menu": "මෙනුව",
+                    "customer": "ගනුදෙනුකරු",
+                    "cart": "කරත්තය"
+                },
+                "items": {
+                    "open_barcode": {
+                        "action": "බාර්කෝඩ් ප්‍රකාරය විවෘත කරන්න",
+                        "description": "බාර්කෝඩ් ස්කෑන් කිරීමට මාරු වන්න"
+                    },
+                    "open_product_modal": {
+                        "action": "නිෂ්පාදන එක් කිරීමේ කවුළුව විවෘත කරන්න",
+                        "description": "නව නිෂ්පාදනයක් ඉක්මනින් එක් කරන්න"
+                    },
+                    "fullscreen": {
+                        "action": "පූර්ණ තිරය මාරු කරන්න",
+                        "description": "පූර්ණ තිරයට පිවිසෙන්න/පිටවන්න"
+                    },
+                    "dark_mode": {
+                        "action": "අඳුරු තේමාව මාරු කරන්න",
+                        "description": "තේමාව මාරු කරන්න"
+                    },
+                    "hold_orders": {
+                        "action": "ඇණවුම් රඳවා තබන්න",
+                        "description": "කල්දැමූ ඇණවුම් කළමනාකරණය කරන්න"
+                    },
+                    "home": {
+                        "action": "මුල් පිටුවට යන්න",
+                        "description": "මුල් පිටුවට යන්න"
+                    },
+                    "customers": {
+                        "action": "ගනුදෙනුකරුවන් වෙත යන්න",
+                        "description": "ගනුදෙනුකරුවන් කොටස විවෘත කරන්න"
+                    },
+                    "cashier": {
+                        "action": "මුදල් පත්‍රයට යන්න",
+                        "description": "POS මුදල් පත්‍රය වෙත පිවිසෙන්න"
+                    },
+                    "orders": {
+                        "action": "ඇණවුම් වෙත යන්න",
+                        "description": "ඇණවුම් ඉතිහාසය පරීක්ෂා කරන්න"
+                    },
+                    "products": {
+                        "action": "නිෂ්පාදන වෙත යන්න",
+                        "description": "නිෂ්පාදන කළමනාකරණය කරන්න"
+                    },
+                    "reports": {
+                        "action": "වාර්තා වෙත යන්න",
+                        "description": "විශ්ලේෂණ බලන්න"
+                    },
+                    "settings": {
+                        "action": "සැකසුම් වෙත යන්න",
+                        "description": "අභිප්‍රේතයන් සකසන්න"
+                    },
+                    "create_customer": {
+                        "action": "නව ගනුදෙනුකරු එක් කරන්න",
+                        "description": "ගනුදෙනුකරු එක් කරන්න"
+                    },
+                    "edit_customer": {
+                        "action": "වත්මන් ගනුදෙනුකරු සංස්කරණය කරන්න",
+                        "description": "තෝරාගත් ගනුදෙනුකරුගේ තොරතුරු යාවත්කාලීන කරන්න"
+                    },
+                    "delete_customer": {
+                        "action": "වත්මන් ගනුදෙනුකරු මකන්න",
+                        "description": "තෝරාගත් ගනුදෙනුකරු ඉවත් කරන්න"
+                    },
+                    "change_customer": {
+                        "action": "වත්මන් ගනුදෙනුකරු වෙනස් කරන්න",
+                        "description": "වෙනත් ගනුදෙනුකරු තෝරන්න"
+                    },
+                    "add_note": {
+                        "action": "සටහනක් එක් කරන්න",
+                        "description": "ඇණවුමට සටහනක් එක් කරන්න"
+                    },
+                    "remove_note": {
+                        "action": "සටහන ඉවත් කරන්න",
+                        "description": "කරත්තයෙන් සටහන ඉවත් කරන්න"
+                    },
+                    "checkout": {
+                        "action": "ගෙවීමට ඉදිරියට යන්න",
+                        "description": "ගෙවීම් ක්‍රියාවලිය ආරම්භ කරන්න"
+                    },
+                    "hold_order": {
+                        "action": "ඇණවුම රඳවා තබන්න",
+                        "description": "ඇණවුම රඳවා තබන්න"
+                    }
+                }
+            },
+            "regional": {
+                "title": "ප්‍රාදේශීය",
+                "locale": "භාෂාව",
+                "select_locale": "භාෂාව තෝරන්න",
+                "currency": "මුදල් ඒකකය",
+                "select_currency": "මුදල් ඒකකය තෝරන්න",
+                "save_btn_title": "සුරකින්න"
+            },
+            "save_success": "සැකසුම් සාර්ථකව සුරකින්නා ලදි."
+        },
+        "payment": {
+            "title": "ගෙවීම",
+            "back": "ආපසු",
+            "order_details": "ඇණවුම් විස්තර",
+            "subtotal": "උප එකතුව",
+            "tax": "බද්ධ එකතුව",
+            "discount": "වට්ටම්",
+            "grand_total": "සම්පූර්ණ එකතුව",
+            "payable_amount": "ගෙවිය යුතු මුදල",
+            "received": "ලබා ඇත",
+            "remaining": "ඉතිරි",
+            "pos_cash": "මුදල්",
+            "pos_card": "කාඩ්පත",
+            "pos_split": "බෙදීම",
+            "cancel": "අවලංගු කරන්න",
+            "card_details": "කාඩ් විස්තර",
+            "bank": "බැංකුව",
+            "select_bank": "බැංකුව තෝරන්න",
+            "other": "අන්",
+            "confirm_payment": "ගෙවීම තහවුරු කරන්න",
+            "empty_cart": "කරත්තය හිස් විය.",
+            "amount_exceeded": "ගෙවිය යුතු මුදල ඉක්මවා ගොස් ඇත!",
+            "order_placed": "ඇණවුම සාර්ථකව තැබුවා."
+        }
+    }
+}

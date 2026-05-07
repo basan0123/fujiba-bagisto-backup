@@ -1,0 +1,40 @@
+#outlet/products/request-quantity Related APIs
+
+extend type Mutation @guard(with: ["pos_user"]) {
+    requestProductQty(
+        input: requestProductQtyInput! @spread
+    ): StatusResponse @field(resolver: "Webkul\\Pos\\Mutations\\Outlet\\ProductMutation@requestProductQty")
+}
+
+extend type Query @guard(with: ["pos_user"]) {
+    getRequestedProducts(
+        first: Int!,
+        page: Int!
+        query: String
+    ): RequestedProductsResponse @field(resolver: "Webkul\\Pos\\Queries\\Products\\ProductQuery@getRequestedProducts")
+}
+
+input requestProductQtyInput {
+    products: [ProductQtyInput]
+}
+
+input ProductQtyInput {
+    productId: Int! @rename(attribute: "product_id")
+    requestedQuantity: Int! @rename(attribute: "requested_quantity")
+    comment: String
+}
+
+type RequestedProductsResponse {
+    paginatorInfo: PaginatorInfo!
+    data: [RequestedProduct]
+}
+
+type RequestedProduct {
+    id: ID!
+    name: String
+    comment: String
+    requestedQuantity: Int @rename(attribute: "requested_quantity")
+    requestStatus: String @rename(attribute: "request_status")
+    createdAt: String @rename(attribute: "created_at")
+    updatedAt: String @rename(attribute: "updated_at")
+}

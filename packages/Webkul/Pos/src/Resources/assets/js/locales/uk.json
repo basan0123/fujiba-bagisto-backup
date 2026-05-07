@@ -1,0 +1,617 @@
+{
+    "pos": {
+        "title": "Bagisto POS",
+        "page_not_found": {
+            "title": "Щось зникло.",
+            "message": "Вибачте, ми не можемо знайти цю сторінку. На головній сторінці є багато цікавого.",
+            "back_btn_title": "Повернутися на головну сторінку"
+        },
+        "login_form": {
+            "title": "Увійти",
+            "user_name": "Ім'я користувача",
+            "user_name_placeholder": "Введіть ім'я користувача",
+            "password": "Пароль",
+            "password_placeholder": "Введіть пароль",
+            "remember_password": "Запам'ятати пароль",
+            "login_btn_title": "Увійти"
+        },
+        "footer": {
+            "warning": "Webkul не авторизує жодних сторонніх продавців для перепродажу модулів Webkul.",
+            "copyright": "© Авторські права 2010-2023, Webkul Software (зареєстровано в Індії/США). Усі права захищено."
+        },
+        "layout": {
+            "header": {
+                "title": "Bagisto POS",
+                "search_products": "Пошук товарів...",
+                "hold_orders": "Зберегти замовлення",
+                "barcode_form": {
+                    "title": "Введіть штрих-код",
+                    "barcode_placeholder": "Введіть штрих-код товару",
+                    "cancel_btn_title": "Скасувати",
+                    "proceed_btn_title": "Продовжити"
+                },
+                "product_create_form": {
+                    "title": "Додати новий продукт",
+                    "name": "Назва",
+                    "sku": "SKU",
+                    "price": "Ціна",
+                    "weight": "Вага",
+                    "quantity": "Кількість",
+                    "cancel_btn_title": "Скасувати",
+                    "proceed_btn_title": "Продовжити"
+                }
+            },
+            "sidebar": {
+                "home": "Головна",
+                "customers": "Клієнти",
+                "cashier": "Касир",
+                "orders": "Замовлення",
+                "products": "Товари",
+                "reports": "Звіти",
+                "settings": "Налаштування",
+                "logout": "Вийти"
+            },
+            "main": {
+                "cash_drawer": {
+                    "title": "Грошовий ящик",
+                    "opening_drawer_amount": "Сума відкриття ящика",
+                    "remarks": "Примітки",
+                    "remarks_placeholder": "Введіть примітки до закриття каси.",
+                    "open_drawer": "Відкрити грошовий ящик"
+                }
+            }
+        },
+        "common": {
+            "cart": {
+                "add": "Додати",
+                "add_customer": "Додати клієнта",
+                "booking_from": "Бронювання з",
+                "booking_till": "Бронювання до",
+                "closed": "Закрито",
+                "create_success": "Кошик успішно створено.",
+                "discount": "Знижка",
+                "discount_applied": "Застосовано знижку {percentage}%",
+                "downloads": "Завантаження",
+                "event_expired": "Цей захід закінчився.",
+                "event_from": "Захід з",
+                "event_ticket": "Квиток на захід",
+                "event_till": "Захід до",
+                "hold_order": "Утримати замовлення",
+                "hold_order_success": "Замовлення успішно утримано.",
+                "inventory_warning": "Запитана кількість недоступна.",
+                "missing_links": "Відсутні посилання для завантаження для цього продукту.",
+                "missing_options": "Відсутні опції для цього продукту.",
+                "no_customer_selected": "Жоден клієнт не вибраний.",
+                "note": "Примітка",
+                "payable_amount": "Сума до сплати",
+                "proceed": "Продовжити",
+                "product_add_success": "Продукт успішно додано до кошика!",
+                "product_remove_success": "Продукт успішно видалено з кошика!",
+                "qty_missing": "Принаймні один продукт повинен мати кількість більше 1.",
+                "invalid_file_extension": "Знайдено недійсне розширення файлу.",
+                "quantity": "Кількість",
+                "remove_cart": "Видалити кошик",
+                "remove_success": "Кошик успішно видалено.",
+                "rent_from": "Оренда з",
+                "rent_till": "Оренда до",
+                "rent_type": "Тип оренди",
+                "select_hourly_duration": "Виберіть тривалість однієї години.",
+                "selected_products_simple": "Вибрані продукти повинні бути простого типу.",
+                "special_note": "Особливі запити / Примітки",
+                "subtotal": "Проміжний підсумок",
+                "tax": "Податок",
+                "update_success": "Кошик успішно оновлено.",
+                "order_note_form": {
+                    "title": "Примітка до замовлення",
+                    "note_placeholder": "Введіть примітку до замовлення",
+                    "cancel_btn_title": "Скасувати",
+                    "proceed_btn_title": "Продовжити",
+                    "create_success": "Примітка до замовлення успішно додана.",
+                    "remove_success": "Примітка до замовлення успішно видалена."
+                }
+            },
+            "flash_messages": {
+                "close": "Закрити",
+                "error_message": "Щось пішло не так! Будь ласка, спробуйте ще раз.",
+                "offline_error": "Увага, ви в офлайн-режимі",
+                "offline_mode": "Увага: Ви офлайн. Доступна обмежена функціональність",
+                "online_mode": "З’єднання відновлено. Ви знову онлайн"
+            },
+            "offline_loader": {
+                "title": "Увага, ви в офлайн-режимі",
+                "description": "Дані стануть доступні після відновлення з’єднання.",
+                "reconnecting": "Повторне підключення..."
+            },
+            "confirm_modal": {
+                "title": "Ви впевнені?",
+                "description": "Ви впевнені, що хочете виконати цю дію?",
+                "disagree_btn_title": "Не згоден",
+                "agree_btn_title": "Згоден"
+            },
+            "pagination": {
+                "showing": "Показано {count} з {total} результатів",
+                "page": "Сторінка {current} з {total}"
+            }
+        },
+        "home": {
+            "title": "Головна",
+            "print_confirmation_title": "Підтвердження друку?",
+            "print_confirm_message": "Ви хочете роздрукувати чек останнього замовлення?",
+            "items_in_cart": "{count} товарів у кошику.",
+            "view_cart_btn": "Переглянути кошик",
+            "categories": {
+                "all": "Усі"
+            },
+            "products": {
+                "view": {
+                    "qty": "{qty} Кількість",
+                    "add_to_cart": "Додати до кошика",
+                    "total_amount": "Загальна сума",
+                    "type": {
+                        "simple": {
+                            "customizable_options": {
+                                "none": "Немає",
+                                "total_amount": "Загальна сума"
+                            }
+                        },
+                        "booking": {
+                            "location": "Місцезнаходження",
+                            "view_on_map": "Переглянути на карті",
+                            "default": {
+                                "slot_duration_in_minutes": "{minutes} Хвилин",
+                                "slot_duration": "Тривалість слота"
+                            },
+                            "appointment": {
+                                "closed": "Закрито",
+                                "see_details": "Переглянути деталі",
+                                "slot_duration": "Тривалість слота",
+                                "slot_duration_in_minutes": "{minutes} Хвилин",
+                                "today_availability": "Доступність сьогодні"
+                            },
+                            "event": {
+                                "book_your_ticket": "Забронювати квиток",
+                                "per_ticket_price_uk": "{price} за квиток",
+                                "title": "Подія на :"
+                            },
+                            "rental": {
+                                "choose_rent_option": "Виберіть варіант оренди",
+                                "daily_basis": "На щоденній основі",
+                                "from": "Від",
+                                "hourly_basis": "На погодинній основі",
+                                "rent_an_item": "Орендувати предмет",
+                                "select_date": "Виберіть дату",
+                                "select_rent_time": "Виберіть час оренди",
+                                "select_slot": "Виберіть слот",
+                                "select_time_slot": "Виберіть часовий слот",
+                                "slot": "Слот",
+                                "no_slots_available": "Слоти недоступні",
+                                "to": "До"
+                            },
+                            "table": {
+                                "book_a_table": "Забронювати стіл",
+                                "closed": "Закрито",
+                                "slot_duration": "Тривалість слота",
+                                "slot_duration_in_minutes": "{minutes} Хвилин",
+                                "slots_for_all_days": "Показати для всіх днів",
+                                "special_notes": "Особливі запити/Примітки",
+                                "today_availability": "Доступність сьогодні"
+                            },
+                            "slots": {
+                                "book_an_appointment": "Забронювати зустріч",
+                                "date": "Дата",
+                                "no_slots_available": "Слоти недоступні",
+                                "select_slot": "Виберіть слот",
+                                "title": "Слот"
+                            }
+                        },
+                        "bundle": {
+                            "total_amount": "Загальна сума",
+                            "none": "Немає доступних варіантів комплекту"
+                        },
+                        "configurable": {
+                            "select_option": "Виберіть опції",
+                            "select_above_option": "Будь ласка, спочатку виберіть опції вище.",
+                            "price": "Ціна вибраного варіанту"
+                        },
+                        "downloadable": {
+                            "samples": "Зразки",
+                            "links": "Посилання"
+                        },
+                        "grouped": {
+                            "name": "Назва"
+                        }
+                    }
+                },
+                "no_barcode_product": "Продукт з цим штрихкодом не знайдено."
+            }
+        },
+        "customers": {
+            "add_btn": "Додати нового клієнта",
+            "change_btn": "Змінити клієнта",
+            "change_success": "Клієнта успішно змінено.",
+            "delete_success": "Клієнта успішно видалено.",
+            "customers": "Клієнти",
+            "delete_btn": "Видалити",
+            "edit_btn": "Редагувати",
+            "no_current_customer": "Клієнта не знайдено.",
+            "no_customers_found": "Клієнтів не знайдено.",
+            "offline_customers": "Офлайн клієнти",
+            "search_customers": "Пошук клієнтів...",
+            "select_btn": "Вибрати клієнта",
+            "title": "Клієнти",
+            "create": {
+                "title": "Додати нового клієнта",
+                "back_btn_title": "Назад",
+                "first_name": "Ім'я",
+                "last_name": "Прізвище",
+                "email": "Електронна пошта",
+                "phone_number": "Номер телефону",
+                "address": "Адреса",
+                "city": "Місто",
+                "state": "Штат",
+                "select_state": "Виберіть штат",
+                "country": "Країна",
+                "select_country": "Виберіть країну",
+                "pin_code": "Поштовий індекс",
+                "save_btn_title": "Додати клієнта",
+                "phone_already_exist": "Цей номер телефону вже використовується.",
+                "email_already_exist": "Ця електронна пошта вже використовується.",
+                "create_success": "Клієнта успішно створено."
+            },
+            "edit": {
+                "title": "Редагувати клієнта",
+                "back_btn_title": "Назад",
+                "first_name": "Ім'я",
+                "last_name": "Прізвище",
+                "email": "Електронна пошта",
+                "phone_number": "Номер телефону",
+                "address": "Адреса",
+                "city": "Місто",
+                "state": "Штат",
+                "select_state": "Виберіть штат",
+                "country": "Країна",
+                "select_country": "Виберіть країну",
+                "pin_code": "Поштовий індекс",
+                "save_btn_title": "Оновити клієнта",
+                "phone_already_exist": "Цей номер телефону вже використовується.",
+                "email_already_exist": "Ця електронна пошта вже використовується.",
+                "update_success": "Клієнта успішно оновлено."
+            }
+        },
+        "cashier": {
+            "title": "Касир",
+            "cash_drawer": {
+                "title": "Готівковий ящик",
+                "drawer_amount_summary": "Підсумок готівкового ящика",
+                "opening_drawer_amount": "Початкова сума в готівковому ящику",
+                "cash_payment_sale": "Продаж за готівку",
+                "other_payment_sale": "Продаж за іншими способами оплати",
+                "expected_drawer_amount": "Очікувана сума в готівковому ящику",
+                "difference": "Різниця",
+                "remarks": "Примітки",
+                "remarks_placeholder": "Введіть примітки про закриття лічильника.",
+                "close_drawer": "Закрити готівковий ящик"
+            },
+            "today_sale": {
+                "title": "Продаж за сьогодні",
+                "opening_drawer_amount": "Початкова сума в готівковому ящику",
+                "cash_payment_sale": "Продаж за готівку",
+                "other_payment_sale": "Продаж за іншими способами оплати",
+                "sale_history": "Історія продажів",
+                "filters": "Фільтри",
+                "order_id": "ID замовлення",
+                "time": "Час",
+                "order_total": "Загальна сума замовлення",
+                "payment_mode": "Спосіб оплати",
+                "no_records": "Записи не знайдено.",
+                "no_records_desc": "Історія продажів з’явиться тут після здійснення транзакцій.",
+                "drawer": {
+                    "title": "Фільтр",
+                    "order_id": "ID Замовлення",
+                    "time": "Час",
+                    "order_total": "Загальна Сума Замовлення",
+                    "payment_mode": "Метод Оплати",
+                    "select_payment_mode": "Вибрати Метод Оплати",
+                    "pos_cash": "Готівковий Розрахунок",
+                    "pos_card": "Оплата Карткою",
+                    "pos_split": "Розділений Розрахунок",
+                    "filter_btn_title": "Застосувати Фільтр"
+                }
+            },
+            "sale_history": {
+                "title": "Історія продажів",
+                "filters": "Фільтри",
+                "date": "Дата",
+                "cash_payments": "Готівкові платежі",
+                "other_payments": "Інші платежі",
+                "total_sale": "Загальний продаж",
+                "drawer_note": "Примітка готівкового ящика",
+                "no_records": "Записи не знайдено.",
+                "no_records_desc": "Історія продажів з’явиться тут після здійснення транзакцій.",
+                "drawer": {
+                    "title": "Фільтр",
+                    "date": "Дата",
+                    "cash_payment": "Готівковий платіж",
+                    "other_payment": "Інший платіж",
+                    "total_sale": "Загальний продаж",
+                    "filter_btn_title": "Застосувати фільтр"
+                }
+            }
+        },
+        "orders": {
+            "title": "Замовлення",
+            "history": {
+                "title": "Історія",
+                "search_orders": "Пошук ID замовлення або імені клієнта...",
+                "filters": "Фільтри",
+                "order_id": "ID замовлення",
+                "date": "Дата",
+                "total_sales": "Загальний продаж",
+                "subtotal": "Підсумок",
+                "tax": "Податок",
+                "no_records": "Записи не знайдено.",
+                "no_records_desc": "Історія продажів з’явиться тут після здійснення транзакцій.",
+                "return_btn": "Повернути",
+                "order_status": {
+                    "title": "Статус",
+                    "completed": "Завершено",
+                    "returned": "Повернено"
+                }
+            },
+            "hold": {
+                "title": "Замовлення На Очікуванні",
+                "note": "Примітка",
+                "resume": "Продовжити",
+                "remove": "Видалити",
+                "remove_success": "Замовлення успішно видалено.",
+                "resume_success": "Замовлення успішно відновлено.",
+                "resume_error": "Будь ласка, спочатку обробіть поточний кошик.",
+                "no_orders": "Замовлення не знайдено."
+            },
+            "offline": {
+                "title": "Офлайн замовлення",
+                "sync_order": "Синхронізувати замовлення",
+                "sync_all_orders": "Синхронізувати всі замовлення",
+                "search_order_id": "Пошук ID замовлення...",
+                "order_id": "ID замовлення",
+                "date": "Дата",
+                "no_orders": "Офлайн-замовлення не знайдено.",
+                "sync_success": "Замовлення успішно синхронізовано.",
+                "return": "Повернення",
+                "returned": "Повернено",
+                "return_success": "Замовлення успішно повернено."
+            },
+            "info": {
+                "order_id": "ID замовлення",
+                "subtotal": "Підсумок",
+                "tax": "Податок",
+                "discount": "Знижка",
+                "grand_total": "Загальна сума",
+                "cash": "Готівка",
+                "balance": "Баланс",
+                "no_order_selected": "Не вибрано жодного замовлення для попереднього перегляду або друку рахунку."
+            },
+            "print": {
+                "btn_title": "Друкувати Рахунок",
+                "cashier": "Касир",
+                "change": "Здача",
+                "contact_info": "Контактна Інформація",
+                "customer": "Клієнт",
+                "customer_care": "Служба Підтримки",
+                "date": "Дата",
+                "discount": "Знижка",
+                "email": "Електронна Пошта",
+                "grand_total": "Загальна Сума",
+                "item": "Товар",
+                "name": "Ім'я",
+                "no_receipt": "Немає квитанції для цієї торгової точки.",
+                "order_id": "Номер Замовлення",
+                "phone": "Телефон",
+                "price": "Ціна",
+                "qty": "Кількість",
+                "subtotal": "Проміжна Сума",
+                "tax": "Податок",
+                "total": "Разом",
+                "total_qty": "Загальна Кількість",
+                "website": "Веб-сайт"
+            }
+        },
+        "products": {
+            "title": "Продукти",
+            "low_stock_products": {
+                "title": "Товари з Низьким Запасом",
+                "qty": "{qty} Кількість",
+                "purchase_request": "Запит на Покупку",
+                "send_request_btn": "Надіслати Запит",
+                "no_purchase_request": "Запити на покупку не знайдено.",
+                "no_products": "Не знайдено продукти з низьким запасом.",
+                "items_in_request": "{count} предметів у запиті на покупку.",
+                "view_btn_title": "Переглянути",
+                "request": {
+                    "title": "Надіслати Запит на Кількість",
+                    "requested_quantity": "Запитувана Кількість",
+                    "comment": "Коментар",
+                    "comment_placeholder": "Введіть коментар",
+                    "add_btn_title": "Додати Товар",
+                    "cancel_btn_title": "Скасувати",
+                    "already_exist": "Товар вже є у списку запитів."
+                }
+            },
+            "requested_products": {
+                "title": "Запитані товари",
+                "search_products": "Пошук товарів...",
+                "qty": "Кількість:- {qty}",
+                "pending": "Очікується",
+                "received": "Отримано",
+                "declined": "Відхилено",
+                "no_products": "Запит на продукт не знайдено."
+            },
+            "settings": {
+                "title": "Налаштування",
+                "minimum_qty": "Мінімальна кількість",
+                "save_btn_title": "Зберегти",
+                "save_success": "Налаштування успішно збережено."
+            }
+        },
+        "reports": {
+            "title": "Звіти",
+            "day": "День",
+            "week": "Тиждень",
+            "month": "Місяць"
+        },
+        "settings": {
+            "title": "Налаштування",
+            "profile": {
+                "title": "Профіль",
+                "first_name": "Ім'я",
+                "last_name": "Прізвище",
+                "email": "Електронна пошта",
+                "old_password": "Старий пароль",
+                "new_password": "Новий пароль",
+                "confirm_password": "Підтвердити пароль",
+                "update_btn_title": "Оновити профіль"
+            },
+            "sync": {
+                "completed": "Завершено",
+                "customers": "Клієнти",
+                "deselect_all": "Скасувати вибір усіх",
+                "entities": "Сутності",
+                "entities_desc": "Виберіть сутності, які потрібно синхронізувати з сервером.",
+                "fetching": "Отримання...",
+                "orders": "Замовлення",
+                "products": "Товари",
+                "ready": "Готово",
+                "records": "Записи",
+                "select_all": "Вибрати всі",
+                "start_syncing": "Почати синхронізацію",
+                "sync_btn_title": "Синхронізувати зараз",
+                "title": "Синхронізація"
+            },
+            "shortcuts": {
+                "title": "Гарячі клавіші",
+                "description": "Комбінації клавіш, які дозволяють швидко виконувати дії.",
+                "sections": {
+                    "header": "Заголовок",
+                    "menu": "Меню",
+                    "customer": "Клієнт",
+                    "cart": "Кошик"
+                },
+                "items": {
+                    "open_barcode": {
+                        "action": "Відкрити режим штрих-коду",
+                        "description": "Перейти до сканування штрих-коду"
+                    },
+                    "open_product_modal": {
+                        "action": "Відкрити модальне вікно створення продукту",
+                        "description": "Швидко додати новий продукт"
+                    },
+                    "fullscreen": {
+                        "action": "Перемкнути повноекранний режим",
+                        "description": "Увімкнути/вимкнути повноекранний режим"
+                    },
+                    "dark_mode": {
+                        "action": "Перемкнути темний режим",
+                        "description": "Змінити тему"
+                    },
+                    "hold_orders": {
+                        "action": "Утримати замовлення",
+                        "description": "Керування утриманими замовленнями"
+                    },
+                    "home": {
+                        "action": "Перейти на головну",
+                        "description": "Перейти на головну сторінку"
+                    },
+                    "customers": {
+                        "action": "Перейти до клієнтів",
+                        "description": "Відкрити розділ клієнтів"
+                    },
+                    "cashier": {
+                        "action": "Перейти до касира",
+                        "description": "Доступ до POS касира"
+                    },
+                    "orders": {
+                        "action": "Перейти до замовлень",
+                        "description": "Переглянути історію замовлень"
+                    },
+                    "products": {
+                        "action": "Перейти до продуктів",
+                        "description": "Керування продуктами"
+                    },
+                    "reports": {
+                        "action": "Перейти до звітів",
+                        "description": "Переглянути аналітику"
+                    },
+                    "settings": {
+                        "action": "Перейти до налаштувань",
+                        "description": "Змінити налаштування"
+                    },
+                    "create_customer": {
+                        "action": "Створити нового клієнта",
+                        "description": "Додати клієнта"
+                    },
+                    "edit_customer": {
+                        "action": "Редагувати поточного клієнта",
+                        "description": "Оновити інформацію вибраного клієнта"
+                    },
+                    "delete_customer": {
+                        "action": "Видалити поточного клієнта",
+                        "description": "Видалити вибраного клієнта"
+                    },
+                    "change_customer": {
+                        "action": "Змінити поточного клієнта",
+                        "description": "Вибрати іншого клієнта"
+                    },
+                    "add_note": {
+                        "action": "Додати примітку",
+                        "description": "Додати примітку до замовлення"
+                    },
+                    "remove_note": {
+                        "action": "Видалити примітку",
+                        "description": "Видалити примітку з кошика"
+                    },
+                    "checkout": {
+                        "action": "Перейти до оформлення",
+                        "description": "Почати процес оплати"
+                    },
+                    "hold_order": {
+                        "action": "Утримати замовлення",
+                        "description": "Поставити замовлення на утримання"
+                    }
+                }
+            },
+            "regional": {
+                "title": "Регіональні",
+                "locale": "Локаль",
+                "select_locale": "Виберіть локаль",
+                "currency": "Валюта",
+                "select_currency": "Виберіть валюту",
+                "save_btn_title": "Зберегти"
+            },
+            "save_success": "Налаштування успішно збережено."
+        },
+        "payment": {
+            "title": "Оплата",
+            "back": "Назад",
+            "order_details": "Деталі замовлення",
+            "subtotal": "Підсумок",
+            "tax": "Податок",
+            "discount": "Знижка",
+            "grand_total": "Загальна сума",
+            "payable_amount": "Сума до сплати",
+            "received": "Отримано",
+            "remaining": "Залишок",
+            "pos_cash": "Готівка",
+            "pos_card": "Картка",
+            "pos_split": "Поділити",
+            "cancel": "Скасувати",
+            "card_details": "Дані картки",
+            "bank": "Банк",
+            "select_bank": "Вибрати банк",
+            "other": "Інше",
+            "confirm_payment": "Підтвердити оплату",
+            "empty_cart": "Кошик порожній!",
+            "amount_exceeded": "Перевищено суму до оплати!",
+            "order_placed": "Замовлення успішно оформлено."
+        }
+    }
+}

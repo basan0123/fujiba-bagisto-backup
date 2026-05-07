@@ -1,0 +1,25 @@
+{
+    "name": "fujiba/accounting",
+    "description": "Self-hosted Japanese accounting (経理) for Bagisto multi-channel — chart of accounts, journal entries, receipts, invoice registrant cache, payroll, audit log.",
+    "license": "proprietary",
+    "type": "library",
+    "require": {
+        "php": "^8.2",
+        "illuminate/support": "^11.0"
+    },
+    "autoload": {
+        "psr-4": {
+            "Fujiba\\Accounting\\": "src/",
+            "Fujiba\\Accounting\\Database\\Seeders\\": "src/Database/Seeders/"
+        }
+    },
+    "extra": {
+        "laravel": {
+            "providers": [
+                "Fujiba\\Accounting\\Providers\\AccountingServiceProvider"
+            ]
+        }
+    },
+    "minimum-stability": "dev",
+    "prefer-stable": true
+}

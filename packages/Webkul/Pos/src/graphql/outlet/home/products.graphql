@@ -1,0 +1,98 @@
+#outlet\home\products states related APIs
+extend type Query @guard(with: ["pos_user"]) {
+    getOutletProducts(
+        first: Int,
+        page: Int
+    ): [OutletProductResult!] @paginate(
+        type: "PAGINATOR",
+        builder: "Webkul\\Pos\\Queries\\Home\\HomeQuery@getProducts",
+        defaultCount: 10
+    )
+}
+
+type OutletProductResult {
+    id: Int!
+    sku: String
+    type: String
+    name: String
+    quantity: Int
+    weight: Float
+    price: Float
+    specialPrice: Float @rename(attribute: "special_price")
+    specialPriceFrom: String @rename(attribute: "special_price_from")
+    specialPriceTo: String @rename(attribute: "special_price_to")
+    convertedPrice: Float @field(resolver: "Webkul\\Pos\\Queries\\Home\\HomeQuery@getConvertedPrice")
+    taxCategoryId: Int @rename(attribute: "tax_category_id")
+    status: Int
+    posStatus: Int @rename(attribute: "pos_status")
+    barcode: String
+    gtin: String
+    scanType: String @rename(attribute: "scan_type")
+    scanValue: String @rename(attribute: "scan_value")
+    priceHtml: String @field(resolver: "Webkul\\Pos\\Queries\\Home\\HomeQuery@getPriceHtml")
+    images: [ProductImage]
+    categories: [Category] @belongsToMany(relation: "categories")
+    booking: [BookingProduct] @hasMany(relation: "booking_products")
+    variantConfigurations: JSON @field(resolver: "Webkul\\Pos\\Queries\\Home\\HomeQuery@getVariantsConfig")
+    downloadableSamples: [ProductDownloadableSample] @hasMany(relation: "downloadable_samples")
+    downloadableLinks: [ProductDownloadableLink] @hasMany(relation: "downloadable_links")
+    groupedProducts: [ProductGroupedProduct] @hasMany(relation: "grouped_products")
+    options: [BundleOption] @field(resolver: "Webkul\\Pos\\Queries\\Home\\HomeQuery@getBundleOptions")
+    customizableOptions: [ProductCustomizableOption] @hasMany(relation: "customizable_options")
+    variants: [VariantProduct] @hasMany(relation: "variants")
+    superAttributes: [Attribute!] @belongsToMany(relation: "super_attributes")
+}
+
+type VariantProduct {
+    id: Int!
+    sku: String
+    type: String
+    name: String
+    size: Int
+    color: Int
+    quantity: Int
+    price: Float
+    convertedPrice: Float @field(resolver: "Webkul\\Pos\\Queries\\Home\\HomeQuery@getConvertedPrice")
+    barcode: String
+    gtin: String
+    scanType: String @rename(attribute: "scan_type")
+    scanValue: String @rename(attribute: "scan_value")
+    priceHtml: String @field(resolver: "Webkul\\Pos\\Queries\\Home\\HomeQuery@getPriceHtml")
+    superAttributes: [Attribute!] @belongsToMany(relation: "super_attributes")
+}
+
+type ProductImage {
+    id: Int!
+    url: String
+}
+
+type BundleOption {
+    id: Int!
+    label: String
+    type: String
+    isRequired: Boolean @rename(attribute: "is_required")
+    sortOrder: Int @rename(attribute: "sort_order")
+    products: [BundleOptionProduct]
+}
+
+type BundleOptionProduct {
+    id: Int!
+    qty: Int
+    name: String
+    productId: Int @rename(attribute: "product_id")
+    isDefault: Boolean @rename(attribute: "is_default")
+    sortOrder: Int @rename(attribute: "sort_order")
+    inStock: Boolean @rename(attribute: "in_stock")
+    inventory: Int
+    price: Price
+}
+
+type Price {
+    regular: RegularOrFinalPrice
+    final: RegularOrFinalPrice
+}
+
+type RegularOrFinalPrice {
+    price: Float
+    formattedPrice: String @rename(attribute: "formatted_price")
+}

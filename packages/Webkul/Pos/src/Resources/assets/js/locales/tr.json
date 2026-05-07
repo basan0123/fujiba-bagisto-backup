@@ -1,0 +1,617 @@
+{
+    "pos": {
+        "title": "Bagisto POS",
+        "page_not_found": {
+            "title": "Bir şeyler eksik.",
+            "message": "Üzgünüz, bu sayfayı bulamıyoruz. Ana sayfada keşfedilecek çok şey var.",
+            "back_btn_title": "Ana Sayfaya Dön"
+        },
+        "login_form": {
+            "title": "Giriş Yap",
+            "user_name": "Kullanıcı Adı",
+            "user_name_placeholder": "Kullanıcı Adını Girin",
+            "password": "Şifre",
+            "password_placeholder": "Şifreyi Girin",
+            "remember_password": "Şifreyi Hatırla",
+            "login_btn_title": "Giriş Yap"
+        },
+        "footer": {
+            "warning": "Webkul, Webkul modüllerini yeniden satmak için herhangi bir üçüncü taraf satıcıya yetki vermez.",
+            "copyright": "© Telif Hakkı 2010-2023, Webkul Software (Hindistan/ABD'de kayıtlı). Tüm hakları saklıdır."
+        },
+        "layout": {
+            "header": {
+                "title": "Bagisto POS",
+                "search_products": "Ürünleri Ara...",
+                "hold_orders": "Siparişleri Beklet",
+                "barcode_form": {
+                    "title": "Barkod Girin",
+                    "barcode_placeholder": "Ürünün barkodunu girin",
+                    "cancel_btn_title": "İptal",
+                    "proceed_btn_title": "Devam Et"
+                },
+                "product_create_form": {
+                    "title": "Yeni Ürün Ekle",
+                    "name": "İsim",
+                    "sku": "SKU",
+                    "price": "Fiyat",
+                    "weight": "Ağırlık",
+                    "quantity": "Miktar",
+                    "cancel_btn_title": "İptal",
+                    "proceed_btn_title": "Devam Et"
+                }
+            },
+            "sidebar": {
+                "home": "Ana Sayfa",
+                "customers": "Müşteriler",
+                "cashier": "Kasiyer",
+                "orders": "Siparişler",
+                "products": "Ürünler",
+                "reports": "Raporlar",
+                "settings": "Ayarlar",
+                "logout": "Çıkış Yap"
+            },
+            "main": {
+                "cash_drawer": {
+                    "title": "Nakit Çekmecesi",
+                    "opening_drawer_amount": "Açılış Çekmecesi Miktarı",
+                    "remarks": "Notlar",
+                    "remarks_placeholder": "Tezgah kapanış notlarını girin.",
+                    "open_drawer": "Çekmecenin Açılması"
+                }
+            }
+        },
+        "common": {
+            "cart": {
+                "add": "Ekle",
+                "add_customer": "Müşteri Ekle",
+                "booking_from": "Rezervasyon Başlangıcı",
+                "booking_till": "Rezervasyon Bitişi",
+                "closed": "Kapalı",
+                "create_success": "Sepet başarıyla oluşturuldu.",
+                "discount": "İndirim",
+                "discount_applied": "{percentage}% indirim uygulandı",
+                "downloads": "İndirilenler",
+                "event_expired": "Bu etkinliğin süresi doldu.",
+                "event_from": "Etkinlik Başlangıcı",
+                "event_ticket": "Etkinlik Bileti",
+                "event_till": "Etkinlik Bitişi",
+                "hold_order": "Siparişi Beklet",
+                "hold_order_success": "Sipariş başarıyla bekletildi.",
+                "inventory_warning": "İstenen miktar mevcut değil.",
+                "missing_links": "Bu ürün için indirilebilir linkler eksik.",
+                "missing_options": "Bu ürün için seçenekler eksik.",
+                "no_customer_selected": "Hiçbir müşteri seçilmedi.",
+                "note": "Not",
+                "payable_amount": "Ödenecek Tutar",
+                "proceed": "Devam Et",
+                "product_add_success": "Ürün sepete başarıyla eklendi!",
+                "product_remove_success": "Ürün sepette başarıyla kaldırıldı!",
+                "qty_missing": "En az bir ürünün miktarı 1'den fazla olmalıdır.",
+                "invalid_file_extension": "Geçersiz dosya uzantısı bulundu.",
+                "quantity": "Miktar",
+                "remove_cart": "Sepeti Kaldır",
+                "remove_success": "Sepet başarıyla kaldırıldı.",
+                "rent_from": "Kiralama Başlangıcı",
+                "rent_till": "Kiralama Bitişi",
+                "rent_type": "Kiralama Türü",
+                "select_hourly_duration": "Bir saatlik süre seçin.",
+                "selected_products_simple": "Seçilen ürünler basit ürün türünde olmalıdır.",
+                "special_note": "Özel Talep / Notlar",
+                "subtotal": "Ara Toplam",
+                "tax": "Vergi",
+                "update_success": "Sepet başarıyla güncellendi.",
+                "order_note_form": {
+                    "title": "Sipariş Notu",
+                    "note_placeholder": "Sipariş notunu girin",
+                    "cancel_btn_title": "İptal",
+                    "proceed_btn_title": "Devam Et",
+                    "create_success": "Sipariş notu başarıyla eklendi.",
+                    "remove_success": "Sipariş notu başarıyla kaldırıldı."
+                }
+            },
+            "flash_messages": {
+                "close": "Kapat",
+                "error_message": "Bir şeyler ters gitti! Lütfen tekrar deneyin.",
+                "offline_error": "Uyarı, çevrimdışı moddasınız",
+                "offline_mode": "Uyarı: Çevrimdışısınız. Sınırlı işlevsellik mevcut",
+                "online_mode": "Bağlantı yeniden kuruldu. Tekrar çevrimiçisiniz"
+            },
+            "offline_loader": {
+                "title": "Uyarı, çevrimdışı moddasınız",
+                "description": "Bağlantınız yeniden kurulduğunda detaylara erişilebilecektir.",
+                "reconnecting": "Yeniden bağlanılıyor..."
+            },
+            "confirm_modal": {
+                "title": "Emin misiniz?",
+                "description": "Bu işlemi yapmak istediğinizden emin misiniz?",
+                "disagree_btn_title": "Katılmıyorum",
+                "agree_btn_title": "Katılıyorum"
+            },
+            "pagination": {
+                "showing": "{total} sonuçtan {count} gösteriliyor",
+                "page": "{total} sayfadan {current}. sayfa"
+            }
+        },
+        "home": {
+            "title": "Ana Sayfa",
+            "print_confirmation_title": "Yazdırma Onayı?",
+            "print_confirm_message": "Son siparişin fişini yazdırmak istiyor musunuz?",
+            "items_in_cart": "Sepette {count} ürün var.",
+            "view_cart_btn": "Sepeti Görüntüle",
+            "categories": {
+                "all": "Tümü"
+            },
+            "products": {
+                "view": {
+                    "qty": "{qty} Miktar",
+                    "add_to_cart": "Sepete Ekle",
+                    "total_amount": "Toplam Tutar",
+                    "type": {
+                        "simple": {
+                            "customizable_options": {
+                                "none": "Hiçbiri",
+                                "total_amount": "Toplam Tutar"
+                            }
+                        },
+                        "booking": {
+                            "location": "Konum",
+                            "view_on_map": "Haritada Görüntüle",
+                            "default": {
+                                "slot_duration_in_minutes": "{minutes} Dakika",
+                                "slot_duration": "Zaman Aralığı"
+                            },
+                            "appointment": {
+                                "closed": "Kapalı",
+                                "see_details": "Detayları Gör",
+                                "slot_duration": "Zaman Aralığı",
+                                "slot_duration_in_minutes": "{minutes} Dakika",
+                                "today_availability": "Bugünkü Uygunluk"
+                            },
+                            "event": {
+                                "book_your_ticket": "Biletinizi Ayırtın",
+                                "per_ticket_price_tr": "Bilet başına {price}",
+                                "title": "Etkinlik :"
+                            },
+                            "rental": {
+                                "choose_rent_option": "Kiralama Seçeneğini Seçin",
+                                "daily_basis": "Günlük Bazda",
+                                "from": "Başlangıç",
+                                "hourly_basis": "Saatlik Bazda",
+                                "rent_an_item": "Bir Ürün Kiralayın",
+                                "select_date": "Tarih Seçin",
+                                "select_rent_time": "Kiralama Zamanını Seçin",
+                                "select_slot": "Zaman Aralığını Seçin",
+                                "select_time_slot": "Zaman Dilimini Seçin",
+                                "slot": "Zaman Aralığı",
+                                "no_slots_available": "Uygun zaman aralığı yok",
+                                "to": "Bitiş"
+                            },
+                            "table": {
+                                "book_a_table": "Masa Ayırtın",
+                                "closed": "Kapalı",
+                                "slot_duration": "Zaman Aralığı",
+                                "slot_duration_in_minutes": "{minutes} Dakika",
+                                "slots_for_all_days": "Tüm günler için göster",
+                                "special_notes": "Özel İstek/Notlar",
+                                "today_availability": "Bugünkü Uygunluk"
+                            },
+                            "slots": {
+                                "book_an_appointment": "Randevu Ayırtın",
+                                "date": "Tarih",
+                                "no_slots_available": "Uygun zaman aralığı yok",
+                                "select_slot": "Zaman Aralığını Seçin",
+                                "title": "Zaman Aralığı"
+                            }
+                        },
+                        "bundle": {
+                            "total_amount": "Toplam Tutar",
+                            "none": "Mevcut Paket Seçeneği Yok"
+                        },
+                        "configurable": {
+                            "select_option": "Seçenekleri Seçin",
+                            "select_above_option": "Lütfen önce yukarıdaki seçenekleri seçin.",
+                            "price": "Seçilen Varyant Fiyatı"
+                        },
+                        "downloadable": {
+                            "samples": "Örnekler",
+                            "links": "Bağlantılar"
+                        },
+                        "grouped": {
+                            "name": "Ad"
+                        }
+                    }
+                },
+                "no_barcode_product": "Bu barkodla eşleşen ürün bulunamadı."
+            }
+        },
+        "customers": {
+            "add_btn": "Yeni Müşteri Ekle",
+            "change_btn": "Müşteri Değiştir",
+            "change_success": "Müşteri başarıyla değiştirildi.",
+            "delete_success": "Müşteri başarıyla silindi.",
+            "customers": "Müşteriler",
+            "delete_btn": "Sil",
+            "edit_btn": "Düzenle",
+            "no_current_customer": "Müşteri bulunamadı.",
+            "no_customers_found": "Hiç müşteri bulunamadı.",
+            "offline_customers": "Çevrimdışı Müşteriler",
+            "search_customers": "Müşteri Ara...",
+            "select_btn": "Müşteri Seç",
+            "title": "Müşteriler",
+            "create": {
+                "title": "Yeni Müşteri Ekle",
+                "back_btn_title": "Geri",
+                "first_name": "Ad",
+                "last_name": "Soyad",
+                "email": "E-posta",
+                "phone_number": "Telefon Numarası",
+                "address": "Adres",
+                "city": "Şehir",
+                "state": "Eyalet",
+                "select_state": "Eyalet Seçin",
+                "country": "Ülke",
+                "select_country": "Ülke Seçin",
+                "pin_code": "Posta Kodu",
+                "save_btn_title": "Müşteri Ekle",
+                "phone_already_exist": "Telefon zaten alınmış.",
+                "email_already_exist": "E-posta zaten alınmış.",
+                "create_success": "Müşteri başarıyla oluşturuldu."
+            },
+            "edit": {
+                "title": "Müşteriyi Düzenle",
+                "back_btn_title": "Geri",
+                "first_name": "Ad",
+                "last_name": "Soyad",
+                "email": "E-posta",
+                "phone_number": "Telefon Numarası",
+                "address": "Adres",
+                "city": "Şehir",
+                "state": "Eyalet",
+                "select_state": "Eyalet Seçin",
+                "country": "Ülke",
+                "select_country": "Ülke Seçin",
+                "pin_code": "Posta Kodu",
+                "save_btn_title": "Müşteriyi Güncelle",
+                "phone_already_exist": "Telefon zaten alınmış.",
+                "email_already_exist": "E-posta zaten alınmış.",
+                "update_success": "Müşteri başarıyla güncellendi."
+            }
+        },
+        "cashier": {
+            "title": "Kasiyer",
+            "cash_drawer": {
+                "title": "Nakit Çekmece",
+                "drawer_amount_summary": "Çekmece Tutarı Özeti",
+                "opening_drawer_amount": "Açılış Çekmece Tutarı",
+                "cash_payment_sale": "Nakit Ödeme Satışı",
+                "other_payment_sale": "Diğer Ödeme Satışı",
+                "expected_drawer_amount": "Beklenen Çekmece Tutarı",
+                "difference": "Fark",
+                "remarks": "Açıklamalar",
+                "remarks_placeholder": "Banko kapanışıyla ilgili açıklamaları girin.",
+                "close_drawer": "Çekmecenin Kapanması"
+            },
+            "today_sale": {
+                "title": "Bugünkü Satış",
+                "opening_drawer_amount": "Açılış Çekmece Tutarı",
+                "cash_payment_sale": "Nakit Ödeme Satışı",
+                "other_payment_sale": "Diğer Ödeme Satışı",
+                "sale_history": "Satış Geçmişi",
+                "filters": "Filtreler",
+                "order_id": "Sipariş ID'si",
+                "time": "Zaman",
+                "order_total": "Sipariş Toplamı",
+                "payment_mode": "Ödeme Modu",
+                "no_records": "Kayıt bulunamadı.",
+                "no_records_desc": "İşlemler yapıldığında satış geçmişi burada görünecektir.",
+                "drawer": {
+                    "title": "Filtre",
+                    "order_id": "Sipariş ID",
+                    "time": "Zaman",
+                    "order_total": "Sipariş Toplamı",
+                    "payment_mode": "Ödeme Yöntemi",
+                    "select_payment_mode": "Ödeme Yöntemi Seçin",
+                    "pos_cash": "Nakit Ödeme",
+                    "pos_card": "Kartla Ödeme",
+                    "pos_split": "Bölünmüş Ödeme",
+                    "filter_btn_title": "Filtre Uygula"
+                }
+            },
+            "sale_history": {
+                "title": "Satış Geçmişi",
+                "filters": "Filtreler",
+                "date": "Tarih",
+                "cash_payments": "Nakit Ödemeler",
+                "other_payments": "Diğer Ödemeler",
+                "total_sale": "Toplam Satış",
+                "drawer_note": "Çekmece Notu",
+                "no_records": "Kayıt bulunamadı.",
+                "no_records_desc": "İşlemler yapıldığında satış geçmişi burada görünecektir.",
+                "drawer": {
+                    "title": "Filtre",
+                    "date": "Tarih",
+                    "cash_payment": "Nakit Ödeme",
+                    "other_payment": "Diğer Ödeme",
+                    "total_sale": "Toplam Satış",
+                    "filter_btn_title": "Filtreyi Uygula"
+                }
+            }
+        },
+        "orders": {
+            "title": "Siparişler",
+            "history": {
+                "title": "Geçmiş",
+                "search_orders": "Sipariş ID'si veya Müşteri Adı Ara...",
+                "filters": "Filtreler",
+                "order_id": "Sipariş ID'si",
+                "date": "Tarih",
+                "total_sales": "Toplam Satışlar",
+                "subtotal": "Ara Toplam",
+                "tax": "Vergi",
+                "no_records": "Kayıt bulunamadı.",
+                "no_records_desc": "İşlemler yapıldığında satış geçmişi burada görünecektir.",
+                "return_btn": "İade Et",
+                "order_status": {
+                    "title": "Durum",
+                    "completed": "Tamamlandı",
+                    "returned": "İade Edildi"
+                }
+            },
+            "hold": {
+                "title": "Beklemede Olan Siparişler",
+                "note": "Not",
+                "resume": "Devam Et",
+                "remove": "Kaldır",
+                "remove_success": "Sipariş başarıyla kaldırıldı.",
+                "resume_success": "Sipariş başarıyla devam ettirildi.",
+                "resume_error": "Lütfen önce mevcut sepeti işleyin.",
+                "no_orders": "Sipariş bulunamadı."
+            },
+            "offline": {
+                "title": "Çevrimdışı Siparişler",
+                "sync_order": "Siparişi Senkronize Et",
+                "sync_all_orders": "Tüm Siparişleri Senkronize Et",
+                "search_order_id": "Sipariş ID'si Ara...",
+                "order_id": "Sipariş ID'si",
+                "date": "Tarih",
+                "no_orders": "Çevrimdışı sipariş bulunamadı.",
+                "sync_success": "Sipariş başarıyla senkronize edildi.",
+                "return": "İade",
+                "returned": "İade edildi",
+                "return_success": "Sipariş başarıyla iade edildi."
+            },
+            "info": {
+                "order_id": "Sipariş ID'si",
+                "subtotal": "Ara Toplam",
+                "tax": "Vergi",
+                "discount": "İndirim",
+                "grand_total": "Genel Toplam",
+                "cash": "Nakit",
+                "balance": "Bakiye",
+                "no_order_selected": "Önizleme veya faturayı yazdırmak için herhangi bir sipariş seçilmedi."
+            },
+            "print": {
+                "btn_title": "Fatura Yazdır",
+                "cashier": "Kasiyer",
+                "change": "Para Üstü",
+                "contact_info": "İletişim Bilgileri",
+                "customer": "Müşteri",
+                "customer_care": "Müşteri Hizmetleri",
+                "date": "Tarih",
+                "discount": "İndirim",
+                "email": "E-posta",
+                "grand_total": "Genel Toplam",
+                "item": "Ürün",
+                "name": "Ad",
+                "no_receipt": "Bu bayi için fiş mevcut değil.",
+                "order_id": "Sipariş Numarası",
+                "phone": "Telefon",
+                "price": "Fiyat",
+                "qty": "Adet",
+                "subtotal": "Ara Toplam",
+                "tax": "Vergi",
+                "total": "Toplam",
+                "total_qty": "Toplam Adet",
+                "website": "Web Sitesi"
+            }
+        },
+        "products": {
+            "title": "Ürünler",
+            "low_stock_products": {
+                "title": "Düşük Stoklu Ürünler",
+                "qty": "{qty} Miktar",
+                "purchase_request": "Satın Alma Talebi",
+                "send_request_btn": "Talebi Gönder",
+                "no_purchase_request": "Satın alma talebi bulunamadı.",
+                "no_products": "Düşük stoklu ürün bulunamadı.",
+                "items_in_request": "Satın alma talebinde {count} öğe.",
+                "view_btn_title": "Görüntüle",
+                "request": {
+                    "title": "Miktar Talebi Gönder",
+                    "requested_quantity": "Talep Edilen Miktar",
+                    "comment": "Yorum",
+                    "comment_placeholder": "Yorum girin",
+                    "add_btn_title": "Ürün Ekle",
+                    "cancel_btn_title": "İptal",
+                    "already_exist": "Ürün zaten talep listesinde mevcut."
+                }
+            },
+            "requested_products": {
+                "title": "Talep Edilen Ürünler",
+                "search_products": "Ürünleri Ara...",
+                "qty": "Miktar:- {qty}",
+                "pending": "Beklemede",
+                "received": "Alındı",
+                "declined": "Reddedildi",
+                "no_products": "Hiçbir ürün talebi bulunamadı."
+            },
+            "settings": {
+                "title": "Ayarlar",
+                "minimum_qty": "Minimum Miktar",
+                "save_btn_title": "Kaydet",
+                "save_success": "Ayarlar başarıyla kaydedildi."
+            }
+        },
+        "reports": {
+            "title": "Raporlar",
+            "day": "Gün",
+            "week": "Hafta",
+            "month": "Ay"
+        },
+        "settings": {
+            "title": "Ayarlar",
+            "profile": {
+                "title": "Profil",
+                "first_name": "Ad",
+                "last_name": "Soyad",
+                "email": "E-posta",
+                "old_password": "Eski Şifre",
+                "new_password": "Yeni Şifre",
+                "confirm_password": "Şifreyi Onayla",
+                "update_btn_title": "Profili Güncelle"
+            },
+            "sync": {
+                "completed": "Tamamlandı",
+                "customers": "Müşteriler",
+                "deselect_all": "Tümünü Seçimi Kaldır",
+                "entities": "Varlıklar",
+                "entities_desc": "Sunucu ile senkronize etmek istediğiniz varlıkları seçin.",
+                "fetching": "Alınıyor...",
+                "orders": "Siparişler",
+                "products": "Ürünler",
+                "ready": "Hazır",
+                "records": "Kayıtlar",
+                "select_all": "Tümünü Seç",
+                "start_syncing": "Senkronizasyona Başla",
+                "sync_btn_title": "Şimdi Senkronize Et",
+                "title": "Senkronizasyon"
+            },
+            "shortcuts": {
+                "title": "Kısayollar",
+                "description": "Hızlıca işlem yapmanızı sağlayan klavye kombinasyonları.",
+                "sections": {
+                    "header": "Üstbilgi",
+                    "menu": "Menü",
+                    "customer": "Müşteri",
+                    "cart": "Sepet"
+                },
+                "items": {
+                    "open_barcode": {
+                        "action": "Barkod Modunu Aç",
+                        "description": "Barkod tarama moduna geç"
+                    },
+                    "open_product_modal": {
+                        "action": "Ürün Ekleme Penceresini Aç",
+                        "description": "Hızlıca yeni ürün ekle"
+                    },
+                    "fullscreen": {
+                        "action": "Tam Ekran Modunu Aç/Kapat",
+                        "description": "Tam ekrana geç/çık"
+                    },
+                    "dark_mode": {
+                        "action": "Karanlık Modu Aç/Kapat",
+                        "description": "Temayı değiştir"
+                    },
+                    "hold_orders": {
+                        "action": "Siparişleri Beklet",
+                        "description": "Bekletilen siparişleri yönetin"
+                    },
+                    "home": {
+                        "action": "Ana Sayfaya Git",
+                        "description": "Ana sayfaya git"
+                    },
+                    "customers": {
+                        "action": "Müşterilere Git",
+                        "description": "Müşteri bölümünü aç"
+                    },
+                    "cashier": {
+                        "action": "Kasiyere Git",
+                        "description": "POS kasiyerine eriş"
+                    },
+                    "orders": {
+                        "action": "Siparişlere Git",
+                        "description": "Sipariş geçmişini kontrol et"
+                    },
+                    "products": {
+                        "action": "Ürünlere Git",
+                        "description": "Ürünleri yönet"
+                    },
+                    "reports": {
+                        "action": "Raporlara Git",
+                        "description": "Analitikleri görüntüle"
+                    },
+                    "settings": {
+                        "action": "Ayarlar'a Git",
+                        "description": "Tercihleri ayarla"
+                    },
+                    "create_customer": {
+                        "action": "Yeni Müşteri Oluştur",
+                        "description": "Müşteri ekle"
+                    },
+                    "edit_customer": {
+                        "action": "Mevcut Müşteriyi Düzenle",
+                        "description": "Seçili müşteri bilgisini güncelle"
+                    },
+                    "delete_customer": {
+                        "action": "Mevcut Müşteriyi Sil",
+                        "description": "Seçili müşteriyi kaldır"
+                    },
+                    "change_customer": {
+                        "action": "Mevcut Müşteriyi Değiştir",
+                        "description": "Farklı müşteri seç"
+                    },
+                    "add_note": {
+                        "action": "Not Ekle",
+                        "description": "Siparişe not ekle"
+                    },
+                    "remove_note": {
+                        "action": "Notu Kaldır",
+                        "description": "Sepetten notu sil"
+                    },
+                    "checkout": {
+                        "action": "Ödemeye Geç",
+                        "description": "Ödeme işlemini başlat"
+                    },
+                    "hold_order": {
+                        "action": "Siparişi Beklet",
+                        "description": "Siparişi beklemeye al"
+                    }
+                }
+            },
+            "regional": {
+                "title": "Bölgesel",
+                "locale": "Yerel Ayar",
+                "select_locale": "Yerel Ayar Seçin",
+                "currency": "Para Birimi",
+                "select_currency": "Para Birimi Seçin",
+                "save_btn_title": "Kaydet"
+            },
+            "save_success": "Ayarlar başarıyla kaydedildi."
+        },
+        "payment": {
+            "title": "Ödeme",
+            "back": "Geri",
+            "order_details": "Sipariş Detayları",
+            "subtotal": "Ara Toplam",
+            "tax": "Vergi",
+            "discount": "İndirim",
+            "grand_total": "Genel Toplam",
+            "payable_amount": "Ödenecek Tutar",
+            "received": "Alındı",
+            "remaining": "Kalan",
+            "pos_cash": "Nakit",
+            "pos_card": "Kart",
+            "pos_split": "Bölme",
+            "cancel": "İptal",
+            "card_details": "Kart Detayları",
+            "bank": "Banka",
+            "select_bank": "Banka Seçin",
+            "other": "Diğer",
+            "confirm_payment": "Ödemeyi Onayla",
+            "empty_cart": "Sepet boş!",
+            "amount_exceeded": "Ödenecek tutar aşıldı!",
+            "order_placed": "Sipariş başarıyla verildi."
+        }
+    }
+}

@@ -1,0 +1,6 @@
+#outlet\customers\delete Related APIs
+extend type Mutation @guard(with: ["pos_user"]) {
+    deletePosCustomer(
+        id: ID! @rules(apply: ["required"]) 
+    ): StatusResponse @field(resolver: "Webkul\\Pos\\Mutations\\Outlet\\CustomerMutation@delete")
+}

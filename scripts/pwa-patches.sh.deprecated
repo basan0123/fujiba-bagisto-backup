@@ -1,0 +1,190 @@
+#!/usr/bin/env bash
+# =============================================================================
+# /var/www/bagisto/scripts/pwa-patches.sh
+# Re-apply all PWA JS patches after: php artisan vendor:publish --force
+#
+# Usage:
+#   bash /var/www/bagisto/scripts/pwa-patches.sh
+#
+# Safe to run multiple times — every patch is idempotent.
+# =============================================================================
+set -euo pipefail
+
+BUNDLE="/var/www/bagisto/public/themes/pwa/default/build/assets/js/app.js"
+SW="/var/www/bagisto/public/service-worker.js"
+I18N_SCRIPT="/tmp/pwa_i18n_patch.php"
+
+PASS="✅"
+SKIP="⏭ "
+FAIL="❌"
+
+echo "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━"
+echo "  Bagisto PWA patch script"
+echo "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━"
+
+if [[ ! -f "$BUNDLE" ]]; then
+    echo "$FAIL Bundle not found: $BUNDLE"
+    exit 1
+fi
+
+cp "$BUNDLE" "${BUNDLE}.bak.$(date +%s)"
+echo "  Backup: ${BUNDLE}.bak.$(date +%s)"
+echo ""
+
+CHANGED=0
+
+# -----------------------------------------------------------------------------
+# Helper: idempotent in-place replace via Python (handles multi-line + UTF-8)
+# Args: <marker> <old> <new>
+# Echoes: DONE | SKIP | MISS
+# -----------------------------------------------------------------------------
+patch_py() {
+    local marker="$1" old="$2" new="$3"
+    MARKER="$marker" OLD="$old" NEW="$new" BUNDLE="$BUNDLE" python3 <<'PYEOF'
+import os, pathlib
+p = os.environ['BUNDLE']
+marker = os.environ['MARKER']
+old = os.environ['OLD']
+new = os.environ['NEW']
+s = pathlib.Path(p).read_text(encoding='utf-8')
+if marker in s:
+    print("SKIP")
+elif old in s:
+    pathlib.Path(p).write_text(s.replace(old, new, 1), encoding='utf-8')
+    print("DONE")
+else:
+    print("MISS")
+PYEOF
+}
+
+# -----------------------------------------------------------------------------
+# PATCH 1: errorResponseHandler null-response guard
+# -----------------------------------------------------------------------------
+MARKER1="errorResponseHandler: function errorResponseHandler(error) { /* PATCHED */"
+OLD1=$'errorResponseHandler: function errorResponseHandler(error) {\n      EventBus.$emit(\'destroy-ajax-loader\');\n      switch (error.response.status) {'
+NEW1=$'errorResponseHandler: function errorResponseHandler(error) { /* PATCHED */\n      EventBus.$emit(\'destroy-ajax-loader\');\n      if (!error || !error.response) { return Promise.reject(error || new Error(\'Network error\')); }\n      switch (error.response.status) {'
+
+result=$(patch_py "$MARKER1" "$OLD1" "$NEW1")
+case "$result" in
+    DONE) echo "$PASS PATCH 1: errorResponseHandler null-response guard applied" ; CHANGED=1 ;;
+    SKIP) echo "$SKIP PATCH 1: errorResponseHandler already patched" ;;
+    MISS) echo "$FAIL PATCH 1: errorResponseHandler pattern not found — bundle may have changed" ;;
+esac
+
+# -----------------------------------------------------------------------------
+# PATCH 2: response interceptor — don't return undefined on offline
+# -----------------------------------------------------------------------------
+MARKER2="offline PATCHED"
+OLD2=$'axios.interceptors.response.use(function (response) {\n      if (response.data.offline) {\n        this_this.$router.push({\n          name: \'offline\'\n        });\n      } else {\n        return response;\n      }\n    }, this.errorResponseHandler);'
+NEW2=$'axios.interceptors.response.use(function (response) { /* offline PATCHED */\n      if (response && response.data && response.data.offline) {\n        if (this_this.$route && this_this.$route.name !== \'offline\') {\n          this_this.$router.push({ name: \'offline\' }).catch(function(){});\n        }\n        return Promise.reject(new Error(\'offline\'));\n      }\n      return response;\n    }, this.errorResponseHandler);'
+
+result=$(patch_py "$MARKER2" "$OLD2" "$NEW2")
+case "$result" in
+    DONE) echo "$PASS PATCH 2: response interceptor offline guard applied" ; CHANGED=1 ;;
+    SKIP) echo "$SKIP PATCH 2: response interceptor already patched" ;;
+    MISS) echo "$FAIL PATCH 2: response interceptor pattern not found — bundle may have changed" ;;
+esac
+
+# -----------------------------------------------------------------------------
+# PATCH 3: getConfigValues defensive read (response/data may be undefined)
+# -----------------------------------------------------------------------------
+MARKER3="getConfigValues PATCHED"
+OLD3=$'}).then(function (response) {\n        EventBus.$emit(\'hide-ajax-loader\');\n        if (response.data.data[enable_new_key] == "1") {'
+NEW3=$'}).then(function (response) { /* getConfigValues PATCHED */\n        EventBus.$emit(\'hide-ajax-loader\');\n        var __cfg = (response && response.data && response.data.data) ? response.data.data : {};\n        if (__cfg[enable_new_key] == "1") {'
+
+result=$(patch_py "$MARKER3" "$OLD3" "$NEW3")
+case "$result" in
+    DONE)
+        echo "$PASS PATCH 3: getConfigValues defensive read applied"
+        # Localised: rewrite remaining response.data.data refs in this then-block to __cfg
+        BUNDLE="$BUNDLE" python3 <<'PYEOF'
+import os, pathlib
+p = os.environ['BUNDLE']
+s = pathlib.Path(p).read_text(encoding='utf-8')
+i = s.find('/* getConfigValues PATCHED */')
+j = s.find('})["catch"](function (error) {', i) if i != -1 else -1
+if i != -1 and j != -1:
+    block = s[i:j].replace('response.data.data[', '__cfg[')
+    pathlib.Path(p).write_text(s[:i] + block + s[j:], encoding='utf-8')
+PYEOF
+        CHANGED=1
+        ;;
+    SKIP) echo "$SKIP PATCH 3: getConfigValues already patched" ;;
+    MISS) echo "$FAIL PATCH 3: getConfigValues pattern not found — bundle may have changed" ;;
+esac
+
+# -----------------------------------------------------------------------------
+# PATCH 4: service-worker bypass for /api/ + cache version bump
+# -----------------------------------------------------------------------------
+if [[ -f "$SW" ]]; then
+    SW_MARKER='requestUrl.pathname.indexOf("/api/") >= 0'
+    if grep -q "$SW_MARKER" "$SW"; then
+        echo "$SKIP PATCH 4: service-worker already patched"
+    else
+        # Minimal patch: insert /api/ bypass at top of skipIfThese, bump version.
+        BUNDLE_SW="$SW" python3 <<'PYEOF'
+import os, pathlib, re
+p = os.environ['BUNDLE_SW']
+s = pathlib.Path(p).read_text(encoding='utf-8')
+old = 'function skipIfThese(requestUrl) {\n    if (requestUrl.pathname.indexOf("/pwa") < 0'
+new = 'function skipIfThese(requestUrl) {\n    if (requestUrl.pathname.indexOf("/api/") >= 0) { return true; }\n    if (requestUrl.pathname.indexOf("/pwa") < 0'
+if old in s:
+    s = s.replace(old, new, 1)
+s = re.sub(r"var version = 'v[0-9.]+';", "var version = 'v3.2';", s, count=1)
+pathlib.Path(p).write_text(s, encoding='utf-8')
+PYEOF
+        echo "$PASS PATCH 4: service-worker bypass for /api/ applied (version bumped)"
+        CHANGED=1
+    fi
+else
+    echo "$SKIP PATCH 4: service-worker.js not found at $SW"
+fi
+
+# -----------------------------------------------------------------------------
+# PATCH 5+6: i18n translations (ja + my) via existing PHP script
+# -----------------------------------------------------------------------------
+echo ""
+if [[ -f "$I18N_SCRIPT" ]]; then
+    echo "  Running i18n patch: $I18N_SCRIPT"
+    if php "$I18N_SCRIPT"; then
+        echo "$PASS PATCH 5+6: ja/my translations applied"
+        CHANGED=1
+    else
+        echo "$FAIL PATCH 5+6: i18n script failed"
+    fi
+else
+    echo "$SKIP PATCH 5+6: $I18N_SCRIPT not found — skipping i18n"
+fi
+
+# -----------------------------------------------------------------------------
+# Cache-bust: bump mtimes so ?v= cache-bust query refreshes on clients
+# -----------------------------------------------------------------------------
+echo ""
+if [[ "$CHANGED" -eq 1 ]]; then
+    touch "$BUNDLE"
+    echo "$PASS Cache-bust: bundle mtime bumped"
+    if [[ -f "$SW" ]]; then
+        touch "$SW"
+        echo "$PASS Cache-bust: service-worker mtime bumped"
+    fi
+else
+    echo "$SKIP Cache-bust: no changes written"
+fi
+
+# Restore ownership in case files were touched as root
+chown www-data:www-data "$BUNDLE" 2>/dev/null || true
+[[ -f "$SW" ]] && chown www-data:www-data "$SW" 2>/dev/null || true
+
+# Quick syntax check
+if command -v node >/dev/null 2>&1; then
+    if node --check "$BUNDLE" 2>&1 | grep -q .; then
+        echo "$FAIL Syntax check FAILED — review backup at ${BUNDLE}.bak.*"
+    else
+        echo "$PASS Syntax check passed"
+    fi
+fi
+
+echo ""
+echo "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━"
+echo "  Done. Clear PWA cache on device to pull fresh bundle."
+echo "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━"

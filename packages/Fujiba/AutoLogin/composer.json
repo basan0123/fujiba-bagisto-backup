@@ -1,0 +1,19 @@
+{
+    "name": "fujiba/auto-login",
+    "description": "Auto Login (TikTok SSO, QR signed-URL, POS staff PIN) for Fujiba Elegance Emporium",
+    "type": "library",
+    "license": "proprietary",
+    "autoload": {
+        "psr-4": {
+            "Fujiba\\AutoLogin\\": "src/"
+        }
+    },
+    "extra": {
+        "laravel": {
+            "providers": [
+                "Fujiba\\AutoLogin\\Providers\\AutoLoginServiceProvider"
+            ]
+        }
+    },
+    "minimum-stability": "dev"
+}

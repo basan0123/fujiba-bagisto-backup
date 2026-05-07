@@ -1,0 +1,35 @@
+#outlet\cashier\drawer.graphql
+
+extend type Query @guard(with: ["pos_user"]) {
+    getDrawerDetails: CashierDrawer @field(resolver: "Webkul\\Pos\\Queries\\Cashier\\CashierQuery@getDrawerDetails")
+}
+
+extend type Mutation @guard(with: ["pos_user"]) {
+    openDrawer(
+        input: drawerInput! @spread
+    ): DrawerResult @field(resolver: "Webkul\\Pos\\Mutations\\Outlet\\CashierMutation@openDrawer")
+
+    closeDrawer(
+        input: drawerInput! @spread
+    ): DrawerResult @field(resolver: "Webkul\\Pos\\Mutations\\Outlet\\CashierMutation@closeDrawer")
+}
+
+input drawerInput {
+    openingAmount: Float @rename(attribute: "opening_amount")
+    remark: String
+}
+
+type CashierDrawer {
+    openingAmount: String @rename(attribute: "opening_amount")
+    cashPaymentSale: String @rename(attribute: "cash_payment_sale")
+    otherPaymentSale: String @rename(attribute: "other_payment_sale")
+    expectedDrawerAmount: String @rename(attribute: "expected_drawer_amount")
+    differenceAmount: String @rename(attribute: "difference_amount")
+    remark: String
+}
+
+type DrawerResult {
+    success: Boolean!
+    errors: String
+    message: String
+}

@@ -1,0 +1,767 @@
+{
+    "pos": {
+        "title": "Fujiba POS",
+        "page_not_found": {
+            "title": "何かが見つかりません。",
+            "message": "申し訳ありませんが、そのページは見つかりません。ホームページでたくさんのことを探索できます。",
+            "back_btn_title": "ホームページに戻る"
+        },
+        "login_form": {
+            "title": "ログイン",
+            "user_name": "ユーザー名",
+            "user_name_placeholder": "ユーザー名を入力してください",
+            "password": "パスワード",
+            "password_placeholder": "パスワードを入力してください",
+            "remember_password": "パスワードを記憶する",
+            "login_btn_title": "ログイン"
+        },
+        "footer": {
+            "warning": "WebkulはWebkulモジュールの再販売を許可していません。",
+            "copyright": "© 2010-2023 Webkul Software（インド/米国で登録）。全著作権所有。"
+        },
+        "layout": {
+            "header": {
+                "title": "Fujiba POS",
+                "search_products": "商品を検索...",
+                "hold_orders": "保留中の注文",
+                "barcode_form": {
+                    "title": "バーコードを入力",
+                    "barcode_placeholder": "商品のバーコードを入力してください",
+                    "cancel_btn_title": "キャンセル",
+                    "proceed_btn_title": "進む"
+                },
+                "new_sale": "新規販売",
+                "product_create_form": {
+                    "title": "新しい製品を追加",
+                    "name": "名前",
+                    "sku": "SKU",
+                    "price": "価格",
+                    "weight": "重量",
+                    "quantity": "数量",
+                    "barcode_label": "バーコード",
+                    "cancel_btn_title": "キャンセル",
+                    "proceed_btn_title": "進む"
+                },
+                "barcode_picker": {
+                    "title": "未登録のバーコード",
+                    "subtitle": "スキャンしたバーコード「{barcode}」に紐付ける商品を選択してください。",
+                    "search_placeholder": "商品名・SKUで検索...",
+                    "no_results": "該当する商品が見つかりません。",
+                    "link_btn": "この商品にリンク",
+                    "cancel_btn": "キャンセル",
+                    "link_success": "バーコードが商品に紐付けられました。",
+                    "link_error": "バーコードの紐付けに失敗しました。"
+                }
+            },
+            "sidebar": {
+                "home": "ホーム",
+                "dashboard": "ホーム",
+                "customers": "顧客",
+                "cashier": "キャッシャー",
+                "orders": "注文",
+                "products": "商品",
+                "reports": "レポート",
+                "settings": "設定",
+                "logout": "ログアウト"
+            },
+            "main": {
+                "cash_drawer": {
+                    "title": "現金引き出し",
+                    "opening_drawer_amount": "引き出し時の金額",
+                    "remarks": "備考",
+                    "remarks_placeholder": "カウンター終了の備考を入力してください。",
+                    "open_drawer": "引き出しを開く"
+                }
+            }
+        },
+        "common": {
+            "cart": {
+                "add": "追加",
+                "add_customer": "顧客を追加",
+                "booking_from": "予約開始",
+                "booking_till": "予約終了",
+                "closed": "閉店",
+                "create_success": "カートが正常に作成されました。",
+                "discount": "割引",
+                "discount_applied": "{percentage}%の割引が適用されました",
+                "downloads": "ダウンロード",
+                "event_expired": "このイベントは期限切れです。",
+                "event_from": "イベント開始",
+                "event_ticket": "イベントチケット",
+                "event_till": "イベント終了",
+                "hold_order": "注文を保留",
+                "hold_order_success": "注文が正常に保留されました。",
+                "inventory_warning": "要求された数量は利用できません。",
+                "missing_links": "この商品のダウンロードリンクがありません。",
+                "missing_options": "この商品のオプションがありません。",
+                "no_customer_selected": "顧客が選択されていません。",
+                "note": "メモ",
+                "payable_amount": "支払金額",
+                "proceed": "進む",
+                "product_add_success": "商品がカートに正常に追加されました！",
+                "product_remove_success": "商品がカートから正常に削除されました！",
+                "qty_missing": "少なくとも1つの商品は数量1以上である必要があります。",
+                "invalid_file_extension": "無効なファイル拡張子が見つかりました。",
+                "quantity": "数量",
+                "remove_cart": "カートを削除",
+                "remove_success": "カートが正常に削除されました。",
+                "rent_from": "レンタル開始",
+                "rent_till": "レンタル終了",
+                "rent_type": "レンタルタイプ",
+                "select_hourly_duration": "1時間のスロットを選択してください。",
+                "selected_products_simple": "選択された商品はシンプルタイプである必要があります。",
+                "special_note": "特別なリクエスト / メモ",
+                "subtotal": "小計",
+                "tax": "税金",
+                "update_success": "カートが正常に更新されました。",
+                "order_note_form": {
+                    "title": "注文の備考",
+                    "note_placeholder": "注文の備考を入力してください",
+                    "cancel_btn_title": "キャンセル",
+                    "proceed_btn_title": "進む",
+                    "create_success": "注文ノートが正常に追加されました。",
+                    "remove_success": "注文ノートが正常に削除されました。"
+                }
+            },
+            "flash_messages": {
+                "close": "閉じる",
+                "error_message": "エラーが発生しました！もう一度お試しください。",
+                "offline_error": "警告、オフラインモードです",
+                "offline_mode": "警告：オフラインです。利用できる機能が制限されています",
+                "online_mode": "接続が回復しました。オンラインに戻りました"
+            },
+            "offline_loader": {
+                "title": "警告、オフラインモードです",
+                "description": "接続が回復すると詳細を確認できます。",
+                "reconnecting": "再接続中..."
+            },
+            "confirm_modal": {
+                "title": "本当によろしいですか？",
+                "description": "この操作を実行してもよろしいですか？",
+                "disagree_btn_title": "同意しない",
+                "agree_btn_title": "同意する"
+            },
+            "pagination": {
+                "showing": "{total} 件中 {count} 件を表示中",
+                "page": "{total} ページ中 {current} ページ"
+            }
+        },
+        "home": {
+            "title": "ホーム",
+            "cart_bar": {
+                "hold": "保留",
+                "items": "商品",
+                "checkout": "会計"
+            },
+            "print_confirmation_title": "印刷確認？",
+            "print_confirm_message": "最後の注文のレシートを印刷しますか？",
+            "items_in_cart": "カートに{count}個の商品があります。",
+            "view_cart_btn": "カートを見る",
+            "categories": {
+                "all": "すべて",
+                "no_barcode": "バーコードなし"
+            },
+            "products": {
+                "view": {
+                    "qty": "{qty} 数量",
+                    "add_to_cart": "カートに追加",
+                    "total_amount": "合計金額",
+                    "type": {
+                        "simple": {
+                            "customizable_options": {
+                                "none": "なし",
+                                "total_amount": "合計金額"
+                            }
+                        },
+                        "booking": {
+                            "location": "場所",
+                            "view_on_map": "地図で表示",
+                            "default": {
+                                "slot_duration_in_minutes": "{minutes} 分",
+                                "slot_duration": "スロット期間"
+                            },
+                            "appointment": {
+                                "closed": "閉店",
+                                "see_details": "詳細を見る",
+                                "slot_duration": "スロット期間",
+                                "slot_duration_in_minutes": "{minutes} 分",
+                                "today_availability": "本日の空き状況"
+                            },
+                            "event": {
+                                "book_your_ticket": "チケットを予約する",
+                                "per_ticket_price_ja": "チケット1枚あたり{price}",
+                                "title": "イベント："
+                            },
+                            "rental": {
+                                "choose_rent_option": "レンタルオプションを選択",
+                                "daily_basis": "日単位",
+                                "from": "開始",
+                                "hourly_basis": "時間単位",
+                                "rent_an_item": "アイテムをレンタル",
+                                "select_date": "日付を選択",
+                                "select_rent_time": "レンタル時間を選択",
+                                "select_slot": "スロットを選択",
+                                "select_time_slot": "時間スロットを選択",
+                                "slot": "スロット",
+                                "no_slots_available": "利用可能なスロットはありません",
+                                "to": "終了"
+                            },
+                            "table": {
+                                "book_a_table": "テーブルを予約する",
+                                "closed": "閉店",
+                                "slot_duration": "スロット期間",
+                                "slot_duration_in_minutes": "{minutes} 分",
+                                "slots_for_all_days": "すべての日のスロットを表示",
+                                "special_notes": "特別なリクエスト/メモ",
+                                "today_availability": "本日の空き状況"
+                            },
+                            "slots": {
+                                "book_an_appointment": "予約をする",
+                                "date": "日付",
+                                "no_slots_available": "利用可能なスロットはありません",
+                                "select_slot": "スロットを選択",
+                                "title": "スロット"
+                            }
+                        },
+                        "bundle": {
+                            "total_amount": "合計金額",
+                            "none": "利用可能なバンドルオプションはありません"
+                        },
+                        "configurable": {
+                            "select_option": "オプションを選択",
+                            "select_above_option": "まず上記のオプションを選択してください。",
+                            "price": "選択されたバリアントの価格"
+                        },
+                        "downloadable": {
+                            "samples": "サンプル",
+                            "links": "リンク"
+                        },
+                        "grouped": {
+                            "name": "名前"
+                        }
+                    }
+                },
+                "no_barcode_product": "このバーコードに一致する商品が見つかりませんでした。"
+            }
+        },
+        "customers": {
+            "add_btn": "新しい顧客を追加",
+            "change_btn": "顧客を変更",
+            "change_success": "顧客が正常に変更されました。",
+            "delete_success": "顧客が正常に削除されました。",
+            "customers": "顧客",
+            "delete_btn": "削除",
+            "edit_btn": "編集",
+            "no_current_customer": "顧客が見つかりません。",
+            "no_customers_found": "顧客が見つかりません。",
+            "offline_customers": "オフライン顧客",
+            "search_customers": "顧客を検索...",
+            "select_btn": "顧客を選択",
+            "title": "顧客",
+            "create": {
+                "title": "新しい顧客を追加",
+                "back_btn_title": "戻る",
+                "first_name": "名",
+                "last_name": "姓",
+                "email": "メール",
+                "phone_number": "電話番号",
+                "address": "住所",
+                "city": "市",
+                "state": "州",
+                "select_state": "州を選択",
+                "country": "国",
+                "select_country": "国を選択",
+                "pin_code": "郵便番号",
+                "save_btn_title": "顧客を追加",
+                "phone_already_exist": "この電話番号は既に使用されています。",
+                "email_already_exist": "このメールアドレスは既に使用されています。",
+                "create_success": "顧客が正常に作成されました。"
+            },
+            "edit": {
+                "title": "顧客を編集",
+                "back_btn_title": "戻る",
+                "first_name": "名",
+                "last_name": "姓",
+                "email": "メール",
+                "phone_number": "電話番号",
+                "address": "住所",
+                "city": "市",
+                "state": "州",
+                "select_state": "州を選択",
+                "country": "国",
+                "select_country": "国を選択",
+                "pin_code": "郵便番号",
+                "save_btn_title": "顧客を更新",
+                "phone_already_exist": "この電話番号は既に使用されています。",
+                "email_already_exist": "このメールアドレスは既に使用されています。",
+                "update_success": "顧客が正常に更新されました。"
+            }
+        },
+        "cashier": {
+            "title": "レジ係",
+            "cash_drawer": {
+                "title": "キャッシュドロワー",
+                "drawer_amount_summary": "ドロワー金額の概要",
+                "opening_drawer_amount": "ドロワーの初期金額",
+                "cash_payment_sale": "現金支払いの売上",
+                "other_payment_sale": "その他の支払いの売上",
+                "expected_drawer_amount": "予想されるドロワー金額",
+                "difference": "差額",
+                "remarks": "備考",
+                "remarks_placeholder": "カウンターの終了備考を入力してください。",
+                "close_drawer": "ドロワーを閉じる"
+            },
+            "today_sale": {
+                "title": "今日の売上",
+                "opening_drawer_amount": "ドロワーの初期金額",
+                "cash_payment_sale": "現金支払いの売上",
+                "other_payment_sale": "その他の支払いの売上",
+                "sale_history": "売上履歴",
+                "filters": "フィルター",
+                "order_id": "注文ID",
+                "time": "時間",
+                "order_total": "注文合計",
+                "payment_mode": "支払い方法",
+                "no_records": "レコードが見つかりませんでした。",
+                "no_records_desc": "取引が行われると、販売履歴がここに表示されます。",
+                "drawer": {
+                    "title": "フィルター",
+                    "order_id": "注文ID",
+                    "time": "時間",
+                    "order_total": "注文合計",
+                    "payment_mode": "支払い方法",
+                    "select_payment_mode": "支払い方法を選択",
+                    "pos_cash": "現金支払い",
+                    "pos_card": "カード支払い",
+                    "pos_split": "分割払い",
+                    "filter_btn_title": "フィルターを適用"
+                }
+            },
+            "sale_history": {
+                "title": "売上履歴",
+                "filters": "フィルター",
+                "date": "日付",
+                "cash_payments": "現金支払い",
+                "other_payments": "その他の支払い",
+                "total_sale": "総売上",
+                "drawer_note": "ドロワーノート",
+                "no_records": "レコードが見つかりませんでした。",
+                "no_records_desc": "取引が行われると、販売履歴がここに表示されます。",
+                "drawer": {
+                    "title": "フィルター",
+                    "date": "日付",
+                    "cash_payment": "現金支払い",
+                    "other_payment": "その他の支払い",
+                    "total_sale": "総売上",
+                    "filter_btn_title": "フィルターを適用"
+                }
+            },
+            "waste": {
+                "title": "廃棄入力",
+                "add_entry": "廃棄を記録",
+                "product": "商品名",
+                "product_placeholder": "商品名を入力…",
+                "qty": "数量",
+                "unit_cost": "単価",
+                "reason": "理由",
+                "notes": "メモ",
+                "submit": "廃棄を送信",
+                "submitting": "送信中…",
+                "recent": "最近の廃棄",
+                "no_entries": "廃棄記録はありません。",
+                "reasons": {
+                    "damaged": "破損",
+                    "expired": "期限切れ",
+                    "theft": "盗難",
+                    "spoilage": "腐敗",
+                    "other": "その他"
+                }
+            },
+            "cash_movement": {
+                "title": "入出金",
+                "income": "入金",
+                "expense": "出金",
+                "category": "カテゴリ",
+                "description": "説明",
+                "amount": "金額",
+                "submit": "保存",
+                "categories": {
+                    "rent": "家賃",
+                    "electricity": "電気",
+                    "gas": "ガス",
+                    "salary": "給料",
+                    "supplies": "備品",
+                    "misc": "その他",
+                    "sales_other": "売上・その他"
+                }
+            }
+        },
+        "orders": {
+            "title": "注文",
+            "history": {
+                "title": "履歴",
+                "search_orders": "注文IDまたは顧客名を検索...",
+                "filters": "フィルター",
+                "order_id": "注文ID",
+                "date": "日付",
+                "total_sales": "総売上",
+                "subtotal": "小計",
+                "tax": "税金",
+                "no_records": "レコードが見つかりませんでした。",
+                "no_records_desc": "取引が行われると、販売履歴がここに表示されます。",
+                "return_btn": "返品する",
+                "order_status": {
+                    "title": "ステータス",
+                    "completed": "完了",
+                    "returned": "返品済み"
+                }
+            },
+            "hold": {
+                "title": "保留中の注文",
+                "note": "メモ",
+                "resume": "再開",
+                "remove": "削除",
+                "remove_success": "注文が正常に削除されました。",
+                "resume_success": "注文が正常に再開されました。",
+                "resume_error": "まず現在のカートを処理してください。",
+                "no_orders": "注文が見つかりませんでした。"
+            },
+            "offline": {
+                "title": "オフライン注文",
+                "sync_order": "注文の同期",
+                "sync_all_orders": "すべての注文を同期",
+                "search_order_id": "注文IDを検索...",
+                "order_id": "注文ID",
+                "date": "日付",
+                "no_orders": "オフライン注文が見つかりませんでした。",
+                "sync_success": "注文が正常に同期されました。",
+                "return": "返品",
+                "returned": "返品済み",
+                "return_success": "注文が正常に返品されました。"
+            },
+            "info": {
+                "order_id": "注文ID",
+                "subtotal": "小計",
+                "tax": "税金",
+                "discount": "割引",
+                "grand_total": "総合計",
+                "cash": "現金",
+                "balance": "残高",
+                "no_order_selected": "プレビューまたは請求書の印刷のために選択された注文はありません。"
+            },
+            "print": {
+                "btn_title": "請求書を印刷",
+                "options_title": "印刷オプション",
+                "receipt_language": "レシート言語",
+                "ryoshuho_btn": "領収書を印刷",
+                "cancel": "キャンセル",
+                "cashier": "レジ係",
+                "change": "お釣り",
+                "contact_info": "連絡先情報",
+                "customer": "顧客",
+                "customer_care": "顧客サービス",
+                "date": "日付",
+                "discount": "割引",
+                "email": "メール",
+                "grand_total": "総計",
+                "item": "商品",
+                "name": "名前",
+                "no_receipt": "この店舗の領収書は利用できません。",
+                "print_sent": "印刷ジョブをプリンターに送信しました。",
+                "print_failed": "印刷に失敗しました。プリンター接続を確認してください。",
+                "popup_blocked": "レシートを印刷するには、このサイトのポップアップを許可してください。",
+                "order_id": "注文番号",
+                "phone": "電話",
+                "price": "価格",
+                "qty": "数量",
+                "subtotal": "小計",
+                "tax": "税金",
+                "total": "合計",
+                "total_qty": "合計数量",
+                "website": "ウェブサイト"
+            }
+        },
+        "products": {
+            "title": "製品",
+            "create": {
+                "title": "商品を追加",
+                "sku_placeholder": "空白のまま自動生成",
+                "sku_helper": "空白のままにするとSKUが自動生成されます。",
+                "error_name_required": "名前は必須です。",
+                "error_price_required": "価格は必須です。",
+                "error_quantity_required": "数量は必須です。",
+                "error_weight_required": "重量は必須です。",
+                "error_generic": "商品の作成に失敗しました。"
+            },
+            "edit": {
+                "title": "商品を編集",
+                "not_found": "商品が見つかりません。",
+                "categories": "カテゴリ",
+                "stock": "在庫",
+                "image": "画像",
+                "image_add": "画像を追加",
+                "image_change": "画像を変更",
+                "image_camera": "写真を撮影",
+                "image_remove": "画像を削除",
+                "image_remove_confirm": "この画像を削除しますか?",
+                "image_too_large": "この端末では画像が大きすぎて処理できません。",
+                "image_invalid": "画像を読み込めませんでした。別のファイルをお試しください。",
+                "image_updated": "画像を更新しました。",
+                "image_removed": "画像を削除しました。",
+                "image_error": "画像の処理に失敗しました。",
+                "barcode_placeholder": "バーコードをスキャンまたは入力",
+                "barcode_required": "バーコードは必須です。",
+                "barcode_save_error": "バーコードの保存に失敗しました。"
+            },
+            "list": {
+                "title": "商品設定",
+                "save_success": "変更が保存されました。",
+                "save_success_btn": "保存する",
+                "save_error": "保存に失敗しました。もう一度お試しください。",
+                "delete_success": "商品が削除されました。",
+                "delete_error": "商品の削除に失敗しました。",
+                "set_at_order": "注文時に設定",
+                "column": {
+                    "menu_title": "表示する列",
+                    "menu_aria": "表示列を選択",
+                    "stock": "在庫",
+                    "price": "価格",
+                    "weight": "重量",
+                    "category": "カテゴリ",
+                    "status": "公開設定"
+                },
+                "status": {
+                    "pos": "POSに表示",
+                    "web": "Webサイトに表示",
+                    "pos_short": "POS",
+                    "web_short": "Web"
+                }
+            },
+            "inception": {
+                "title": "在庫棚卸",
+                "search_placeholder": "商品名・SKU・バーコードで検索",
+                "system_qty": "システム在庫",
+                "counted_qty": "棚卸数量",
+                "diff": "差異",
+                "total_products": "対象商品",
+                "total_system": "システム在庫合計",
+                "total_counted": "カウント合計",
+                "total_diff": "差異合計",
+                "fill_system": "全てシステム在庫で埋める",
+                "fill_zero": "全て0で埋める",
+                "clear_counts": "カウントをクリア",
+                "apply_all": "棚卸を適用",
+                "apply_confirm_title": "棚卸を適用しますか？",
+                "apply_confirm_body": "{count}件の商品の在庫を更新します。この操作は元に戻せません。",
+                "apply_btn": "適用する",
+                "applying": "保存中 {done}/{total}...",
+                "cancel_btn": "キャンセル",
+                "apply_success": "{count}件の在庫が更新されました。",
+                "apply_error": "適用に失敗しました。再度お試しください。",
+                "no_products": "商品が見つかりません。",
+                "counted_count": "カウント済み",
+                "uncounted": "未カウント",
+                "filter_all": "すべて",
+                "filter_zero": "在庫切れ",
+                "filter_low": "在庫少",
+                "filter_in_stock": "在庫あり",
+                "filter_custom": "閾値以下",
+                "filter_label_short": "絞り込み"
+            },
+            "low_stock_products": {
+                "title": "在庫が少ない商品",
+                "qty": "{qty} 数量",
+                "purchase_request": "購入リクエスト",
+                "send_request_btn": "リクエストを送信",
+                "no_purchase_request": "購入リクエストが見つかりません。",
+                "no_products": "低在庫の製品は見つかりませんでした。",
+                "items_in_request": "購入リクエストに{count}個のアイテムがあります。",
+                "view_btn_title": "表示",
+                "request": {
+                    "title": "数量リクエストを送信",
+                    "requested_quantity": "リクエストされた数量",
+                    "comment": "コメント",
+                    "comment_placeholder": "コメントを入力",
+                    "add_btn_title": "商品を追加",
+                    "cancel_btn_title": "キャンセル",
+                    "already_exist": "リクエストリストに既に商品が存在します。"
+                }
+            },
+            "requested_products": {
+                "title": "リクエストされた商品",
+                "search_products": "商品を検索...",
+                "qty": "数量:- {qty}",
+                "pending": "保留中",
+                "received": "受け取り済み",
+                "declined": "拒否",
+                "no_products": "商品のリクエストが見つかりませんでした。"
+            },
+            "settings": {
+                "title": "設定",
+                "minimum_qty": "最小数量",
+                "save_btn_title": "保存",
+                "save_success": "設定が正常に保存されました。"
+            }
+        },
+        "reports": {
+            "title": "レポート",
+            "day": "日",
+            "week": "週",
+            "month": "月"
+        },
+        "settings": {
+            "title": "設定",
+            "profile": {
+                "title": "プロフィール",
+                "first_name": "名",
+                "last_name": "姓",
+                "email": "メール",
+                "old_password": "現在のパスワード",
+                "new_password": "新しいパスワード",
+                "confirm_password": "パスワードを確認",
+                "update_btn_title": "プロフィールを更新"
+            },
+            "sync": {
+                "completed": "完了",
+                "customers": "顧客",
+                "deselect_all": "すべて選択解除",
+                "entities": "エンティティ",
+                "entities_desc": "サーバーと同期したいエンティティを選択してください。",
+                "fetching": "取得中...",
+                "orders": "注文",
+                "products": "製品",
+                "ready": "準備完了",
+                "records": "レコード",
+                "select_all": "すべて選択",
+                "start_syncing": "同期開始",
+                "sync_btn_title": "今すぐ同期",
+                "title": "同期"
+            },
+            "shortcuts": {
+                "title": "ショートカット",
+                "description": "キーボードの組み合わせで素早く操作を実行できます。",
+                "sections": {
+                    "header": "ヘッダー",
+                    "menu": "メニュー",
+                    "customer": "顧客",
+                    "cart": "カート"
+                },
+                "items": {
+                    "open_barcode": {
+                        "action": "バーコードモードを開く",
+                        "description": "バーコードスキャンに切り替え"
+                    },
+                    "open_product_modal": {
+                        "action": "商品作成モーダルを開く",
+                        "description": "新しい商品を素早く追加"
+                    },
+                    "fullscreen": {
+                        "action": "フルスクリーン切替",
+                        "description": "フルスクリーンの切り替え"
+                    },
+                    "dark_mode": {
+                        "action": "ダークモード切替",
+                        "description": "テーマを切り替え"
+                    },
+                    "hold_orders": {
+                        "action": "注文を保留",
+                        "description": "保留中の注文を管理する"
+                    },
+                    "home": {
+                        "action": "ホームへ移動",
+                        "description": "ホームページへ移動"
+                    },
+                    "customers": {
+                        "action": "顧客セクションへ移動",
+                        "description": "顧客セクションを開く"
+                    },
+                    "cashier": {
+                        "action": "レジへ移動",
+                        "description": "POSレジにアクセス"
+                    },
+                    "orders": {
+                        "action": "注文履歴へ移動",
+                        "description": "注文履歴を確認"
+                    },
+                    "products": {
+                        "action": "商品管理へ移動",
+                        "description": "商品を管理"
+                    },
+                    "reports": {
+                        "action": "レポートへ移動",
+                        "description": "分析を表示"
+                    },
+                    "settings": {
+                        "action": "設定へ移動",
+                        "description": "設定を調整"
+                    },
+                    "create_customer": {
+                        "action": "新規顧客を作成",
+                        "description": "顧客を追加"
+                    },
+                    "edit_customer": {
+                        "action": "現在の顧客を編集",
+                        "description": "選択中の顧客情報を更新"
+                    },
+                    "delete_customer": {
+                        "action": "現在の顧客を削除",
+                        "description": "選択中の顧客を削除"
+                    },
+                    "change_customer": {
+                        "action": "現在の顧客を変更",
+                        "description": "別の顧客を選択"
+                    },
+                    "add_note": {
+                        "action": "メモを追加",
+                        "description": "注文にメモを添付"
+                    },
+                    "remove_note": {
+                        "action": "メモを削除",
+                        "description": "カートからメモを削除"
+                    },
+                    "checkout": {
+                        "action": "チェックアウトへ進む",
+                        "description": "支払い処理を開始"
+                    },
+                    "hold_order": {
+                        "action": "注文を保留",
+                        "description": "注文を保留にする"
+                    }
+                }
+            },
+            "regional": {
+                "title": "地域設定",
+                "locale": "ロケール",
+                "select_locale": "言語を選択",
+                "currency": "通貨",
+                "select_currency": "通貨を選択",
+                "save_btn_title": "保存"
+            },
+            "save_success": "設定が正常に保存されました。"
+        },
+        "payment": {
+            "title": "支払い",
+            "back": "戻る",
+            "order_details": "注文詳細",
+            "subtotal": "小計",
+            "tax": "税金",
+            "discount": "割引",
+            "grand_total": "総合計",
+            "payable_amount": "支払金額",
+            "received": "受領済み",
+            "remaining": "残り",
+            "pos_cash": "現金",
+            "pos_card": "カード",
+            "pos_split": "分割",
+            "cancel": "キャンセル",
+            "card_details": "カード詳細",
+            "bank": "銀行",
+            "select_bank": "銀行を選択",
+            "other": "その他",
+            "confirm_payment": "支払いを確認",
+            "empty_cart": "カートが空です！",
+            "amount_exceeded": "支払額が超過しました！",
+            "order_placed": "注文が正常に完了しました。"
+        }
+    }
+}

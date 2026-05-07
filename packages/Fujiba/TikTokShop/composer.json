@@ -1,0 +1,19 @@
+{
+    "name": "fujiba/tiktok-shop",
+    "description": "TikTok Shop integration (OAuth, product sync, order import, stock sync) for Fujiba Elegance Emporium",
+    "type": "library",
+    "license": "proprietary",
+    "autoload": {
+        "psr-4": {
+            "Fujiba\\TikTokShop\\": "src/"
+        }
+    },
+    "extra": {
+        "laravel": {
+            "providers": [
+                "Fujiba\\TikTokShop\\Providers\\TikTokShopServiceProvider"
+            ]
+        }
+    },
+    "minimum-stability": "dev"
+}

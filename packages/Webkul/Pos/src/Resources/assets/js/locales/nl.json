@@ -1,0 +1,617 @@
+{
+    "pos": {
+        "title": "Bagisto POS",
+        "page_not_found": {
+            "title": "Er ontbreekt iets.",
+            "message": "Sorry, we kunnen die pagina niet vinden. Op de startpagina is veel te ontdekken.",
+            "back_btn_title": "Terug naar de startpagina"
+        },
+        "login_form": {
+            "title": "Inloggen",
+            "user_name": "Gebruikersnaam",
+            "user_name_placeholder": "Voer gebruikersnaam in",
+            "password": "Wachtwoord",
+            "password_placeholder": "Voer wachtwoord in",
+            "remember_password": "Wachtwoord onthouden",
+            "login_btn_title": "Inloggen"
+        },
+        "footer": {
+            "warning": "Webkul machtigt geen wederverkopers om Webkul-modules opnieuw te verkopen.",
+            "copyright": "© Auteursrecht 2010-2023, Webkul Software (geregistreerd in India/USA). Alle rechten voorbehouden."
+        },
+        "layout": {
+            "header": {
+                "title": "Bagisto POS",
+                "search_products": "Zoek producten...",
+                "hold_orders": "Bestellingen vasthouden",
+                "barcode_form": {
+                    "title": "Voer barcode in",
+                    "barcode_placeholder": "Voer de barcode van het product in",
+                    "cancel_btn_title": "Annuleren",
+                    "proceed_btn_title": "Doorgaan"
+                },
+                "product_create_form": {
+                    "title": "Nieuw product toevoegen",
+                    "name": "Naam",
+                    "sku": "SKU",
+                    "price": "Prijs",
+                    "weight": "Gewicht",
+                    "quantity": "Aantal",
+                    "cancel_btn_title": "Annuleren",
+                    "proceed_btn_title": "Doorgaan"
+                }
+            },
+            "sidebar": {
+                "home": "Home",
+                "customers": "Klanten",
+                "cashier": "Kassamedewerker",
+                "orders": "Bestellingen",
+                "products": "Producten",
+                "reports": "Rapporten",
+                "settings": "Instellingen",
+                "logout": "Uitloggen"
+            },
+            "main": {
+                "cash_drawer": {
+                    "title": "Kassalade",
+                    "opening_drawer_amount": "Opening Kasbedrag",
+                    "remarks": "Opmerkingen",
+                    "remarks_placeholder": "Voer opmerkingen in voor de sluiting van de toonbank.",
+                    "open_drawer": "Kassalade openen"
+                }
+            }
+        },
+        "common": {
+            "cart": {
+                "add": "Toevoegen",
+                "add_customer": "Klant toevoegen",
+                "booking_from": "Boeking vanaf",
+                "booking_till": "Boeking tot",
+                "closed": "Gesloten",
+                "create_success": "Winkelwagen succesvol aangemaakt.",
+                "discount": "Korting",
+                "discount_applied": "{percentage}% korting toegepast",
+                "downloads": "Downloads",
+                "event_expired": "Dit evenement is verlopen.",
+                "event_from": "Evenement van",
+                "event_ticket": "Evenementticket",
+                "event_till": "Evenement tot",
+                "hold_order": "Bestelling in de wacht zetten",
+                "hold_order_success": "Bestelling succesvol in de wacht gezet.",
+                "inventory_warning": "De gevraagde hoeveelheid is niet beschikbaar.",
+                "missing_links": "Downloadbare links ontbreken voor dit product.",
+                "missing_options": "Opties ontbreken voor dit product.",
+                "no_customer_selected": "Geen klant geselecteerd.",
+                "note": "Notitie",
+                "payable_amount": "Te betalen bedrag",
+                "proceed": "Doorgaan",
+                "product_add_success": "Product succesvol toegevoegd aan de winkelwagen!",
+                "product_remove_success": "Product succesvol verwijderd uit de winkelwagen!",
+                "qty_missing": "Ten minste één product moet meer dan 1 hoeveelheid hebben.",
+                "invalid_file_extension": "Ongeldige bestandsextensie gevonden.",
+                "quantity": "Hoeveelheid",
+                "remove_cart": "Winkelwagen verwijderen",
+                "remove_success": "Winkelwagen succesvol verwijderd.",
+                "rent_from": "Huur vanaf",
+                "rent_till": "Huur tot",
+                "rent_type": "Huurtype",
+                "select_hourly_duration": "Selecteer een tijdsduur van één uur.",
+                "selected_products_simple": "Geselecteerde producten moeten van het type eenvoudig zijn.",
+                "special_note": "Speciale aanvraag / Opmerkingen",
+                "subtotal": "Subtotaal",
+                "tax": "Belasting",
+                "update_success": "Winkelwagen succesvol bijgewerkt.",
+                "order_note_form": {
+                    "title": "Bestelnotitie",
+                    "note_placeholder": "Voer bestelnotitie in",
+                    "cancel_btn_title": "Annuleren",
+                    "proceed_btn_title": "Doorgaan",
+                    "create_success": "Bestellingsnota succesvol toegevoegd.",
+                    "remove_success": "Bestellingsnota succesvol verwijderd."
+                }
+            },
+            "flash_messages": {
+                "close": "Sluiten",
+                "error_message": "Er is iets misgegaan! Probeer het opnieuw.",
+                "offline_error": "Waarschuwing, je bent offline",
+                "offline_mode": "Waarschuwing: Je bent offline. Beperkte functionaliteit beschikbaar",
+                "online_mode": "Verbinding hersteld. Je bent weer online"
+            },
+            "offline_loader": {
+                "title": "Waarschuwing, je bent offline",
+                "description": "Details zijn beschikbaar zodra je verbinding is hersteld.",
+                "reconnecting": "Opnieuw verbinden..."
+            },
+            "confirm_modal": {
+                "title": "Weet je het zeker?",
+                "description": "Weet je zeker dat je deze actie wilt uitvoeren?",
+                "disagree_btn_title": "Oneens",
+                "agree_btn_title": "Eens"
+            },
+            "pagination": {
+                "showing": "{count} van {total} resultaten weergegeven",
+                "page": "Pagina {current} van {total}"
+            }
+        },
+        "home": {
+            "title": "Home",
+            "print_confirmation_title": "Afdrukbevestiging?",
+            "print_confirm_message": "Wilt u de bon van de laatste bestelling afdrukken?",
+            "items_in_cart": "{count} items in winkelwagen.",
+            "view_cart_btn": "Bekijk winkelwagen",
+            "categories": {
+                "all": "Alles"
+            },
+            "products": {
+                "view": {
+                    "qty": "{qty} Hoeveelheid",
+                    "add_to_cart": "Toevoegen aan winkelwagen",
+                    "total_amount": "Totaalbedrag",
+                    "type": {
+                        "simple": {
+                            "customizable_options": {
+                                "none": "Geen",
+                                "total_amount": "Totaalbedrag"
+                            }
+                        },
+                        "booking": {
+                            "location": "Locatie",
+                            "view_on_map": "Bekijk op kaart",
+                            "default": {
+                                "slot_duration_in_minutes": "{minutes} Minuten",
+                                "slot_duration": "Tijdsduur slot"
+                            },
+                            "appointment": {
+                                "closed": "Gesloten",
+                                "see_details": "Bekijk details",
+                                "slot_duration": "Tijdsduur slot",
+                                "slot_duration_in_minutes": "{minutes} Minuten",
+                                "today_availability": "Beschikbaarheid vandaag"
+                            },
+                            "event": {
+                                "book_your_ticket": "Boek je ticket",
+                                "per_ticket_price_nl": "{price} per ticket",
+                                "title": "Evenement op :"
+                            },
+                            "rental": {
+                                "choose_rent_option": "Kies huur optie",
+                                "daily_basis": "Dagelijks",
+                                "from": "Van",
+                                "hourly_basis": "Per uur",
+                                "rent_an_item": "Huur een item",
+                                "select_date": "Selecteer datum",
+                                "select_rent_time": "Selecteer huur tijd",
+                                "select_slot": "Selecteer slot",
+                                "select_time_slot": "Selecteer tijdslot",
+                                "slot": "Slot",
+                                "no_slots_available": "Geen slots beschikbaar",
+                                "to": "Tot"
+                            },
+                            "table": {
+                                "book_a_table": "Reserveer een tafel",
+                                "closed": "Gesloten",
+                                "slot_duration": "Tijdsduur slot",
+                                "slot_duration_in_minutes": "{minutes} Minuten",
+                                "slots_for_all_days": "Toon voor alle dagen",
+                                "special_notes": "Speciale verzoeken/opmerkingen",
+                                "today_availability": "Beschikbaarheid vandaag"
+                            },
+                            "slots": {
+                                "book_an_appointment": "Maak een afspraak",
+                                "date": "Datum",
+                                "no_slots_available": "Geen slots beschikbaar",
+                                "select_slot": "Selecteer slot",
+                                "title": "Slot"
+                            }
+                        },
+                        "bundle": {
+                            "total_amount": "Totaalbedrag",
+                            "none": "Geen bundelopties beschikbaar"
+                        },
+                        "configurable": {
+                            "select_option": "Selecteer opties",
+                            "select_above_option": "Selecteer eerst bovenstaande opties.",
+                            "price": "Prijs van geselecteerde variant"
+                        },
+                        "downloadable": {
+                            "samples": "Voorbeelden",
+                            "links": "Links"
+                        },
+                        "grouped": {
+                            "name": "Naam"
+                        }
+                    }
+                },
+                "no_barcode_product": "Geen product gevonden met deze streepjescode."
+            }
+        },
+        "customers": {
+            "add_btn": "Nieuwe klant toevoegen",
+            "change_btn": "Klant wijzigen",
+            "change_success": "Klant succesvol gewijzigd.",
+            "delete_success": "Klant succesvol verwijderd.",
+            "customers": "Klanten",
+            "delete_btn": "Verwijderen",
+            "edit_btn": "Bewerken",
+            "no_current_customer": "Geen klant gevonden.",
+            "no_customers_found": "Geen klanten gevonden.",
+            "offline_customers": "Offline klanten",
+            "search_customers": "Zoek klanten...",
+            "select_btn": "Klant selecteren",
+            "title": "Klanten",
+            "create": {
+                "title": "Nieuwe Klant Toevoegen",
+                "back_btn_title": "Terug",
+                "first_name": "Voornaam",
+                "last_name": "Achternaam",
+                "email": "E-mail",
+                "phone_number": "Telefoonnummer",
+                "address": "Adres",
+                "city": "Stad",
+                "state": "Staat",
+                "select_state": "Selecteer Staat",
+                "country": "Land",
+                "select_country": "Selecteer Land",
+                "pin_code": "Postcode",
+                "save_btn_title": "Klant Toevoegen",
+                "phone_already_exist": "Het telefoonnummer is al in gebruik.",
+                "email_already_exist": "Het e-mailadres is al in gebruik.",
+                "create_success": "Klant succesvol aangemaakt."
+            },
+            "edit": {
+                "title": "Klant Bewerken",
+                "back_btn_title": "Terug",
+                "first_name": "Voornaam",
+                "last_name": "Achternaam",
+                "email": "E-mail",
+                "phone_number": "Telefoonnummer",
+                "address": "Adres",
+                "city": "Stad",
+                "state": "Staat",
+                "select_state": "Selecteer Staat",
+                "country": "Land",
+                "select_country": "Selecteer Land",
+                "pin_code": "Postcode",
+                "save_btn_title": "Klant Bijwerken",
+                "phone_already_exist": "Het telefoonnummer is al in gebruik.",
+                "email_already_exist": "Het e-mailadres is al in gebruik.",
+                "update_success": "Klant succesvol bijgewerkt."
+            }
+        },
+        "cashier": {
+            "title": "Kassier",
+            "cash_drawer": {
+                "title": "Kassalade",
+                "drawer_amount_summary": "Samenvatting kassaladebedrag",
+                "opening_drawer_amount": "Beginbedrag kassalade",
+                "cash_payment_sale": "Verkoop met contante betaling",
+                "other_payment_sale": "Verkoop met andere betaling",
+                "expected_drawer_amount": "Verwacht kassaladebedrag",
+                "difference": "Verschil",
+                "remarks": "Opmerkingen",
+                "remarks_placeholder": "Voer opmerkingen voor sluiting van de kassa in.",
+                "close_drawer": "Kassalade sluiten"
+            },
+            "today_sale": {
+                "title": "Verkoop van vandaag",
+                "opening_drawer_amount": "Beginbedrag kassalade",
+                "cash_payment_sale": "Verkoop met contante betaling",
+                "other_payment_sale": "Verkoop met andere betaling",
+                "sale_history": "Verkoophistorie",
+                "filters": "Filters",
+                "order_id": "Bestel-ID",
+                "time": "Tijd",
+                "order_total": "Besteltotaal",
+                "payment_mode": "Betalingswijze",
+                "no_records": "Geen records gevonden.",
+                "no_records_desc": "De verkoopgeschiedenis verschijnt hier zodra er transacties zijn gedaan.",
+                "drawer": {
+                    "title": "Filter",
+                    "order_id": "Bestel-ID",
+                    "time": "Tijd",
+                    "order_total": "Besteltotaal",
+                    "payment_mode": "Betaalmethode",
+                    "select_payment_mode": "Kies Betaalmethode",
+                    "pos_cash": "Contante Betaling",
+                    "pos_card": "Kaartbetaling",
+                    "pos_split": "Gesplitste Betaling",
+                    "filter_btn_title": "Filter Toepassen"
+                }
+            },
+            "sale_history": {
+                "title": "Verkoophistorie",
+                "filters": "Filters",
+                "date": "Datum",
+                "cash_payments": "Contante betalingen",
+                "other_payments": "Andere betalingen",
+                "total_sale": "Totale verkoop",
+                "drawer_note": "Kassanotitie",
+                "no_records": "Geen records gevonden.",
+                "no_records_desc": "De verkoopgeschiedenis verschijnt hier zodra er transacties zijn gedaan.",
+                "drawer": {
+                    "title": "Filter",
+                    "date": "Datum",
+                    "cash_payment": "Contante betaling",
+                    "other_payment": "Andere betaling",
+                    "total_sale": "Totale verkoop",
+                    "filter_btn_title": "Filter toepassen"
+                }
+            }
+        },
+        "orders": {
+            "title": "Bestellingen",
+            "history": {
+                "title": "Geschiedenis",
+                "search_orders": "Zoek bestel-ID of klantnaam...",
+                "filters": "Filters",
+                "order_id": "Bestel-ID",
+                "date": "Datum",
+                "total_sales": "Totale verkopen",
+                "subtotal": "Subtotaal",
+                "tax": "Belasting",
+                "no_records": "Geen records gevonden.",
+                "no_records_desc": "De verkoopgeschiedenis verschijnt hier zodra er transacties zijn gedaan.",
+                "return_btn": "Retourneren",
+                "order_status": {
+                    "title": "Status",
+                    "completed": "Voltooid",
+                    "returned": "Geretourneerd"
+                }
+            },
+            "hold": {
+                "title": "Bestellingen In Afwachting",
+                "note": "Opmerking",
+                "resume": "Hervatten",
+                "remove": "Verwijderen",
+                "remove_success": "Bestelling succesvol verwijderd.",
+                "resume_success": "Bestelling succesvol hervat.",
+                "resume_error": "Verwerk eerst de huidige winkelwagen.",
+                "no_orders": "Geen bestellingen gevonden."
+            },
+            "offline": {
+                "title": "Offline bestellingen",
+                "sync_order": "Bestelling synchroniseren",
+                "sync_all_orders": "Alle bestellingen synchroniseren",
+                "search_order_id": "Zoek bestel-ID...",
+                "order_id": "Bestel-ID",
+                "date": "Datum",
+                "no_orders": "Geen offline bestellingen gevonden.",
+                "sync_success": "Bestelling succesvol gesynchroniseerd.",
+                "return": "Retour",
+                "returned": "Geretourneerd",
+                "return_success": "Bestelling succesvol geretourneerd."
+            },
+            "info": {
+                "order_id": "Bestel-ID",
+                "subtotal": "Subtotaal",
+                "tax": "Belasting",
+                "discount": "Korting",
+                "grand_total": "Totaalbedrag",
+                "cash": "Contant",
+                "balance": "Saldo",
+                "no_order_selected": "Geen bestelling geselecteerd om te bekijken of de factuur af te drukken."
+            },
+            "print": {
+                "btn_title": "Factuur Afdrukken",
+                "cashier": "Kassier",
+                "change": "Wisselgeld",
+                "contact_info": "Contactgegevens",
+                "customer": "Klant",
+                "customer_care": "Klantenservice",
+                "date": "Datum",
+                "discount": "Korting",
+                "email": "E-mail",
+                "grand_total": "Totaalbedrag",
+                "item": "Product",
+                "name": "Naam",
+                "no_receipt": "Geen bon beschikbaar voor dit verkooppunt.",
+                "order_id": "Bestelnummer",
+                "phone": "Telefoon",
+                "price": "Prijs",
+                "qty": "Aantal",
+                "subtotal": "Subtotaal",
+                "tax": "Belasting",
+                "total": "Totaal",
+                "total_qty": "Totale Hoeveelheid",
+                "website": "Website"
+            }
+        },
+        "products": {
+            "title": "Producten",
+            "low_stock_products": {
+                "title": "Producten met Lage Voorraad",
+                "qty": "{qty} Hoeveelheid",
+                "purchase_request": "Aankoopverzoek",
+                "send_request_btn": "Verzoek Verzenden",
+                "no_purchase_request": "Geen aankoopverzoek gevonden.",
+                "no_products": "Geen producten met een laag voorraadniveau gevonden.",
+                "items_in_request": "{count} items in het aankoopverzoek.",
+                "view_btn_title": "Bekijken",
+                "request": {
+                    "title": "Verzoek voor Hoeveelheid Verzenden",
+                    "requested_quantity": "Gevraagde Hoeveelheid",
+                    "comment": "Opmerking",
+                    "comment_placeholder": "Voer opmerking in",
+                    "add_btn_title": "Product Toevoegen",
+                    "cancel_btn_title": "Annuleren",
+                    "already_exist": "Product bestaat al in de verzoeklijst."
+                }
+            },
+            "requested_products": {
+                "title": "Aangevraagde producten",
+                "search_products": "Zoek producten...",
+                "qty": "Aantal:- {qty}",
+                "pending": "In behandeling",
+                "received": "Ontvangen",
+                "declined": "Afgewezen",
+                "no_products": "Geen productverzoek gevonden."
+            },
+            "settings": {
+                "title": "Instellingen",
+                "minimum_qty": "Minimale hoeveelheid",
+                "save_btn_title": "Opslaan",
+                "save_success": "Instellingen succesvol opgeslagen."
+            }
+        },
+        "reports": {
+            "title": "Rapporten",
+            "day": "Dag",
+            "week": "Week",
+            "month": "Maand"
+        },
+        "settings": {
+            "title": "Instellingen",
+            "profile": {
+                "title": "Profiel",
+                "first_name": "Voornaam",
+                "last_name": "Achternaam",
+                "email": "E-mail",
+                "old_password": "Oud wachtwoord",
+                "new_password": "Nieuw wachtwoord",
+                "confirm_password": "Bevestig wachtwoord",
+                "update_btn_title": "Profiel bijwerken"
+            },
+            "sync": {
+                "completed": "Voltooid",
+                "customers": "Klanten",
+                "deselect_all": "Alles deselecteren",
+                "entities": "Entiteiten",
+                "entities_desc": "Selecteer de entiteiten die je met de server wilt synchroniseren.",
+                "fetching": "Bezig met ophalen...",
+                "orders": "Bestellingen",
+                "products": "Producten",
+                "ready": "Klaar",
+                "records": "Records",
+                "select_all": "Alles selecteren",
+                "start_syncing": "Synchronisatie starten",
+                "sync_btn_title": "Nu synchroniseren",
+                "title": "Synchronisatie"
+            },
+            "shortcuts": {
+                "title": "Sneltoetsen",
+                "description": "Toetsencombinaties waarmee je snel acties kunt uitvoeren.",
+                "sections": {
+                    "header": "Koptekst",
+                    "menu": "Menu",
+                    "customer": "Klant",
+                    "cart": "Winkelwagen"
+                },
+                "items": {
+                    "open_barcode": {
+                        "action": "Barcode-modus openen",
+                        "description": "Overschakelen naar barcodescannen"
+                    },
+                    "open_product_modal": {
+                        "action": "Product toevoegen venster openen",
+                        "description": "Snel een nieuw product toevoegen"
+                    },
+                    "fullscreen": {
+                        "action": "Volledig scherm wisselen",
+                        "description": "Volledig scherm in-/uitschakelen"
+                    },
+                    "dark_mode": {
+                        "action": "Donkere modus wisselen",
+                        "description": "Thema wisselen"
+                    },
+                    "hold_orders": {
+                        "action": "Bestellingen vasthouden",
+                        "description": "Ingehouden bestellingen beheren"
+                    },
+                    "home": {
+                        "action": "Ga naar Home",
+                        "description": "Navigeer naar de startpagina"
+                    },
+                    "customers": {
+                        "action": "Ga naar Klanten",
+                        "description": "Open klantensectie"
+                    },
+                    "cashier": {
+                        "action": "Ga naar Kassier",
+                        "description": "Toegang tot POS kassier"
+                    },
+                    "orders": {
+                        "action": "Ga naar Bestellingen",
+                        "description": "Bekijk bestelgeschiedenis"
+                    },
+                    "products": {
+                        "action": "Ga naar Producten",
+                        "description": "Beheer producten"
+                    },
+                    "reports": {
+                        "action": "Ga naar Rapporten",
+                        "description": "Bekijk analyses"
+                    },
+                    "settings": {
+                        "action": "Ga naar Instellingen",
+                        "description": "Voorkeuren aanpassen"
+                    },
+                    "create_customer": {
+                        "action": "Nieuwe klant aanmaken",
+                        "description": "Klant toevoegen"
+                    },
+                    "edit_customer": {
+                        "action": "Huidige klant bewerken",
+                        "description": "Geselecteerde klantgegevens bijwerken"
+                    },
+                    "delete_customer": {
+                        "action": "Huidige klant verwijderen",
+                        "description": "Geselecteerde klant verwijderen"
+                    },
+                    "change_customer": {
+                        "action": "Huidige klant wijzigen",
+                        "description": "Andere klant selecteren"
+                    },
+                    "add_note": {
+                        "action": "Notitie toevoegen",
+                        "description": "Notitie aan bestelling toevoegen"
+                    },
+                    "remove_note": {
+                        "action": "Notitie verwijderen",
+                        "description": "Notitie uit winkelwagen verwijderen"
+                    },
+                    "checkout": {
+                        "action": "Doorgaan naar afrekenen",
+                        "description": "Betalingsproces starten"
+                    },
+                    "hold_order": {
+                        "action": "Bestelling vasthouden",
+                        "description": "Bestelling in de wacht zetten"
+                    }
+                }
+            },
+            "regional": {
+                "title": "Regionaal",
+                "locale": "Taal",
+                "select_locale": "Selecteer taal",
+                "currency": "Valuta",
+                "select_currency": "Selecteer valuta",
+                "save_btn_title": "Opslaan"
+            },
+            "save_success": "Instellingen succesvol opgeslagen."
+        },
+        "payment": {
+            "title": "Betaling",
+            "back": "Terug",
+            "order_details": "Bestelgegevens",
+            "subtotal": "Subtotaal",
+            "tax": "Belasting",
+            "discount": "Korting",
+            "grand_total": "Totaalbedrag",
+            "payable_amount": "Te betalen bedrag",
+            "received": "Ontvangen",
+            "remaining": "Resterend",
+            "pos_cash": "Contant",
+            "pos_card": "Kaart",
+            "pos_split": "Gesplitst",
+            "cancel": "Annuleren",
+            "card_details": "Kaartgegevens",
+            "bank": "Bank",
+            "select_bank": "Kies bank",
+            "other": "Overig",
+            "confirm_payment": "Betalen bevestigen",
+            "empty_cart": "Winkelwagen is leeg!",
+            "amount_exceeded": "Te betalen bedrag overschreden!",
+            "order_placed": "Bestelling succesvol geplaatst."
+        }
+    }
+}

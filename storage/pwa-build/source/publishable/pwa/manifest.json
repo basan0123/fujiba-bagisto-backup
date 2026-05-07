@@ -1,0 +1,31 @@
+{
+    "name": "pwa app",
+    "short_name": "pwa short",
+    "start_url": "http://192.168.15.215/bagisto/v2.1.2/core-2/public/",
+    "display": "standalone",
+    "orientation": "any",
+    "theme_color": "#d1d1d1",
+    "background_color": "#1d1d1d",
+    "icons": [
+        {
+            "src": "http://192.168.15.215/bagisto/v2.1.2/core-2/public/storage/configuration/9f4sJCxFIdjiCApx1TgjxiGV9RVNorrSnBICB8Hx.png",
+            "sizes": "48x48",
+            "type": "image/png"
+        },
+        {
+            "src": "http://192.168.15.215/bagisto/v2.1.2/core-2/public/storage/configuration/1ORWNrj4VufMrS167cFMoXhA8lHKSzHjdYzLz7wm.png",
+            "sizes": "96x96",
+            "type": "image/png"
+        },
+        {
+            "src": "http://192.168.15.215/bagisto/v2.1.2/core-2/public/storage/configuration/bGfD6flhXPf5YLYx6n3pWXV5tSmMOOQC4qLvyJot.png",
+            "sizes": "144x144",
+            "type": "image/png"
+        },
+        {
+            "src": "http://192.168.15.215/bagisto/v2.1.2/core-2/public/storage/configuration/TJPJBe0KomCoaxyZ7VFr42gbe080TGDS6h3NpPn6.png",
+            "sizes": "196x196",
+            "type": "image/png"
+        }
+    ]
+}

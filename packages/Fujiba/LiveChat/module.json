@@ -1,0 +1,7 @@
+{
+    "name": "Fujiba LiveChat",
+    "slug": "fujiba_livechat",
+    "version": "1.0.0",
+    "description": "Multi-tenant Messenger live chat for Fujiba, powered by Fujiba",
+    "providers": ["Fujiba\\LiveChat\\Providers\\LiveChatServiceProvider"]
+}
