@@ -28,6 +28,28 @@ return [
         'export'  => 'တင်ပို့',
         'confirm' => 'အတည်ပြု',
         'back'    => 'နောက်ပြန်',
+        'all'     => 'အားလုံး',
+    ],
+
+    // MY-REVIEW: journal labels are best-effort transliterations.
+    'journal' => [
+        'from'          => 'မှ',
+        'to'            => 'အထိ',
+        'source_type'   => 'ဇာစ်မြစ်အမျိုးအစား',
+        'channel'       => 'ချန်နယ်',
+        'entry_no'      => 'ဂျာနယ် နံပါတ်',
+        'date'          => 'ရက်စွဲ',
+        'memo'          => 'မှတ်စု',
+        'source'        => 'ဇာစ်မြစ်',
+        'amount'        => 'ပမာဏ',
+        'empty'         => 'ဂျာနယ်မှတ်တိုင် မရှိသေးပါ',
+        'fiscal_period' => 'ဘဏ္ဍာရေးကာလ',
+        'status'        => 'အခြေအနေ',
+        'account'       => 'အကောင့်',
+        'debit'         => 'ဒက်ဘစ်',
+        'credit'        => 'ခရက်ဒစ်',
+        'tax'           => 'အခွန်',
+        'totals'        => 'စုစုပေါင်း',
     ],
 
     'dashboard' => [

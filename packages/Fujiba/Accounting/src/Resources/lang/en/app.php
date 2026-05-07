@@ -26,6 +26,27 @@ return [
         'export'  => 'Export',
         'confirm' => 'Confirm',
         'back'    => 'Back',
+        'all'     => 'All',
+    ],
+
+    'journal' => [
+        'from'          => 'From',
+        'to'            => 'To',
+        'source_type'   => 'Source Type',
+        'channel'       => 'Channel',
+        'entry_no'      => 'Entry No.',
+        'date'          => 'Date',
+        'memo'          => 'Memo',
+        'source'        => 'Source',
+        'amount'        => 'Amount',
+        'empty'         => 'No journal entries yet',
+        'fiscal_period' => 'Fiscal Period',
+        'status'        => 'Status',
+        'account'       => 'Account',
+        'debit'         => 'Debit',
+        'credit'        => 'Credit',
+        'tax'           => 'Tax',
+        'totals'        => 'Totals',
     ],
 
     'dashboard' => [

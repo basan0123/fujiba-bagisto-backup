@@ -2,6 +2,8 @@
 
 namespace Fujiba\Accounting\Providers;
 
+use Fujiba\Accounting\Console\Commands\PostBagistoOrders;
+use Fujiba\Accounting\Console\Commands\PostBagistoRefunds;
 use Fujiba\Accounting\Models\Account;
 use Fujiba\Accounting\Models\JournalEntry;
 use Fujiba\Accounting\Models\JournalLine;
@@ -9,6 +11,11 @@ use Fujiba\Accounting\Models\PayrollSlip;
 use Fujiba\Accounting\Models\Receipt;
 use Fujiba\Accounting\Models\Staff;
 use Fujiba\Accounting\Observers\AuditObserver;
+use Fujiba\Accounting\Services\JournalPoster;
+use Fujiba\Accounting\Services\SettingService;
+use Fujiba\Accounting\Services\Tax\ConsumptionTaxCalculator;
+use Illuminate\Console\Scheduling\Schedule;
+use Illuminate\Contracts\Foundation\Application;
 use Illuminate\Support\ServiceProvider;
 
 class AccountingServiceProvider extends ServiceProvider
@@ -25,12 +32,18 @@ class AccountingServiceProvider extends ServiceProvider
         ], 'config');
 
         $this->registerObservers();
+        $this->registerCommands();
+        $this->registerSchedule();
     }
 
     public function register(): void
     {
         $this->mergeConfigFrom(__DIR__ . '/../Config/accounting.php', 'accounting');
         $this->mergeConfigFrom(__DIR__ . '/../Config/admin-menu.php', 'menu.admin');
+
+        $this->app->singleton(SettingService::class);
+        $this->app->singleton(JournalPoster::class);
+        $this->app->singleton(ConsumptionTaxCalculator::class);
     }
 
     protected function registerObservers(): void
@@ -45,5 +58,42 @@ class AccountingServiceProvider extends ServiceProvider
         Receipt::observe(AuditObserver::class);
         PayrollSlip::observe(AuditObserver::class);
         Staff::observe(AuditObserver::class);
+    }
+
+    protected function registerCommands(): void
+    {
+        if (! $this->app->runningInConsole()) {
+            return;
+        }
+
+        $this->commands([
+            PostBagistoOrders::class,
+            PostBagistoRefunds::class,
+        ]);
+    }
+
+    protected function registerSchedule(): void
+    {
+        if (! $this->app->runningInConsole()) {
+            return;
+        }
+
+        $this->app->afterResolving(Schedule::class, function (Schedule $schedule, Application $app): void {
+            $schedule->command('accounting:post-orders')
+                ->hourly()
+                ->name('accounting-post-orders')
+                ->onOneServer()
+                ->withoutOverlapping(10)
+                ->runInBackground()
+                ->appendOutputTo(storage_path('logs/accounting-cron.log'));
+
+            $schedule->command('accounting:post-refunds')
+                ->hourlyAt(15)
+                ->name('accounting-post-refunds')
+                ->onOneServer()
+                ->withoutOverlapping(10)
+                ->runInBackground()
+                ->appendOutputTo(storage_path('logs/accounting-cron.log'));
+        });
     }
 }

@@ -26,6 +26,27 @@ return [
         'export'  => 'エクスポート',
         'confirm' => '確認',
         'back'    => '戻る',
+        'all'     => 'すべて',
+    ],
+
+    'journal' => [
+        'from'          => '開始日',
+        'to'            => '終了日',
+        'source_type'   => 'ソース',
+        'channel'       => 'チャネル',
+        'entry_no'      => '仕訳番号',
+        'date'          => '日付',
+        'memo'          => '摘要',
+        'source'        => '発生元',
+        'amount'        => '金額',
+        'empty'         => '仕訳はまだありません',
+        'fiscal_period' => '会計期間',
+        'status'        => 'ステータス',
+        'account'       => '勘定科目',
+        'debit'         => '借方',
+        'credit'        => '貸方',
+        'tax'           => '消費税',
+        'totals'        => '合計',
     ],
 
     'dashboard' => [

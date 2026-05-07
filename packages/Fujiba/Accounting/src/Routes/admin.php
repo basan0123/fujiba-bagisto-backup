@@ -1,6 +1,7 @@
 <?php
 
 use Fujiba\Accounting\Http\Controllers\Admin\DashboardController;
+use Fujiba\Accounting\Http\Controllers\Admin\JournalController;
 use Illuminate\Support\Facades\Route;
 
 // Spec asked for ['web','admin','admin.locale'] but no `admin.locale` alias is
@@ -11,4 +12,9 @@ Route::middleware(['web', 'admin'])
     ->name('admin.accounting.')
     ->group(function () {
         Route::get('/', [DashboardController::class, 'index'])->name('dashboard.index');
+
+        Route::get('/journal', [JournalController::class, 'index'])->name('journal.index');
+        Route::get('/journal/{id}', [JournalController::class, 'show'])
+            ->whereNumber('id')
+            ->name('journal.show');
     });

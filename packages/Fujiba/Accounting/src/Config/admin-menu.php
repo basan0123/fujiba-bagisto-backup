@@ -16,4 +16,11 @@ return [
         'sort'  => 1,
         'icon'  => '',
     ],
+    [
+        'key'   => 'accounting.journal',
+        'name'  => 'accounting::app.menu.journal',
+        'route' => 'admin.accounting.journal.index',
+        'sort'  => 2,
+        'icon'  => '',
+    ],
 ];
