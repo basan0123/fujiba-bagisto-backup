@@ -35,4 +35,49 @@ return [
             \Fujiba\Accounting\Models\Account::class => ['sort_order'],
         ],
     ],
+
+    /*
+    |--------------------------------------------------------------------------
+    | OCR (receipt extraction)
+    |--------------------------------------------------------------------------
+    | Drivers: 'stub' (default, no external calls) | 'azure' (Document Intelligence).
+    */
+    'ocr' => [
+        'driver' => env('FUJIBA_OCR_DRIVER', 'stub'),
+        'azure'  => [
+            'endpoint' => env('FUJIBA_OCR_AZURE_ENDPOINT'),
+            'key'      => env('FUJIBA_OCR_AZURE_KEY'),
+            'model'    => env('FUJIBA_OCR_AZURE_MODEL', 'prebuilt-receipt'),
+            'api_version' => env('FUJIBA_OCR_AZURE_API_VERSION', '2024-11-30'),
+            'poll_interval_ms' => 1000,
+            'poll_max_attempts' => 60,
+        ],
+    ],
+
+    /*
+    |--------------------------------------------------------------------------
+    | Receipt upload
+    |--------------------------------------------------------------------------
+    */
+    'receipts' => [
+        'storage_disk'   => env('FUJIBA_RECEIPT_DISK', 'local'),
+        'storage_root'   => 'accounting/receipts',
+        'max_size_kb'    => 10240,                 // 10 MB
+        'allowed_mimes'  => ['jpg', 'jpeg', 'png', 'pdf'],
+    ],
+
+    /*
+    |--------------------------------------------------------------------------
+    | 国税庁 適格請求書発行事業者 公表サイト API
+    |--------------------------------------------------------------------------
+    | Get a free app_id at https://www.invoice-kohyo.nta.go.jp/web-api/.
+    | If unset, lookups gracefully no-op (system still captures T-numbers,
+    | just doesn't validate them against the registry).
+    */
+    'nta_invoice_api' => [
+        'app_id'    => env('FUJIBA_NTA_INVOICE_API_ID'),
+        'base_url'  => env('FUJIBA_NTA_INVOICE_API_URL', 'https://web-api.invoice-kohyo.nta.go.jp/v1/num'),
+        'cache_days' => 30,
+        'rate_limit_per_sec' => 10,
+    ],
 ];

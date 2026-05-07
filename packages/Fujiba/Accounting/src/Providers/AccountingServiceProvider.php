@@ -11,7 +11,12 @@ use Fujiba\Accounting\Models\PayrollSlip;
 use Fujiba\Accounting\Models\Receipt;
 use Fujiba\Accounting\Models\Staff;
 use Fujiba\Accounting\Observers\AuditObserver;
+use Fujiba\Accounting\Services\InvoiceRegistrantLookup;
 use Fujiba\Accounting\Services\JournalPoster;
+use Fujiba\Accounting\Services\Ocr\AzureDocIntelligenceOcr;
+use Fujiba\Accounting\Services\Ocr\ReceiptOcrInterface;
+use Fujiba\Accounting\Services\Ocr\StubOcr;
+use Fujiba\Accounting\Services\ReceiptJournalBuilder;
 use Fujiba\Accounting\Services\SettingService;
 use Fujiba\Accounting\Services\Tax\ConsumptionTaxCalculator;
 use Illuminate\Console\Scheduling\Schedule;
@@ -44,6 +49,22 @@ class AccountingServiceProvider extends ServiceProvider
         $this->app->singleton(SettingService::class);
         $this->app->singleton(JournalPoster::class);
         $this->app->singleton(ConsumptionTaxCalculator::class);
+        $this->app->singleton(ReceiptJournalBuilder::class);
+        $this->app->singleton(InvoiceRegistrantLookup::class);
+
+        $this->app->bind(ReceiptOcrInterface::class, function ($app) {
+            return match (config('accounting.ocr.driver', 'stub')) {
+                'azure' => new AzureDocIntelligenceOcr(
+                    endpoint:        (string) config('accounting.ocr.azure.endpoint'),
+                    key:             (string) config('accounting.ocr.azure.key'),
+                    model:           (string) config('accounting.ocr.azure.model', 'prebuilt-receipt'),
+                    apiVersion:      (string) config('accounting.ocr.azure.api_version', '2024-11-30'),
+                    pollIntervalMs:  (int)    config('accounting.ocr.azure.poll_interval_ms', 1000),
+                    pollMaxAttempts: (int)    config('accounting.ocr.azure.poll_max_attempts', 60),
+                ),
+                default => new StubOcr(),
+            };
+        });
     }
 
     protected function registerObservers(): void

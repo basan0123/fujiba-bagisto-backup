@@ -23,4 +23,11 @@ return [
         'sort'  => 2,
         'icon'  => '',
     ],
+    [
+        'key'   => 'accounting.receipts',
+        'name'  => 'accounting::app.menu.receipts',
+        'route' => 'admin.accounting.receipts.index',
+        'sort'  => 3,
+        'icon'  => '',
+    ],
 ];
