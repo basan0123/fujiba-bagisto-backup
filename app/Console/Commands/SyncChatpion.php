@@ -398,16 +398,34 @@ class SyncChatpion extends Command
                  WHERE ec.store_id = ? AND oi.id IS NULL",
                 [$spref, $spref, $pref, $spref, $spref, $storeId]);
 
+            // product_ordered_inventories holds OPEN reservations (Bagisto semantics):
+            // qty = qty_ordered − qty_shipped − qty_canceled − qty_refunded, only for
+            // orders in pending/pending_payment/processing/fraud AND not yet
+            // label-printed. Older ChatPion-import logic used SUM(qty_invoiced) as a
+            // lifetime sales counter, which collided with isSaleable() and made
+            // hundreds of SKUs unbuyable. See feedback_ordered_inventories_dual_semantics.
+            //
+            // Truth source: orders + order_items. We DELETE this channel's POI rows and
+            // re-INSERT only the ones backed by real open orders. Use ON DUPLICATE KEY
+            // UPDATE to be safe against the unique key (product_id, channel_id).
+            DB::statement("DELETE FROM `{$this->bg}`.product_ordered_inventories WHERE channel_id = ?", [$ch]);
+
             DB::statement("
                 INSERT INTO `{$this->bg}`.product_ordered_inventories (product_id, channel_id, qty)
-                SELECT p.id, ?, SUM(oi.qty_invoiced)
+                SELECT oi.product_id, ?, SUM(
+                    oi.qty_ordered
+                    - COALESCE(oi.qty_shipped, 0)
+                    - COALESCE(oi.qty_canceled, 0)
+                    - COALESCE(oi.qty_refunded, 0)
+                ) AS open_qty
                   FROM `{$this->bg}`.order_items oi
                   JOIN `{$this->bg}`.orders o ON o.id = oi.order_id
-                  JOIN `{$this->bg}`.products p ON p.sku = oi.sku
                  WHERE o.channel_id = ?
-                   AND o.status NOT IN ('canceled','fraud','closed')
-                   AND oi.qty_invoiced > 0
-                 GROUP BY p.id
+                   AND o.status IN ('pending','pending_payment','processing','fraud')
+                   AND (o.fujiba_label_printed IS NULL OR o.fujiba_label_printed = 0)
+                   AND oi.parent_id IS NULL
+                 GROUP BY oi.product_id
+                HAVING open_qty > 0
                 ON DUPLICATE KEY UPDATE qty = VALUES(qty)",
                 [$ch, $ch]);
 

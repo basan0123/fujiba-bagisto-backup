@@ -2,7 +2,9 @@
 
 namespace Fujiba\CatalogAdmin\Providers;
 
+use Fujiba\CatalogAdmin\Http\Middleware\RedirectProductEditToVisibleChannel;
 use Fujiba\CatalogAdmin\Listeners\AddCostAndProfitColumns;
+use Illuminate\Contracts\Http\Kernel;
 use Illuminate\Support\Facades\Event;
 use Illuminate\Support\ServiceProvider;
 
@@ -21,5 +23,7 @@ class CatalogAdminServiceProvider extends ServiceProvider
             'datagrid.product_data_grid.columns.prepare.after',
             [AddCostAndProfitColumns::class, 'addColumns'],
         );
+
+        $this->app->make(Kernel::class)->pushMiddleware(RedirectProductEditToVisibleChannel::class);
     }
 }
