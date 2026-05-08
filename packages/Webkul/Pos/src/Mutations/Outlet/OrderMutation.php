@@ -44,6 +44,7 @@ class OrderMutation
             'cash_total'          => 'required_if:payment_mode,pos_cash,pos_split|numeric|min:0',
             'card_details'        => 'required_if:payment_mode,pos_card,pos_split|string',
             'bank_name'           => 'required_if:payment_mode,pos_card,pos_split|string',
+            'training_mode'       => 'nullable|boolean',
             'order_items'         => 'required|array|min:1',
         ]);
 

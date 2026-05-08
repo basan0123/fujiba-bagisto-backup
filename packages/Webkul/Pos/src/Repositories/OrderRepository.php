@@ -120,6 +120,13 @@ class OrderRepository extends Repository
             'outlet_id'            => $agent->outlet_id,
             'user_id'              => $agent->id,
             'order_note'           => $args['order_note'] ?? '',
+            // Per-order training flag. Source of truth = explicit arg from the
+            // client; the agent-level pos_users.training_mode is only a safety
+            // net (a forgetful native build would still tag the row). The web
+            // POS contract is: every syncOrder MUST send trainingMode explicitly.
+            'is_training'          => array_key_exists('training_mode', $args)
+                ? (bool) $args['training_mode']
+                : (bool) ($agent->training_mode ?? false),
             'discount_amount'      => round($order->discount_amount, 2),
             'base_discount_amount' => round($order->base_discount_amount, 2),
             'order_currency'       => $order->order_currency_code,

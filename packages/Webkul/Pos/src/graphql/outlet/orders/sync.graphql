@@ -15,6 +15,7 @@ input syncOrderInput {
     bankName: String @rename(attribute: "bank_name")
     cardDetails: String @rename(attribute: "card_details")
     orderNote: String @rename(attribute: "order_note")
+    trainingMode: Boolean @rename(attribute: "training_mode")
     orderItems: [SyncOrderItemInput] @rename(attribute: "order_items")
     isReturned: Boolean @rename(attribute: "is_returned")
 }
