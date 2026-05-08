@@ -5,6 +5,7 @@ use Fujiba\Accounting\Http\Controllers\Admin\InvoiceRegistrantApiController;
 use Fujiba\Accounting\Http\Controllers\Admin\JournalController;
 use Fujiba\Accounting\Http\Controllers\Admin\PayrollController;
 use Fujiba\Accounting\Http\Controllers\Admin\ReceiptController;
+use Fujiba\Accounting\Http\Controllers\Admin\ReportController;
 use Fujiba\Accounting\Http\Controllers\Admin\StaffController;
 use Fujiba\Accounting\Http\Controllers\Admin\TimecardController;
 use Illuminate\Support\Facades\Route;
@@ -55,6 +56,13 @@ Route::middleware(['web', 'admin'])
         Route::post('/payroll/run',              [PayrollController::class, 'run'])->name('payroll.run');
         Route::get('/payroll/{id}',              [PayrollController::class, 'show'])->whereNumber('id')->name('payroll.show');
         Route::post('/payroll/{id}/finalize',    [PayrollController::class, 'finalize'])->whereNumber('id')->name('payroll.finalize');
+
+        // Reports
+        Route::get('/reports/trial-balance', [ReportController::class, 'trialBalance'])->name('reports.trial_balance');
+        Route::get('/reports/pl',            [ReportController::class, 'pl'])->name('reports.pl');
+        Route::get('/reports/bs',            [ReportController::class, 'bs'])->name('reports.bs');
+        Route::get('/reports/journal',       [ReportController::class, 'journalBook'])->name('reports.journal');
+        Route::get('/reports/ledger',        [ReportController::class, 'ledger'])->name('reports.ledger');
 
         // Invoice-registrant lookup JSON API
         Route::get('/api/invoice-registrants/{t_number}', [InvoiceRegistrantApiController::class, 'show'])

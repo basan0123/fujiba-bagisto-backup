@@ -20,6 +20,13 @@ use Fujiba\Accounting\Services\Ocr\StubOcr;
 use Fujiba\Accounting\Services\Payroll\PayrollCalculator;
 use Fujiba\Accounting\Services\Payroll\PayrollJournalBuilder;
 use Fujiba\Accounting\Services\ReceiptJournalBuilder;
+use Fujiba\Accounting\Services\Reports\BsCalculator;
+use Fujiba\Accounting\Services\Reports\DashboardSummary;
+use Fujiba\Accounting\Services\Reports\JournalBookCalculator;
+use Fujiba\Accounting\Services\Reports\LedgerCalculator;
+use Fujiba\Accounting\Services\Reports\PlCalculator;
+use Fujiba\Accounting\Services\Reports\ReportPeriodResolver;
+use Fujiba\Accounting\Services\Reports\TrialBalanceCalculator;
 use Fujiba\Accounting\Services\SettingService;
 use Fujiba\Accounting\Services\Tax\ConsumptionTaxCalculator;
 use Illuminate\Console\Scheduling\Schedule;
@@ -57,6 +64,13 @@ class AccountingServiceProvider extends ServiceProvider
         $this->app->singleton(InvoiceRegistrantLookup::class);
         $this->app->singleton(PayrollCalculator::class);
         $this->app->singleton(PayrollJournalBuilder::class);
+        $this->app->singleton(ReportPeriodResolver::class);
+        $this->app->singleton(TrialBalanceCalculator::class);
+        $this->app->singleton(PlCalculator::class);
+        $this->app->singleton(BsCalculator::class);
+        $this->app->singleton(LedgerCalculator::class);
+        $this->app->singleton(JournalBookCalculator::class);
+        $this->app->singleton(DashboardSummary::class);
 
         $this->app->bind(ReceiptOcrInterface::class, function ($app) {
             return match (config('accounting.ocr.driver', 'stub')) {
