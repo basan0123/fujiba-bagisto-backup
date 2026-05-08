@@ -4,6 +4,7 @@ namespace Fujiba\Accounting\Providers;
 
 use Fujiba\Accounting\Console\Commands\PostBagistoOrders;
 use Fujiba\Accounting\Console\Commands\PostBagistoRefunds;
+use Fujiba\Accounting\Console\Commands\RunPayroll;
 use Fujiba\Accounting\Models\Account;
 use Fujiba\Accounting\Models\JournalEntry;
 use Fujiba\Accounting\Models\JournalLine;
@@ -16,6 +17,8 @@ use Fujiba\Accounting\Services\JournalPoster;
 use Fujiba\Accounting\Services\Ocr\AzureDocIntelligenceOcr;
 use Fujiba\Accounting\Services\Ocr\ReceiptOcrInterface;
 use Fujiba\Accounting\Services\Ocr\StubOcr;
+use Fujiba\Accounting\Services\Payroll\PayrollCalculator;
+use Fujiba\Accounting\Services\Payroll\PayrollJournalBuilder;
 use Fujiba\Accounting\Services\ReceiptJournalBuilder;
 use Fujiba\Accounting\Services\SettingService;
 use Fujiba\Accounting\Services\Tax\ConsumptionTaxCalculator;
@@ -31,6 +34,7 @@ class AccountingServiceProvider extends ServiceProvider
         $this->loadTranslationsFrom(__DIR__ . '/../Resources/lang', 'accounting');
         $this->loadViewsFrom(__DIR__ . '/../Resources/views', 'accounting');
         $this->loadRoutesFrom(__DIR__ . '/../Routes/admin.php');
+        $this->loadRoutesFrom(__DIR__ . '/../Routes/kiosk.php');
 
         $this->publishes([
             __DIR__ . '/../Config/accounting.php' => config_path('accounting.php'),
@@ -51,6 +55,8 @@ class AccountingServiceProvider extends ServiceProvider
         $this->app->singleton(ConsumptionTaxCalculator::class);
         $this->app->singleton(ReceiptJournalBuilder::class);
         $this->app->singleton(InvoiceRegistrantLookup::class);
+        $this->app->singleton(PayrollCalculator::class);
+        $this->app->singleton(PayrollJournalBuilder::class);
 
         $this->app->bind(ReceiptOcrInterface::class, function ($app) {
             return match (config('accounting.ocr.driver', 'stub')) {
@@ -90,6 +96,7 @@ class AccountingServiceProvider extends ServiceProvider
         $this->commands([
             PostBagistoOrders::class,
             PostBagistoRefunds::class,
+            RunPayroll::class,
         ]);
     }
 

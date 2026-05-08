@@ -30,4 +30,25 @@ return [
         'sort'  => 3,
         'icon'  => '',
     ],
+    [
+        'key'   => 'accounting.staff',
+        'name'  => 'accounting::app.menu.staff',
+        'route' => 'admin.accounting.staff.index',
+        'sort'  => 4,
+        'icon'  => '',
+    ],
+    [
+        'key'   => 'accounting.timecards',
+        'name'  => 'accounting::app.menu.timecard',
+        'route' => 'admin.accounting.timecards.index',
+        'sort'  => 5,
+        'icon'  => '',
+    ],
+    [
+        'key'   => 'accounting.payroll',
+        'name'  => 'accounting::app.menu.payroll',
+        'route' => 'admin.accounting.payroll.index',
+        'sort'  => 6,
+        'icon'  => '',
+    ],
 ];
