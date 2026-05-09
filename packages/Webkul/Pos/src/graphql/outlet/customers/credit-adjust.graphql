@@ -1,0 +1,26 @@
+# customerCreditAdjust — manager/owner-only mutation to add or deduct
+# customer-credit balance. Writes a row to pos_customer_credit_log;
+# rejects when a deduct would push the balance below zero.
+
+extend type Mutation @guard(with: ["pos_user"]) {
+    customerCreditAdjust (
+        input: customerCreditAdjustInput! @spread
+    ): customerCreditAdjustResponse
+        @field(resolver: "Webkul\\Pos\\Mutations\\Outlet\\CustomerCreditMutation@adjust")
+}
+
+input customerCreditAdjustInput {
+    customerId:     ID!     @rename(attribute: "customer_id")
+    amount:         Float!
+    type:           String! # 'add' | 'deduct'
+    reason:         String! # one of: manual_add, manual_deduct, order_change, refund_to_credit, expiry, correction
+    note:           String
+    idempotencyKey: String  @rename(attribute: "idempotency_key")
+}
+
+type customerCreditAdjustResponse {
+    success:    Boolean
+    message:    String
+    newBalance: Float @rename(attribute: "new_balance")
+    auditRowId: Int   @rename(attribute: "audit_row_id")
+}

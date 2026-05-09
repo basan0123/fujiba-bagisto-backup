@@ -31,6 +31,13 @@ return [
             'pending-orders' => 'Customer has pending orders!',
         ],
 
+        'credit' => [
+            'adjust-success'    => 'Customer credit adjusted successfully.',
+            'manager-required'  => 'Manager-level access is required.',
+            'insufficient'      => 'Insufficient balance. Current balance is :balance.',
+            'customer-missing'  => 'Customer not found.',
+        ],
+
         'cart' => [
             'already-applied'     => 'Coupon already applied!',
             'coupon-applied'      => 'Coupon applied successfully!',

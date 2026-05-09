@@ -31,6 +31,13 @@ return [
             'pending-orders' => '顧客には保留中の注文があります！',
         ],
 
+        'credit' => [
+            'adjust-success'    => '顧客クレジットを更新しました。',
+            'manager-required'  => '管理者権限が必要です。',
+            'insufficient'      => '残高不足です。現在の残高は :balance です。',
+            'customer-missing'  => '顧客が見つかりません。',
+        ],
+
         'cart' => [
             'already-applied'     => 'クーポンは既に適用されています！',
             'coupon-applied'      => 'クーポンが正常に適用されました！',
