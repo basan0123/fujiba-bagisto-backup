@@ -19,6 +19,7 @@ use Fujiba\Accounting\Services\Ocr\ReceiptOcrInterface;
 use Fujiba\Accounting\Services\Ocr\StubOcr;
 use Fujiba\Accounting\Services\Payroll\PayrollCalculator;
 use Fujiba\Accounting\Services\Payroll\PayrollJournalBuilder;
+use Fujiba\Accounting\Services\Payroll\ZenginExportService;
 use Fujiba\Accounting\Services\ReceiptJournalBuilder;
 use Fujiba\Accounting\Services\Reports\BsCalculator;
 use Fujiba\Accounting\Services\Reports\DashboardSummary;
@@ -64,6 +65,7 @@ class AccountingServiceProvider extends ServiceProvider
         $this->app->singleton(InvoiceRegistrantLookup::class);
         $this->app->singleton(PayrollCalculator::class);
         $this->app->singleton(PayrollJournalBuilder::class);
+        $this->app->singleton(ZenginExportService::class);
         $this->app->singleton(ReportPeriodResolver::class);
         $this->app->singleton(TrialBalanceCalculator::class);
         $this->app->singleton(PlCalculator::class);

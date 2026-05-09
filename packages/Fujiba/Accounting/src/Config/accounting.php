@@ -88,6 +88,25 @@ return [
         'cache_prefix'      => 'fujiba:accounting:report:',
     ],
 
+    /*
+    |--------------------------------------------------------------------------
+    | Zengin payroll-transfer defaults
+    |--------------------------------------------------------------------------
+    | Sender info baked into the file header. Override at request time via
+    | the export form. Code-only fields use safe placeholder zeros; produce
+    | a real file only after replacing these with the company's actual codes.
+    */
+    'zengin' => [
+        'sender_code'             => env('FUJIBA_ZENGIN_SENDER_CODE', '0000000000'),
+        'sender_name_kana'        => env('FUJIBA_ZENGIN_SENDER_NAME', 'FUJIBA'),
+        'payer_bank_code'         => env('FUJIBA_ZENGIN_PAYER_BANK_CODE', '0000'),
+        'payer_bank_name_kana'    => env('FUJIBA_ZENGIN_PAYER_BANK_NAME', ''),
+        'payer_branch_code'       => env('FUJIBA_ZENGIN_PAYER_BRANCH_CODE', '000'),
+        'payer_branch_name_kana'  => env('FUJIBA_ZENGIN_PAYER_BRANCH_NAME', ''),
+        'payer_account_type'      => env('FUJIBA_ZENGIN_PAYER_ACCT_TYPE', '1'),
+        'payer_account_no'        => env('FUJIBA_ZENGIN_PAYER_ACCT_NO', '0000000'),
+    ],
+
     'nta_invoice_api' => [
         'app_id'    => env('FUJIBA_NTA_INVOICE_API_ID'),
         'base_url'  => env('FUJIBA_NTA_INVOICE_API_URL', 'https://web-api.invoice-kohyo.nta.go.jp/v1/num'),

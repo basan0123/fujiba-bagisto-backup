@@ -56,6 +56,7 @@ Route::middleware(['web', 'admin'])
         Route::post('/payroll/run',              [PayrollController::class, 'run'])->name('payroll.run');
         Route::get('/payroll/{id}',              [PayrollController::class, 'show'])->whereNumber('id')->name('payroll.show');
         Route::post('/payroll/{id}/finalize',    [PayrollController::class, 'finalize'])->whereNumber('id')->name('payroll.finalize');
+        Route::get('/payroll/{id}/pdf',          [PayrollController::class, 'pdf'])->whereNumber('id')->name('payroll.pdf');
 
         // Reports
         Route::get('/reports/trial-balance', [ReportController::class, 'trialBalance'])->name('reports.trial_balance');
