@@ -1,6 +1,6 @@
 # Sprint 7 — 甲欄 B/C payroll バックフィル
 
-**現状: Phase A (read-only audit) のみ実装、commit 済。Phase B は人間の GO/NO-GO 待ち。**
+**現状: Phase A + Phase B 両方実装、commit 済。Phase B は GO 受領後に実装完了。**
 
 ---
 
@@ -114,9 +114,82 @@ Sprint 1-6 で fujiba_accounting tables は **central DB のみ** に置かれ�
 
 ---
 
-## Phase B — Backfill (実装前、本書では設計だけ提示)
+## Phase B — Backfill (実装済)
 
-### 設計選択 (SPRINT7.md で記述、コードは未実装)
+### コマンド
+
+```bash
+# 必ずまず dry-run
+php artisan accounting:backfill-bc-payroll --mode=staff-deduction --from=2026-04 --to=2026-09
+
+# 確定して書き込む (interactive 確認あり)
+php artisan accounting:backfill-bc-payroll --mode=staff-deduction --from=2026-04 --to=2026-09 --confirm
+
+# 退職者は会社負担
+php artisan accounting:backfill-bc-payroll \
+  --mode=staff-deduction \
+  --inactive-mode=company-bears \
+  --from=2026-04 --to=2026-09 --confirm
+
+# 特定 staff だけ
+php artisan accounting:backfill-bc-payroll --mode=company-bears --staff=42,43,44 --confirm
+```
+
+`--mode` は **必須**、デフォルトなし — 操作者の意識的選択を強制するため。
+
+### 動作
+
+#### `--mode=staff-deduction` (推奨デフォルト)
+
+1. 対象スリップに対して `corrected_from_slip_id` リンク付きの correction
+   slip を作成 (`status='correction'`, `gross_pay=0`, `income_tax=shortfall`)。
+2. **journal は起票しない**。
+3. 次回 `accounting:run-payroll` または `PayrollCalculator::calculate()`
+   実行時、未吸収の correction を `pendingStaffDeductionUplift()` でルックアップし、
+   次月 slip の `income_tax` に上乗せする。
+4. 上乗せ後、correction の `calc_meta.applied_in_slip_id` で吸収先を記録 →
+   二重控除を防ぐ。
+
+#### `--mode=company-bears`
+
+1. 同様に correction slip を作成。
+2. **journal を起票** (`source_type='payroll_correction'`):
+   ```
+   DR  7230 雑損失       ¥shortfall
+       CR  2220 預り金(源泉)               ¥shortfall
+   ```
+3. 次回 slip には影響しない (会社が吸収済)。
+
+### 退職者ハンドリング
+
+`--inactive-mode=company-bears` (デフォルト) — 退職者は給与控除不可なので強制的に
+会社負担モードで処理。`--inactive-mode=staff-deduction` も指定可能だが、その場合
+次月 slip が存在しないので uplift が永久に未吸収のまま残る (運用上避けるべき)。
+
+### 冪等性
+
+- 同じ original slip に対する correction は **1件のみ**。`(corrected_from_slip_id, status='correction')`
+  で先存在チェック → 2回目以降の実行は `skipped_already_corrected` カウントだけ増える。
+- staff-deduction の uplift も `applied_in_slip_id` で 1回限り適用。
+
+### 失敗ハンドリング
+
+各 slip 処理は独立トランザクション。1名失敗しても他は続行、最後にサマリーで
+失敗 staff 一覧表示 + Laravel log への trace 出力。
+
+### UI
+
+- `/admin/accounting/payroll/{id}` 詳細ページ:
+  - 元 slip 側: 「⚠️ この明細に訂正が紐づいています — #N · mode: company-bears · +¥X 追計上」
+  - correction slip 側: 「⚠️ この給与明細は訂正スリップです — 元スリップ #M (2026-05) ·
+    mode: staff-deduction · 不足源泉: ¥X · 吸収先: #Y」
+
+### Pay-stub PDF
+
+- correction slip 単体 PDF: 「源泉徴収訂正のお知らせ」ブロック挿入、staff へ説明可能。
+- staff-deduction 吸収先 slip PDF: 「前月以前の不足源泉 ¥X を本月の所得税に上乗せ」表示。
+
+### 設計判断 (確定済)
 
 #### B-1. correction slip の置き場所
 
@@ -176,16 +249,22 @@ backfill コマンドは `--mode=staff-deduction|company-bears`、
 `--staff=ID,ID,...`、`--inactive-mode=company-bears` (退職者は強制会社負担)
 を受ける。
 
-#### B-6. Tests (Phase B 実装時)
+#### B-6. Tests (Phase B、実装済)
 
-- audit_bc_payroll_test.php (Phase A、本 commit) ✓
-- backfill_bc_payroll_dry_run.php
-- backfill_bc_payroll_confirm_staff_deduction.php
-- backfill_bc_payroll_confirm_company_bears.php
-- correction_slip_journal_balanced.php
-- correction_slip_idempotent.php (再実行で重複生成しない)
-- ui_displays_correction_banner.php
-- staff_deduction_carries_to_next_slip.php (next month slip income_tax += shortfall)
+- `AuditBcPayrollCommandTest` (Phase A) ✓ 8件
+- `BackfillBcPayrollTest` (Phase B) ✓ 12件
+  - dry_run_writes_nothing
+  - confirm_staff_deduction_creates_correction_no_journal
+  - confirm_company_bears_creates_correction_and_balanced_journal
+  - idempotent_second_run_creates_no_new_corrections
+  - class_a_slip_is_not_in_scope
+  - inactive_staff_uses_inactive_mode_override
+  - invalid_mode_throws
+  - **carry_forward_uplifts_next_monthly_slip_income_tax** (重要)
+  - pending_uplift_is_zero_when_no_corrections
+  - audit_log_records_each_correction
+  - command_requires_explicit_mode
+  - command_dry_run_default_no_writes
 
 ---
 

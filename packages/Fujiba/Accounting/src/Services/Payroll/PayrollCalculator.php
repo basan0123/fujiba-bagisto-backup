@@ -104,6 +104,15 @@ class PayrollCalculator
             workingDays: $workingDays,
         );
 
+        // Sprint 7 Phase B: staff-deduction carry-forward.
+        //   If prior periods had B/C correction slips (income_tax shortfall)
+        //   that haven't been absorbed yet, add their sum to this month's
+        //   income_tax. The corrections get tagged with `applied_in_slip_id`
+        //   on save so they're never absorbed twice.
+        $priorCorrectionUplift = app(\Fujiba\Accounting\Services\Payroll\BackfillBcPayrollService::class)
+            ->pendingStaffDeductionUplift($staff->id, $yearMonth);
+        $incomeTax += $priorCorrectionUplift;
+
         // Resident tax priority:
         //   1. Operator-edited value already on the slip (highest priority)
         //   2. Imported value from `fujiba_settings.resident_tax:{staff}:{ym}` (Phase 3C)
@@ -154,14 +163,23 @@ class PayrollCalculator
                     'withholding_' . strtolower($staff->withholding_class ?? 'A'),
                 ],
                 'computed_at'        => now()->toIso8601String(),
+                'prior_period_correction' => $priorCorrectionUplift,
             ],
         ];
 
         if ($existing) {
             $existing->fill($payload)->save();
-            return $existing->fresh();
+            $slip = $existing->fresh();
+        } else {
+            $slip = PayrollSlip::create($payload);
         }
-        return PayrollSlip::create($payload);
+
+        if ($priorCorrectionUplift > 0) {
+            app(\Fujiba\Accounting\Services\Payroll\BackfillBcPayrollService::class)
+                ->markStaffDeductionApplied($staff->id, $yearMonth, $slip->id);
+        }
+
+        return $slip;
     }
 
     /**

@@ -209,6 +209,16 @@ return [
         'income_tax'  => 'ဝင်ငွေခွန်',
         'resident_tax'=> 'နေထိုင်သူ ခွန်',
         'other_deduction' => 'အခြားဖြတ်တောက်',
+
+        // MY-REVIEW: Sprint 7 correction labels best-effort transliteration.
+        'correction' => [
+            'this_is_correction' => 'ဤလစာစာရွက်သည် ပြုပြင်စာရွက် ဖြစ်သည်',
+            'of_original'        => 'မူရင်းစာရွက်',
+            'has_correction'     => 'ဤစာရွက်တွင် ပြုပြင်မှု ပူးတွဲထားသည်',
+            'shortfall'          => 'လိုငွေ',
+            'shortfall_added'    => 'ထပ်တိုး',
+            'applied_in'         => 'ပါဝင်စုပ်ယူသည့်',
+        ],
     ],
 
     // MY-REVIEW: receipts labels are best-effort transliterations.

@@ -16,6 +16,39 @@
         <div class="mt-3 rounded-md bg-rose-50 px-4 py-3 text-sm text-rose-700">{{ session('error') }}</div>
     @endif
 
+    {{-- Sprint 7 Phase B: correction banners --}}
+    @php $corrections = $slip->corrections ?? collect(); @endphp
+    @if ($slip->isCorrection())
+        @php $orig = $slip->correctedFrom; $meta = is_array($slip->calc_meta) ? $slip->calc_meta : []; @endphp
+        <div class="mt-3 rounded-md bg-amber-50 border border-amber-200 px-4 py-3 text-sm text-amber-800 dark:bg-amber-900/30 dark:text-amber-200">
+            ⚠️ {{ __('accounting::app.payroll.correction.this_is_correction') }}
+            @if ($orig)
+                — {{ __('accounting::app.payroll.correction.of_original') }}
+                <a href="{{ route('admin.accounting.payroll.show', $orig->id) }}" class="underline">#{{ $orig->id }} ({{ $orig->year_month }})</a>
+            @endif
+            <br/>
+            <span class="text-xs">
+                mode: <strong>{{ $meta['mode'] ?? '?' }}</strong>
+                · {{ __('accounting::app.payroll.correction.shortfall') }}: ¥{{ number_format((int) ($meta['shortfall'] ?? 0)) }}
+                @if (! empty($meta['applied_in_slip_id']))
+                    · {{ __('accounting::app.payroll.correction.applied_in') }}
+                    <a href="{{ route('admin.accounting.payroll.show', $meta['applied_in_slip_id']) }}" class="underline">#{{ $meta['applied_in_slip_id'] }}</a>
+                @endif
+            </span>
+        </div>
+    @elseif ($corrections->count() > 0)
+        @foreach ($corrections as $c)
+            @php $cm = is_array($c->calc_meta) ? $c->calc_meta : []; @endphp
+            <div class="mt-3 rounded-md bg-amber-50 border border-amber-200 px-4 py-3 text-sm text-amber-800 dark:bg-amber-900/30 dark:text-amber-200">
+                ⚠️ {{ __('accounting::app.payroll.correction.has_correction') }}
+                — <a href="{{ route('admin.accounting.payroll.show', $c->id) }}" class="underline">#{{ $c->id }}</a>
+                · mode: <strong>{{ $cm['mode'] ?? '?' }}</strong>
+                · +¥{{ number_format((int) ($cm['shortfall'] ?? 0)) }}
+                {{ __('accounting::app.payroll.correction.shortfall_added') }}
+            </div>
+        @endforeach
+    @endif
+
     <div class="mt-4 grid gap-4 md:grid-cols-2">
         <div class="box-shadow rounded bg-white p-5 dark:bg-gray-900">
             <p class="mb-3 text-sm font-semibold text-gray-700 dark:text-gray-200">支給</p>

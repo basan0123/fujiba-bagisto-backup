@@ -202,6 +202,15 @@ return [
         'income_tax'  => 'Income Tax',
         'resident_tax'=> 'Resident Tax',
         'other_deduction' => 'Other Deduction',
+
+        'correction' => [
+            'this_is_correction' => 'This payslip is a correction slip',
+            'of_original'        => 'of original',
+            'has_correction'     => 'This slip has an attached correction',
+            'shortfall'          => 'Shortfall',
+            'shortfall_added'    => 'added',
+            'applied_in'         => 'absorbed in',
+        ],
     ],
 
     'receipts' => [

@@ -81,6 +81,32 @@
             <td class="k">休日 (分)</td>      <td class="v">{{ number_format((int) $slip->holiday_minutes) }}</td></tr>
     </table>
 
+    {{-- Sprint 7: correction notice (only on correction slips, or when an original
+         has a correction attached). Keeps the staff-facing paper trail explicit. --}}
+    @php
+        $isCorrection = $slip->status === 'correction';
+        $meta = is_array($slip->calc_meta) ? $slip->calc_meta : [];
+    @endphp
+    @if ($isCorrection)
+        <div style="margin-top:6mm; padding:4mm; border:0.5pt solid #b45309; background:#fffbeb;">
+            <strong>【源泉徴収訂正のお知らせ】</strong><br/>
+            {{ $meta['mode'] === 'staff-deduction'
+                ? '本来 ' . $slip->year_month . ' 給与で控除すべき源泉所得税が ¥' . number_format((int) ($meta['shortfall'] ?? 0)) . ' 不足していました。次回給与で追加控除いたします。'
+                : '本来 ' . $slip->year_month . ' 給与で控除すべき源泉所得税が ¥' . number_format((int) ($meta['shortfall'] ?? 0)) . ' 不足していました。会社負担にて当月計上済み (個人控除なし)。' }}
+            <br/>
+            <small style="color:#666;">
+                訂正対象: #{{ $meta['original_slip_id'] ?? '?' }} / 元税額 ¥{{ number_format((int) ($meta['original_income_tax'] ?? 0)) }} →
+                正税額 ¥{{ number_format((int) ($meta['corrected_income_tax'] ?? 0)) }}
+            </small>
+        </div>
+    @elseif (! empty($meta['prior_period_correction']))
+        <div style="margin-top:6mm; padding:4mm; border:0.5pt solid #b45309; background:#fffbeb;">
+            <strong>【前月以前の源泉徴収訂正】</strong>
+            前月以前の不足源泉 <strong>¥{{ number_format((int) $meta['prior_period_correction']) }}</strong>
+            を本月の所得税に上乗せして控除しました。
+        </div>
+    @endif
+
     <div class="stamp">社判 / 受領印</div>
     <div class="footer">— Fujiba Accounting · {{ $slip->staff?->name_ja }} {{ $slip->year_month }} —</div>
 </body>

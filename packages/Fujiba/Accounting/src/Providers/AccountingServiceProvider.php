@@ -3,6 +3,7 @@
 namespace Fujiba\Accounting\Providers;
 
 use Fujiba\Accounting\Console\Commands\AuditBcPayroll;
+use Fujiba\Accounting\Console\Commands\BackfillBcPayroll;
 use Fujiba\Accounting\Console\Commands\PostBagistoOrders;
 use Fujiba\Accounting\Console\Commands\PostBagistoRefunds;
 use Fujiba\Accounting\Console\Commands\RunPayroll;
@@ -66,6 +67,7 @@ class AccountingServiceProvider extends ServiceProvider
         $this->app->singleton(InvoiceRegistrantLookup::class);
         $this->app->singleton(PayrollCalculator::class);
         $this->app->singleton(PayrollJournalBuilder::class);
+        $this->app->singleton(\Fujiba\Accounting\Services\Payroll\BackfillBcPayrollService::class);
         $this->app->singleton(ZenginExportService::class);
         $this->app->singleton(ReportPeriodResolver::class);
         $this->app->singleton(TrialBalanceCalculator::class);
@@ -115,6 +117,7 @@ class AccountingServiceProvider extends ServiceProvider
             PostBagistoRefunds::class,
             RunPayroll::class,
             AuditBcPayroll::class,
+            BackfillBcPayroll::class,
         ]);
     }
 

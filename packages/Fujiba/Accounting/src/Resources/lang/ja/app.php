@@ -206,6 +206,16 @@ return [
         'income_tax'  => '所得税',
         'resident_tax'=> '住民税',
         'other_deduction' => 'その他控除',
+
+        // Sprint 7 Phase B — backfill correction labels
+        'correction' => [
+            'this_is_correction' => 'この給与明細は訂正スリップです',
+            'of_original'        => '元スリップ',
+            'has_correction'     => 'この明細に訂正が紐づいています',
+            'shortfall'          => '不足源泉',
+            'shortfall_added'    => '追計上',
+            'applied_in'         => '吸収先',
+        ],
     ],
 
     'receipts' => [

@@ -4,6 +4,7 @@ namespace Fujiba\Accounting\Models;
 
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use Illuminate\Database\Eloquent\Relations\HasMany;
 
 class PayrollSlip extends Model
 {
@@ -42,5 +43,22 @@ class PayrollSlip extends Model
     public function journalEntry(): BelongsTo
     {
         return $this->belongsTo(JournalEntry::class, 'journal_entry_id');
+    }
+
+    /** Sprint 7 Phase B: original buggy slip → its correction(s). */
+    public function corrections(): HasMany
+    {
+        return $this->hasMany(self::class, 'corrected_from_slip_id');
+    }
+
+    /** Sprint 7 Phase B: a correction slip → original. */
+    public function correctedFrom(): BelongsTo
+    {
+        return $this->belongsTo(self::class, 'corrected_from_slip_id');
+    }
+
+    public function isCorrection(): bool
+    {
+        return $this->status === 'correction';
     }
 }
