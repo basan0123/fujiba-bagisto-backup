@@ -31,6 +31,24 @@ return [
         'all'     => 'အားလုံး',
     ],
 
+    // MY-REVIEW: Sprint 7 audit labels best-effort transliteration.
+    'audit_bc' => [
+        'title'                  => 'အမျိုးအစား B/C ဝင်ငွေခွန် ဖြတ်တောက်မှု ပြန်လည်စစ်ဆေးမှု',
+        'period'                 => 'ကာလ',
+        'active_b_count'         => 'လက်ရှိ B အမျိုးအစား ဝန်ထမ်း',
+        'active_c_count'         => 'လက်ရှိ C အမျိုးအစား ဝန်ထမ်း',
+        'inactive_count'         => 'အလုပ်မှ ထွက်ပြီး B/C ဝန်ထမ်း',
+        'buggy_slips_count'      => 'ကာလအတွင်း ပြီးဆုံးပြီး အမှားရှိ slip',
+        'class_changes'          => 'ကာလအတွင်း အမျိုးအစား ပြောင်းလဲမှု',
+        'shortfall_total'        => 'ခန့်မှန်း လိုငွေ စုစုပေါင်း',
+        'shortfall_si'           => 'ခန့်မှန်း SI လိုငွေ (2210)',
+        'journal_correction'     => 'ပြုပြင်ရန် ဂျာနယ်မှတ်တိုင်',
+        'top_staff_by_shortfall' => 'လိုငွေအများဆုံး ဝန်ထမ်းများ',
+        'csv_path'               => 'အသေးစိတ် CSV',
+        'readonly_note'          => 'ဖတ်ရုံသာ စစ်ဆေးမှု ပြီးပါပြီ။ slip နှင့် ဂျာနယ်ကို မပြောင်းလဲခဲ့ပါ။',
+        'go_nogo_note'           => 'Phase B မပြုလုပ်မီ CSV ကို စာရင်းကိုင်နှင့် ဆွေးနွေးပါ။',
+    ],
+
     // MY-REVIEW: report labels are best-effort transliterations.
     'reports' => [
         'title'              => 'အစီရင်ခံစာများ',

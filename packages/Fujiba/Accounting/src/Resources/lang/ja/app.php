@@ -29,6 +29,24 @@ return [
         'all'     => 'すべて',
     ],
 
+    // Sprint 7 — B/C 源泉徴収バックフィル (audit のみ)
+    'audit_bc' => [
+        'title'                  => '甲欄 B/C 源泉徴収バックフィル 影響調査',
+        'period'                 => '期間',
+        'active_b_count'         => 'active B 区分 staff',
+        'active_c_count'         => 'active C 区分 staff',
+        'inactive_count'         => 'inactive B/C staff',
+        'buggy_slips_count'      => 'buggy 期間中 finalized slips',
+        'class_changes'          => 'buggy 期間中の class 変更ログ',
+        'shortfall_total'        => '推定不足源泉総額',
+        'shortfall_si'           => '推定不足預り金 (2210 社保)',
+        'journal_correction'     => '仕訳訂正対象 journal entries',
+        'top_staff_by_shortfall' => '影響上位 staff (推定不足源泉降順)',
+        'csv_path'               => '詳細CSV',
+        'readonly_note'          => 'READ-ONLY audit 完了。仕訳・slip は一切変更していません。',
+        'go_nogo_note'           => 'GO/NO-GO の判断材料を CSV と一緒に税理士へ共有してください。',
+    ],
+
     'reports' => [
         'title'              => '帳票',
         'trial_balance'      => '試算表',

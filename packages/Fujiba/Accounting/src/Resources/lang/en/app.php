@@ -29,6 +29,23 @@ return [
         'all'     => 'All',
     ],
 
+    'audit_bc' => [
+        'title'                  => 'Class B/C Withholding Backfill Audit',
+        'period'                 => 'Period',
+        'active_b_count'         => 'Active B-class staff',
+        'active_c_count'         => 'Active C-class staff',
+        'inactive_count'         => 'Inactive B/C staff',
+        'buggy_slips_count'      => 'Buggy finalized slips in window',
+        'class_changes'          => 'Withholding-class changes in window',
+        'shortfall_total'        => 'Estimated total shortfall',
+        'shortfall_si'           => 'Estimated SI shortfall (2210)',
+        'journal_correction'     => 'Journal entries needing correction',
+        'top_staff_by_shortfall' => 'Top staff by shortfall',
+        'csv_path'               => 'Detail CSV',
+        'readonly_note'          => 'Read-only audit complete. No slips or journals were modified.',
+        'go_nogo_note'           => 'Share the CSV with your tax accountant before running the Phase B backfill.',
+    ],
+
     'reports' => [
         'title'              => 'Reports',
         'trial_balance'      => 'Trial Balance',

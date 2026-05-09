@@ -2,6 +2,7 @@
 
 namespace Fujiba\Accounting\Providers;
 
+use Fujiba\Accounting\Console\Commands\AuditBcPayroll;
 use Fujiba\Accounting\Console\Commands\PostBagistoOrders;
 use Fujiba\Accounting\Console\Commands\PostBagistoRefunds;
 use Fujiba\Accounting\Console\Commands\RunPayroll;
@@ -113,6 +114,7 @@ class AccountingServiceProvider extends ServiceProvider
             PostBagistoOrders::class,
             PostBagistoRefunds::class,
             RunPayroll::class,
+            AuditBcPayroll::class,
         ]);
     }
 
