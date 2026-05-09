@@ -51,6 +51,27 @@
     }
     setInterval(tickClock, 1000); tickClock();
 
+    async function callPunch(payload) {
+        const r = await fetch('{{ route('accounting.kiosk.punch') }}', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                'Accept': 'application/json',
+                'X-CSRF-TOKEN': csrf,
+            },
+            body: JSON.stringify(payload),
+            credentials: 'same-origin',
+        });
+        return r.json();
+    }
+
+    function promptPin(staffName, errMsg) {
+        return new Promise((resolve) => {
+            const pin = window.prompt((errMsg ? errMsg + '\n' : '') + (staffName ? staffName + ' — ' : '') + '4桁PINを入力してください');
+            resolve(pin === null ? '' : pin.trim());
+        });
+    }
+
     qrEl.addEventListener('keydown', async (e) => {
         if (e.key !== 'Enter') return;
         const token = qrEl.value.trim();
@@ -60,17 +81,17 @@
         resultEl.textContent = '...';
 
         try {
-            const r = await fetch('{{ route('accounting.kiosk.punch') }}', {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json',
-                    'Accept': 'application/json',
-                    'X-CSRF-TOKEN': csrf,
-                },
-                body: JSON.stringify({ token }),
-                credentials: 'same-origin',
-            });
-            const body = await r.json();
+            let body = await callPunch({ token });
+
+            // PIN prompt loop — at most 3 attempts.
+            let attempts = 0;
+            while (! body.ok && body.pin_required && attempts < 3) {
+                const pin = await promptPin(body.staff_name, attempts > 0 ? body.message : null);
+                if (! pin) { break; }
+                body = await callPunch({ token, pin });
+                attempts++;
+            }
+
             if (body.ok) {
                 resultEl.className = 'result ok';
                 resultEl.innerHTML = `<div><div class="name">${body.staff_name ?? ''}</div><div>${body.message} (${body.time ?? ''})</div></div>`;

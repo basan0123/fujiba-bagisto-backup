@@ -11,9 +11,17 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Carbon;
 
 /**
- * Tablet-mounted punch UI. No login — staff scan the QR token printed from
- * the admin "QR印刷" page. Tokens are unguessable ULIDs so this is acceptable
- * for the in-store-only deployment; for a public deployment add a kiosk PIN.
+ * Tablet-mounted punch UI.
+ *
+ * Auth model:
+ *   1. Staff scans QR (qr_token, ULID, unguessable).
+ *   2. If staff has a 4-digit PIN set (Sprint 6 Phase 1B), the response
+ *      asks the kiosk to prompt for it; the second request includes
+ *      both `token` and `pin` and we verify before punching.
+ *   3. Staff with no PIN punch immediately on first scan (移行期間).
+ *
+ * The 30-second idempotency window applies AFTER PIN verification, so
+ * a flubbed PIN doesn't trigger the no-op return path.
  */
 class TimecardKioskController extends Controller
 {
@@ -46,6 +54,27 @@ class TimecardKioskController extends Controller
                 'message' => __('accounting::app.kiosk.inactive'),
                 'staff_name' => $staff->name_ja,
             ], 403);
+        }
+
+        // Sprint 6 Phase 1B: PIN gate.
+        if ($staff->hasPin()) {
+            $pin = (string) $request->input('pin', '');
+            if ($pin === '') {
+                return response()->json([
+                    'ok'         => false,
+                    'pin_required' => true,
+                    'staff_name' => $staff->name_ja,
+                    'message'    => __('accounting::app.kiosk.pin_required'),
+                ], 401);
+            }
+            if (! $staff->checkPin($pin)) {
+                return response()->json([
+                    'ok'         => false,
+                    'pin_required' => true,
+                    'staff_name' => $staff->name_ja,
+                    'message'    => __('accounting::app.kiosk.pin_invalid'),
+                ], 401);
+            }
         }
 
         $now = now();

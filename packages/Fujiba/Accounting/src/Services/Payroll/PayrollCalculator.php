@@ -94,7 +94,13 @@ class PayrollCalculator
         }
 
         $taxable = max(0, $gross - $commute - $hi - $pen - $ei);
-        $incomeTax = $this->withholding($taxable, $staff->dependents_count ?? 0);
+        $workingDays = $cards->whereStrict('status', 'approved')->count();
+        $incomeTax = $this->withholding(
+            taxable:    $taxable,
+            class:      $staff->withholding_class ?? 'A',
+            dependents: $staff->dependents_count ?? 0,
+            workingDays: $workingDays,
+        );
 
         $residentTax    = (int) round((float) ($existing->resident_tax ?? 0));     // operator-entered
         $otherDeduction = (int) round((float) ($existing->other_deduction ?? 0));
@@ -128,9 +134,15 @@ class PayrollCalculator
             'holiday_minutes'       => $holidayMin,
             'status'                => 'draft',
             'calc_meta'             => [
-                'hourly_rate_used' => $hourly,
-                'rate_codes'       => ['health_insurance_employee', 'pension_employee', 'employment_insurance_employee', 'withholding_a'],
-                'computed_at'      => now()->toIso8601String(),
+                'hourly_rate_used'   => $hourly,
+                'withholding_class'  => $staff->withholding_class ?? 'A',
+                'rate_codes'         => [
+                    'health_insurance_employee',
+                    'pension_employee',
+                    'employment_insurance_employee',
+                    'withholding_' . strtolower($staff->withholding_class ?? 'A'),
+                ],
+                'computed_at'        => now()->toIso8601String(),
             ],
         ];
 
@@ -155,18 +167,55 @@ class PayrollCalculator
     }
 
     /**
-     * 源泉徴収 甲欄 monthly bracket apply. dependents_count shifts the bracket
-     * by ¥31,667 each (¥380,000/year ÷ 12) — simplified vs. full 国税庁 表.
-     * Operator can override on the slip if a staff member has special circumstances.
+     * 源泉徴収税 calculation, dispatching by 甲/乙/丙 class.
+     *
+     * - A (甲欄, monthly): 国税庁 月額表 bracket → rate − deduction.
+     *                     dependents_count shifts brackets ¥31,667/人 (¥380k/年 ÷ 12).
+     * - B (乙欄, monthly secondary): flat 10.21% (10% income tax + 0.21% 復興税).
+     * - C (丙欄, daily): convert taxable to daily amount via workingDays,
+     *                    apply bracket, multiply back. ¥9,300/日 まで非課税.
      */
-    protected function withholding(int $taxable, int $dependents = 0): int
+    protected function withholding(int $taxable, string $class = 'A', int $dependents = 0, int $workingDays = 0): int
     {
-        $brackets = TaxRate::where('code', 'withholding_a')->value('brackets');
+        $code = match (strtoupper($class)) {
+            'B' => 'withholding_b',
+            'C' => 'withholding_c',
+            default => 'withholding_a',
+        };
+
+        $rate = TaxRate::where('code', $code)->first();
+        if (! $rate) {
+            return 0;
+        }
+
+        // Class B is the simplest path: flat rate with no brackets.
+        if ($code === 'withholding_b') {
+            return (int) floor($taxable * (float) $rate->rate / 100.0);
+        }
+
+        $brackets = $rate->brackets;
         if (! is_array($brackets) || empty($brackets)) {
             return 0;
         }
 
-        // Shift the bracket entry point upward for each dependent (¥31,667 per).
+        // Class C: divide by working days, apply daily bracket, multiply back.
+        if ($code === 'withholding_c') {
+            $days = max(1, $workingDays);
+            $perDay = (int) floor($taxable / $days);
+            foreach ($brackets as $b) {
+                $min = (int) ($b['taxable_min'] ?? 0);
+                $max = $b['taxable_max'] ?? null;
+                if ($perDay >= $min && ($max === null || $perDay <= (int) $max)) {
+                    $r = (float) ($b['rate'] ?? 0);
+                    $deduction = (int) ($b['deduction'] ?? 0);
+                    $perDayTax = max(0, (int) floor($perDay * $r / 100.0) - $deduction);
+                    return $perDayTax * $days;
+                }
+            }
+            return 0;
+        }
+
+        // Class A: monthly bracket with dependent shift.
         $shift = $dependents * 31667;
         $effective = max(0, $taxable - $shift);
 
@@ -174,9 +223,9 @@ class PayrollCalculator
             $min = (int) ($b['taxable_min'] ?? 0);
             $max = $b['taxable_max'] ?? null;
             if ($effective >= $min && ($max === null || $effective <= (int) $max)) {
-                $rate = (float) ($b['rate'] ?? 0);
+                $r = (float) ($b['rate'] ?? 0);
                 $deduction = (int) ($b['deduction'] ?? 0);
-                $tax = (int) floor($effective * $rate / 100.0) - $deduction;
+                $tax = (int) floor($effective * $r / 100.0) - $deduction;
                 return max(0, $tax);
             }
         }

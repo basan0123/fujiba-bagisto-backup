@@ -150,6 +150,29 @@
                 </div>
                 <input type="text" name="bank_account_holder" value="{{ old('bank_account_holder', $staff->bank_account_holder) }}" placeholder="{{ __('accounting::app.staff.bank_account_holder') }}"
                        class="h-9 w-full rounded-md border px-3 text-sm dark:border-gray-800 dark:bg-gray-900 dark:text-gray-300"/>
+
+                {{-- Sprint 6: Zengin codes --}}
+                <div class="grid grid-cols-2 gap-2">
+                    <input type="text" name="bank_code" value="{{ old('bank_code', $staff->bank_code) }}" placeholder="{{ __('accounting::app.staff.bank_code') }}" pattern="\d{4}" maxlength="4"
+                           class="h-9 rounded-md border px-3 font-mono text-sm dark:border-gray-800 dark:bg-gray-900 dark:text-gray-300"/>
+                    <input type="text" name="bank_branch_code" value="{{ old('bank_branch_code', $staff->bank_branch_code) }}" placeholder="{{ __('accounting::app.staff.bank_branch_code') }}" pattern="\d{3}" maxlength="3"
+                           class="h-9 rounded-md border px-3 font-mono text-sm dark:border-gray-800 dark:bg-gray-900 dark:text-gray-300"/>
+                </div>
+                <input type="text" name="bank_account_holder_kana" value="{{ old('bank_account_holder_kana', $staff->bank_account_holder_kana) }}" placeholder="{{ __('accounting::app.staff.bank_account_holder_kana') }} (半角カナ)"
+                       class="h-9 w-full rounded-md border px-3 font-mono text-sm dark:border-gray-800 dark:bg-gray-900 dark:text-gray-300"/>
+            </div>
+
+            {{-- Sprint 6: Kiosk PIN --}}
+            <p class="mt-6 mb-2 text-sm font-semibold text-gray-700 dark:text-gray-200">{{ __('accounting::app.staff.kiosk_pin') }}</p>
+            <div>
+                <input type="text" name="pin" value="" inputmode="numeric" pattern="\d{4}" maxlength="4"
+                       placeholder="{{ $staff->pin_hash ? __('accounting::app.staff.pin_set_keep_blank') : __('accounting::app.staff.pin_4digits') }}"
+                       class="h-9 w-32 rounded-md border px-3 font-mono text-sm dark:border-gray-800 dark:bg-gray-900 dark:text-gray-300"/>
+                @if ($staff->pin_hash)
+                    <span class="ml-2 text-xs text-emerald-600">✓ {{ __('accounting::app.staff.pin_set') }}</span>
+                @else
+                    <span class="ml-2 text-xs text-gray-500">{{ __('accounting::app.staff.pin_unset') }}</span>
+                @endif
             </div>
 
             <label class="mt-4 flex items-center gap-2 text-sm">

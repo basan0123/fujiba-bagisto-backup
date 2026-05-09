@@ -118,10 +118,16 @@ class StaffController extends Controller
             'enrolled_pension'             => ['nullable', 'boolean'],
             'enrolled_employment_insurance'=> ['nullable', 'boolean'],
             'bank_name'           => ['nullable', 'string', 'max:64'],
+            'bank_code'           => ['nullable', 'string', 'regex:/^\d{4}$/'],
             'bank_branch'         => ['nullable', 'string', 'max:64'],
+            'bank_branch_code'    => ['nullable', 'string', 'regex:/^\d{3}$/'],
             'bank_account_type'   => ['nullable', 'string', 'max:16'],
             'bank_account_number' => ['nullable', 'string', 'max:32'],
             'bank_account_holder' => ['nullable', 'string', 'max:128'],
+            'bank_account_holder_kana' => ['nullable', 'string', 'max:64'],
+            // Kiosk PIN: 4 digits, optional. Empty/null = leave existing pin_hash alone.
+            // The model mutator setPinAttribute() bcrypts on save.
+            'pin'                 => ['nullable', 'string', 'regex:/^\d{4}$/'],
             'is_active'           => ['nullable', 'boolean'],
             'notes'               => ['nullable', 'string'],
         ]);

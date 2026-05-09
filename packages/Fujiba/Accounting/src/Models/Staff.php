@@ -11,6 +11,8 @@ class Staff extends Model
 
     protected $guarded = ['id'];
 
+    protected $hidden = ['pin_hash'];
+
     protected $casts = [
         'hire_date'                     => 'date',
         'termination_date'              => 'date',
@@ -21,6 +23,27 @@ class Staff extends Model
         'hourly_rate'                   => 'decimal:2',
         'monthly_salary'                => 'decimal:2',
     ];
+
+    public function hasPin(): bool
+    {
+        return ! empty($this->pin_hash);
+    }
+
+    public function checkPin(string $pin): bool
+    {
+        if (! $this->hasPin()) {
+            return false;
+        }
+        return password_verify($pin, $this->pin_hash);
+    }
+
+    public function setPinAttribute(?string $rawPin): void
+    {
+        if ($rawPin === null || $rawPin === '') {
+            return;
+        }
+        $this->attributes['pin_hash'] = password_hash($rawPin, PASSWORD_BCRYPT);
+    }
 
     public function timecards(): HasMany
     {
