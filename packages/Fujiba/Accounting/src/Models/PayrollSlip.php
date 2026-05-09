@@ -14,6 +14,8 @@ class PayrollSlip extends Model
     protected $casts = [
         'pay_date'             => 'date',
         'finalized_at'         => 'datetime',
+        'is_bonus'             => 'boolean',
+        'prev_taxable'         => 'decimal:2',
         'calc_meta'            => 'array',
         'base_pay'             => 'decimal:2',
         'overtime_pay'         => 'decimal:2',

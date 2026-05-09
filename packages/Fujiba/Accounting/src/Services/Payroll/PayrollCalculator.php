@@ -6,6 +6,7 @@ use Fujiba\Accounting\Models\PayrollSlip;
 use Fujiba\Accounting\Models\Staff;
 use Fujiba\Accounting\Models\TaxRate;
 use Fujiba\Accounting\Models\Timecard;
+use Carbon\CarbonInterface;
 use Illuminate\Support\Carbon;
 
 /**
@@ -35,7 +36,7 @@ class PayrollCalculator
      * Build a draft slip for $staff in $yearMonth ("YYYY-MM").
      * Saves with status=draft if not already finalized; returns the model.
      */
-    public function calculate(Staff $staff, string $yearMonth, ?Carbon $payDate = null): PayrollSlip
+    public function calculate(Staff $staff, string $yearMonth, ?CarbonInterface $payDate = null): PayrollSlip
     {
         if (! preg_match('/^\d{4}-\d{2}$/', $yearMonth)) {
             throw new \InvalidArgumentException("Invalid year_month: {$yearMonth}");
@@ -43,6 +44,7 @@ class PayrollCalculator
 
         $existing = PayrollSlip::where('staff_id', $staff->id)
             ->where('year_month', $yearMonth)
+            ->where('is_bonus', false)   // monthly path; bonus uses calculateBonus()
             ->first();
         if ($existing && $existing->status !== 'draft') {
             return $existing;   // already finalized; don't clobber
@@ -102,7 +104,15 @@ class PayrollCalculator
             workingDays: $workingDays,
         );
 
-        $residentTax    = (int) round((float) ($existing->resident_tax ?? 0));     // operator-entered
+        // Resident tax priority:
+        //   1. Operator-edited value already on the slip (highest priority)
+        //   2. Imported value from `fujiba_settings.resident_tax:{staff}:{ym}` (Phase 3C)
+        //   3. ¥0 (default — operator must enter manually)
+        $residentTax = (int) round((float) ($existing->resident_tax ?? 0));
+        if ($residentTax === 0) {
+            $residentTax = app(\Fujiba\Accounting\Services\Payroll\ResidentTaxImporter::class)
+                ->get($staff->id, $yearMonth);
+        }
         $otherDeduction = (int) round((float) ($existing->other_deduction ?? 0));
 
         $totalDeduction = $hi + $pen + $ei + $incomeTax + $residentTax + $otherDeduction;
@@ -111,6 +121,7 @@ class PayrollCalculator
         $payload = [
             'staff_id'              => $staff->id,
             'year_month'            => $yearMonth,
+            'is_bonus'              => false,
             'pay_date'              => $payDate?->toDateString(),
             'channel_id'            => $staff->channel_id,
             'base_pay'              => $basePay,
@@ -151,6 +162,126 @@ class PayrollCalculator
             return $existing->fresh();
         }
         return PayrollSlip::create($payload);
+    }
+
+    /**
+     * 賞与計算 — Sprint 6 Phase 3A.
+     *
+     * 賞与の所得税は「賞与に対する源泉徴収税額の算出率の表」を使う:
+     *   1. 前月の課税給与 (gross − 社保) を bonus bracket で照合 → rate%
+     *   2. 賞与額 × rate% = 賞与所得税
+     *
+     * 社保は通常の率を使う (健保 / 厚年 / 雇用保険) — 完全な賞与標準月額
+     * 上限制度は Sprint 7 で精緻化。常用給与と同じ率で十分実用的。
+     *
+     * @param  int  $bonusAmount  賞与の総支給額 (yen)
+     * @param  int|null  $prevTaxable  前月の課税給与 (gross - SI). null時はDBから前月slip取得
+     */
+    public function calculateBonus(Staff $staff, string $yearMonth, int $bonusAmount, ?int $prevTaxable = null, ?CarbonInterface $payDate = null): PayrollSlip
+    {
+        if (! preg_match('/^\d{4}-\d{2}$/', $yearMonth)) {
+            throw new \InvalidArgumentException("Invalid year_month: {$yearMonth}");
+        }
+        if ($bonusAmount <= 0) {
+            throw new \InvalidArgumentException('Bonus amount must be > 0');
+        }
+
+        $existing = PayrollSlip::where('staff_id', $staff->id)
+            ->where('year_month', $yearMonth)
+            ->where('is_bonus', true)
+            ->first();
+        if ($existing && $existing->status !== 'draft') {
+            return $existing;
+        }
+
+        if ($prevTaxable === null) {
+            $prevYm = Carbon::parse("{$yearMonth}-01")->subMonth()->format('Y-m');
+            $prevSlip = PayrollSlip::where('staff_id', $staff->id)
+                ->where('year_month', $prevYm)
+                ->where('is_bonus', false)
+                ->first();
+            $prevTaxable = $prevSlip
+                ? max(0, (int) $prevSlip->gross_pay
+                       - (int) $prevSlip->commute_allowance
+                       - (int) $prevSlip->health_insurance
+                       - (int) $prevSlip->pension
+                       - (int) $prevSlip->employment_insurance)
+                : 0;
+        }
+
+        $bonusRate = $this->bonusRate($prevTaxable, $staff->dependents_count ?? 0);
+
+        $hi = $pen = $ei = 0;
+        if ($staff->enrolled_health_insurance) {
+            $hi = $this->pct($bonusAmount, $this->rate('health_insurance_employee'));
+        }
+        if ($staff->enrolled_pension) {
+            $pen = $this->pct($bonusAmount, $this->rate('pension_employee'));
+        }
+        if ($staff->enrolled_employment_insurance) {
+            $ei = $this->pct($bonusAmount, $this->rate('employment_insurance_employee'));
+        }
+
+        $taxable = max(0, $bonusAmount - $hi - $pen - $ei);
+        $incomeTax = (int) floor($taxable * $bonusRate / 100.0);
+
+        $totalDeduction = $hi + $pen + $ei + $incomeTax;
+        $net = max(0, $bonusAmount - $totalDeduction);
+
+        $payload = [
+            'staff_id'             => $staff->id,
+            'year_month'           => $yearMonth,
+            'is_bonus'             => true,
+            'prev_taxable'         => $prevTaxable,
+            'pay_date'             => $payDate?->toDateString(),
+            'channel_id'           => $staff->channel_id,
+            'base_pay'             => $bonusAmount,
+            'gross_pay'            => $bonusAmount,
+            'health_insurance'     => $hi,
+            'pension'              => $pen,
+            'employment_insurance' => $ei,
+            'income_tax'           => $incomeTax,
+            'resident_tax'         => 0,
+            'total_deduction'      => $totalDeduction,
+            'net_pay'              => $net,
+            'status'               => 'draft',
+            'calc_meta'            => [
+                'is_bonus'           => true,
+                'prev_taxable'       => $prevTaxable,
+                'bonus_rate_pct'     => $bonusRate,
+                'rate_codes'         => ['bonus_withholding_rate'],
+                'computed_at'        => now()->toIso8601String(),
+            ],
+        ];
+
+        if ($existing) {
+            $existing->fill($payload)->save();
+            return $existing->fresh();
+        }
+        return PayrollSlip::create($payload);
+    }
+
+    /**
+     * Look up bonus withholding rate from the seeded bracket table.
+     * Dependents shift: 扶養 1人 ¥31,667 引き下げ.
+     */
+    protected function bonusRate(int $prevTaxable, int $dependents): float
+    {
+        $brackets = TaxRate::where('code', 'bonus_withholding_rate')->value('brackets');
+        if (! is_array($brackets) || empty($brackets)) {
+            return 0.0;
+        }
+        $shift = $dependents * 31667;
+        $effective = max(0, $prevTaxable - $shift);
+
+        foreach ($brackets as $b) {
+            $min = (int) ($b['prev_taxable_min'] ?? 0);
+            $max = $b['prev_taxable_max'] ?? null;
+            if ($effective >= $min && ($max === null || $effective <= (int) $max)) {
+                return (float) ($b['rate'] ?? 0);
+            }
+        }
+        return 0.0;
     }
 
     protected function pct(int $base, float $ratePct): int

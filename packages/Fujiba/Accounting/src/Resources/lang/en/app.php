@@ -118,6 +118,14 @@ return [
         'bank_account_type'=> 'Account Type',
         'bank_account_number' => 'Account No.',
         'bank_account_holder' => 'Holder',
+        'bank_code'           => 'Bank Code (4 digits)',
+        'bank_branch_code'    => 'Branch Code (3 digits)',
+        'bank_account_holder_kana' => 'Holder (Kana)',
+        'kiosk_pin'           => 'Kiosk PIN (4 digits)',
+        'pin_set'             => 'Set',
+        'pin_unset'           => 'Not set',
+        'pin_set_keep_blank'  => 'Leave blank to keep current',
+        'pin_4digits'         => '4-digit number',
     ],
 
     'timecards' => [
@@ -147,6 +155,8 @@ return [
         'punched_out'=> 'Clocked out',
         'unknown_qr' => 'QR not found',
         'inactive'   => 'This staff member is inactive',
+        'pin_required' => 'PIN required',
+        'pin_invalid'  => 'Invalid PIN',
     ],
 
     'payroll' => [

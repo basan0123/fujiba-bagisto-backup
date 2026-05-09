@@ -107,6 +107,38 @@ return [
         'payer_account_no'        => env('FUJIBA_ZENGIN_PAYER_ACCT_NO', '0000000'),
     ],
 
+    /*
+    |--------------------------------------------------------------------------
+    | Resident-tax (住民税) import — Sprint 6 Phase 3C
+    |--------------------------------------------------------------------------
+    | Each city ships a different CSV. `staff_lookup` says how to find the
+    | staff row from a CSV row: 'staff_code' or 'composite' (postal+birthdate).
+    | `monthly_columns` lists the 12 columns Jun→May (住民税は6月開始).
+    */
+    'resident_tax_imports' => [
+        'saitama_city' => [
+            'label'           => 'さいたま市',
+            'encoding'        => 'SJIS-win',
+            'staff_lookup'    => 'staff_code',
+            'staff_code_col'  => '従業員番号',
+            'monthly_columns' => ['6月分', '7月分', '8月分', '9月分', '10月分', '11月分', '12月分', '1月分', '2月分', '3月分', '4月分', '5月分'],
+        ],
+        'adachi_ku' => [
+            'label'           => '足立区',
+            'encoding'        => 'SJIS-win',
+            'staff_lookup'    => 'staff_code',
+            'staff_code_col'  => '社員コード',
+            'monthly_columns' => ['JUN', 'JUL', 'AUG', 'SEP', 'OCT', 'NOV', 'DEC', 'JAN', 'FEB', 'MAR', 'APR', 'MAY'],
+        ],
+        'toshima_ku' => [
+            'label'           => '豊島区',
+            'encoding'        => 'UTF-8',
+            'staff_lookup'    => 'composite',
+            'composite_cols'  => ['郵便番号', '生年月日'],
+            'monthly_columns' => ['6月', '7月', '8月', '9月', '10月', '11月', '12月', '1月', '2月', '3月', '4月', '5月'],
+        ],
+    ],
+
     'nta_invoice_api' => [
         'app_id'    => env('FUJIBA_NTA_INVOICE_API_ID'),
         'base_url'  => env('FUJIBA_NTA_INVOICE_API_URL', 'https://web-api.invoice-kohyo.nta.go.jp/v1/num'),

@@ -121,6 +121,14 @@ return [
         'bank_account_type'=> '口座種別',
         'bank_account_number' => '口座番号',
         'bank_account_holder' => '名義人',
+        'bank_code'           => '銀行コード(4桁)',
+        'bank_branch_code'    => '支店コード(3桁)',
+        'bank_account_holder_kana' => '名義人(カナ)',
+        'kiosk_pin'           => 'キオスクPIN (4桁)',
+        'pin_set'             => '設定済',
+        'pin_unset'           => '未設定',
+        'pin_set_keep_blank'  => '空欄で現状維持',
+        'pin_4digits'         => '4桁の数字',
     ],
 
     'timecards' => [
@@ -150,6 +158,8 @@ return [
         'punched_out'=> '退勤を記録しました',
         'unknown_qr' => 'QRが見つかりません',
         'inactive'   => 'このスタッフは無効です',
+        'pin_required' => 'PINを入力してください',
+        'pin_invalid'  => 'PINが違います',
     ],
 
     'payroll' => [

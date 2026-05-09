@@ -122,6 +122,15 @@ return [
         'bank_account_type'=> 'အကောင့်အမျိုးအစား',
         'bank_account_number' => 'အကောင့်နံပါတ်',
         'bank_account_holder' => 'အကောင့်ပိုင်ရှင်',
+        // MY-REVIEW: Sprint 6 Zengin/PIN labels are best-effort transliterations.
+        'bank_code'           => 'ဘဏ်ကုဒ် (၄လုံး)',
+        'bank_branch_code'    => 'ဌာနခွဲကုဒ် (၃လုံး)',
+        'bank_account_holder_kana' => 'အကောင့်ပိုင်ရှင် (ကာနာ)',
+        'kiosk_pin'           => 'ကိုစကီ PIN (၄လုံး)',
+        'pin_set'             => 'သတ်မှတ်ပြီး',
+        'pin_unset'           => 'မသတ်မှတ်ရသေး',
+        'pin_set_keep_blank'  => 'လက်ရှိအတိုင်း ထားရန် ကွက်လပ်',
+        'pin_4digits'         => '၄လုံး ဂဏန်း',
     ],
 
     'timecards' => [
@@ -151,6 +160,9 @@ return [
         'punched_out'=> 'ထွက်ချိန် မှတ်တမ်းတင်ပြီး',
         'unknown_qr' => 'QR မတွေ့ပါ',
         'inactive'   => 'ဤဝန်ထမ်းသည် မလုပ်ဆောင်နိုင်ပါ',
+        // MY-REVIEW: Sprint 6 PIN strings.
+        'pin_required' => 'PIN လိုအပ်သည်',
+        'pin_invalid'  => 'PIN မှားနေသည်',
     ],
 
     'payroll' => [
