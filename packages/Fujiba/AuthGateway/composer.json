@@ -1,0 +1,19 @@
+{
+    "name": "fujiba/auth-gateway",
+    "description": "Central auth gateway for snssale.com — signup, login, tenant auto-provisioning",
+    "type": "library",
+    "license": "proprietary",
+    "autoload": {
+        "psr-4": {
+            "Fujiba\\AuthGateway\\": "src/"
+        }
+    },
+    "extra": {
+        "laravel": {
+            "providers": [
+                "Fujiba\\AuthGateway\\Providers\\AuthGatewayServiceProvider"
+            ]
+        }
+    },
+    "minimum-stability": "dev"
+}

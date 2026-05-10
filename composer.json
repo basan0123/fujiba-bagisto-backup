@@ -122,6 +122,7 @@
             "Fujiba\\FacebookCatalog\\": "packages/Fujiba/FacebookCatalog/src",
             "Fujiba\\MessengerBridge\\": "packages/Fujiba/MessengerBridge/src",
             "Fujiba\\Accounting\\": "packages/Fujiba/Accounting/src",
+            "Fujiba\\AuthGateway\\": "packages/Fujiba/AuthGateway/src",
             "Modules\\": "packages/"
         }
     },
@@ -134,7 +135,8 @@
             "Webkul\\Installer\\Tests\\": "packages/Webkul/Installer/tests",
             "Webkul\\Shop\\Tests\\": "packages/Webkul/Shop/tests",
             "Fujiba\\MessengerBridge\\Tests\\": "packages/Fujiba/MessengerBridge/tests",
-            "Fujiba\\Accounting\\Tests\\": "packages/Fujiba/Accounting/tests"
+            "Fujiba\\Accounting\\Tests\\": "packages/Fujiba/Accounting/tests",
+            "Fujiba\\OrdersAdmin\\Tests\\": "packages/Fujiba/OrdersAdmin/tests"
         }
     },
     "scripts": {

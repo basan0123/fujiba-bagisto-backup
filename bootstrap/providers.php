@@ -66,6 +66,7 @@ return [
     Fujiba\FacebookCatalog\Providers\FacebookCatalogServiceProvider::class,
     Fujiba\MessengerBridge\Providers\MessengerBridgeServiceProvider::class,
     Fujiba\Accounting\Providers\AccountingServiceProvider::class,
+    Fujiba\AuthGateway\Providers\AuthGatewayServiceProvider::class,
     Webkul\Waste\Providers\WasteServiceProvider::class,
 
 ];
