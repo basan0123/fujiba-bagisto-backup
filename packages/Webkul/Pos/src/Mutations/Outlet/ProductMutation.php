@@ -14,6 +14,7 @@ use Nuwave\Lighthouse\Support\Contracts\GraphQLContext;
 use Webkul\Attribute\Repositories\AttributeFamilyRepository;
 use Webkul\Core\Rules\Slug;
 use Webkul\GraphQLAPI\Validators\CustomException;
+use Webkul\Pos\Helpers\BarcodeNormalizer;
 use Webkul\Pos\Repositories\OutletProductRepository;
 use Webkul\Pos\Repositories\ProductBarcodeRepository;
 use Webkul\Pos\Repositories\ProductRequestRepository;
@@ -267,7 +268,7 @@ class ProductMutation extends Controller
     {
         $barcode = isset($args['barcode']) ? trim((string) $args['barcode']) : '';
         if ($barcode !== '') {
-            $barcode = self::normalizeScannedCode($barcode) ?: $barcode;
+            $barcode = BarcodeNormalizer::normalize($barcode) ?: $barcode;
             $args['barcode'] = $barcode;
         }
         $imageBase64 = $args['imageBase64'] ?? null;
@@ -404,7 +405,7 @@ class ProductMutation extends Controller
     {
         $candidates = array_values(array_unique(array_filter([
             $barcode,
-            self::normalizeScannedCode($barcode),
+            BarcodeNormalizer::normalize($barcode),
         ], fn ($v) => $v !== '')));
 
         $hit = DB::table('pos_product_barcode')
@@ -428,33 +429,6 @@ class ProductMutation extends Controller
         }
 
         return null;
-    }
-
-    /**
-     * Translit Burmese/fullwidth digits to ASCII; if the input contains a long
-     * digit run or is mostly digits, strip non-digits so a scanner's pure-ASCII
-     * output matches DB rows that may carry typed-in prefix junk.
-     */
-    private static function normalizeScannedCode(string $value): string
-    {
-        $value = trim($value);
-        if ($value === '') {
-            return '';
-        }
-        $value = strtr($value, [
-            "\u{1040}" => '0', "\u{1041}" => '1', "\u{1042}" => '2', "\u{1043}" => '3', "\u{1044}" => '4',
-            "\u{1045}" => '5', "\u{1046}" => '6', "\u{1047}" => '7', "\u{1048}" => '8', "\u{1049}" => '9',
-            "\u{FF10}" => '0', "\u{FF11}" => '1', "\u{FF12}" => '2', "\u{FF13}" => '3', "\u{FF14}" => '4',
-            "\u{FF15}" => '5', "\u{FF16}" => '6', "\u{FF17}" => '7', "\u{FF18}" => '8', "\u{FF19}" => '9',
-        ]);
-        $digits = preg_replace('/\D+/u', '', $value) ?? '';
-        $totalLen = mb_strlen($value);
-        $hasLongRun = (bool) preg_match('/\d{8,}/', $value);
-        $highFrac = strlen($digits) >= 6 && $totalLen > 0 && (strlen($digits) / $totalLen) >= 0.5;
-        if ($hasLongRun || $highFrac) {
-            return $digits;
-        }
-        return preg_replace('/\s+/u', '', $value) ?? $value;
     }
 
     /**
@@ -665,7 +639,7 @@ class ProductMutation extends Controller
         }
 
         $productId = (int) $args['productId'];
-        $barcode   = self::normalizeScannedCode((string) $args['barcode']) ?: trim((string) $args['barcode']);
+        $barcode   = BarcodeNormalizer::normalize((string) $args['barcode']) ?: trim((string) $args['barcode']);
 
         $outlet = $context->user()->outlet;
 

@@ -6,6 +6,7 @@ use App\Http\Controllers\Controller;
 use Illuminate\Database\Eloquent\Builder;
 use Nuwave\Lighthouse\Support\Contracts\GraphQLContext;
 use Webkul\Customer\Repositories\CustomerGroupRepository;
+use Webkul\Pos\Helpers\BarcodeNormalizer;
 use Webkul\Product\Helpers\BundleOption as BundleOptionHelper;
 use Webkul\Product\Helpers\ConfigurableOption as ConfigurableOptionHelper;
 use Webkul\Product\Repositories\ProductRepository;
@@ -111,5 +112,69 @@ class HomeQuery extends Controller
         }
 
         return $data['options'] ?? [];
+    }
+
+    /**
+     * Resolver for the lookupByBarcode query. Returns the first product
+     * whose pos_product_barcode row matches the scanned code (barcode →
+     * gtin → scan_value), constrained to the cashier's outlet. Burmese
+     * and full-width digits are translit'd to ASCII via the shared
+     * BarcodeNormalizer so the same write-side rule applies on read.
+     */
+    public function lookupByBarcode($root, array $args, GraphQLContext $context)
+    {
+        $raw = (string) ($args['value'] ?? '');
+        $candidates = array_values(array_unique(array_filter([
+            trim($raw),
+            BarcodeNormalizer::normalize($raw),
+        ], fn ($v) => $v !== '')));
+
+        if (empty($candidates)) {
+            return null;
+        }
+
+        $agent = $context->user();
+        $outletId = $agent->outlet_id;
+        $inventorySourceId = $agent->outlet->inventory_source_id;
+
+        $customerGroupId = $this->customerGroupRepository->findOneWhere([
+            'code' => 'general',
+        ])->id;
+
+        return $this->productRepository->query()
+            ->select(
+                'products.*',
+                'product_flat.status as status',
+                'product_inventories.qty as quantity',
+                'pos_outlet_product.status as pos_status',
+                'pos_product_barcode.barcode',
+                'pos_product_barcode.gtin',
+                'pos_product_barcode.scan_type',
+                'pos_product_barcode.scan_value',
+            )
+            ->leftJoin('product_flat', 'products.id', '=', 'product_flat.product_id')
+            ->join('pos_product_barcode', 'products.id', '=', 'pos_product_barcode.product_id')
+            ->join('pos_outlet_product', function ($j) use ($outletId) {
+                $j->on('products.id', '=', 'pos_outlet_product.product_id')
+                  ->where('pos_outlet_product.outlet_id', $outletId);
+            })
+            ->leftJoin('product_inventories', function ($join) use ($inventorySourceId) {
+                $join->on('products.id', '=', 'product_inventories.product_id')
+                    ->where('product_inventories.inventory_source_id', $inventorySourceId);
+            })
+            ->leftJoin('product_price_indices', function ($join) use ($customerGroupId) {
+                $join->on('products.id', '=', 'product_price_indices.product_id')
+                    ->where('product_price_indices.customer_group_id', $customerGroupId);
+            })
+            ->whereNull('products.parent_id')
+            ->where(function ($q) use ($candidates) {
+                foreach ($candidates as $c) {
+                    $q->orWhere('pos_product_barcode.barcode', $c)
+                      ->orWhere('pos_product_barcode.gtin', $c)
+                      ->orWhere('pos_product_barcode.scan_value', $c);
+                }
+            })
+            ->groupBy('products.id')
+            ->first();
     }
 }

@@ -1,0 +1,13 @@
+# lookupByBarcode — outlet-scoped product lookup by scanned code.
+# Returns the same OutletProductResult shape as getOutletProducts so
+# the cashier UI can drop the result straight into the cart.
+#
+# Search order: pos_product_barcode.barcode → .gtin → .scan_value
+# (matches the order ProductMutation@findProductByBarcode uses for the
+# admin barcode-link flow). Outlet scope is enforced via
+# pos_outlet_product so a cashier can't pull products from another
+# outlet even if they know the SKU. Returns null when nothing matches.
+extend type Query @guard(with: ["pos_user"]) {
+    lookupByBarcode(value: String!): OutletProductResult
+        @field(resolver: "Webkul\\Pos\\Queries\\Home\\HomeQuery@lookupByBarcode")
+}
