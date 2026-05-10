@@ -129,6 +129,17 @@ class OrderRepository extends Repository
                 : (bool) ($agent->training_mode ?? false),
             'discount_amount'      => round($order->discount_amount, 2),
             'base_discount_amount' => round($order->base_discount_amount, 2),
+            // Order-level discount columns: NULL for sales without an
+            // order-level discount (don't pollute every cash-sale row
+            // with a zero), value + 'unspecified' default reason once
+            // the cashier sets one. The picker UI lands later and
+            // replaces 'unspecified' with a specific code.
+            'order_discount_amount' => ! empty($args['order_discount_amount'])
+                ? round((float) $args['order_discount_amount'], 2)
+                : null,
+            'order_discount_reason' => ! empty($args['order_discount_amount'])
+                ? ($args['order_discount_reason'] ?? 'unspecified')
+                : null,
             'order_currency'       => $order->order_currency_code,
         ];
 

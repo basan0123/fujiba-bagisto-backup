@@ -44,8 +44,10 @@ class OrderMutation
             'cash_total'          => 'required_if:payment_mode,pos_cash,pos_split|numeric|min:0',
             'card_details'        => 'required_if:payment_mode,pos_card,pos_split|string',
             'bank_name'           => 'required_if:payment_mode,pos_card,pos_split|string',
-            'training_mode'       => 'nullable|boolean',
-            'order_items'         => 'required|array|min:1',
+            'training_mode'         => 'nullable|boolean',
+            'order_discount_amount' => 'nullable|numeric|min:0|max:99999999',
+            'order_discount_reason' => 'nullable|string|max:250',
+            'order_items'           => 'required|array|min:1',
         ]);
 
         if ($validator->fails()) {
@@ -297,6 +299,18 @@ class OrderMutation
 
         $order['grand_total'] = round($order['grand_total'], 2);
         $order['base_grand_total'] = round($order['base_grand_total'], 2);
+
+        // Order-level discount: subtract from grand_total. The amount
+        // is in base currency (cashier UI computes against the
+        // subtotal-after-line-discounts in the order's base currency).
+        // Per-line custom_price is left untouched so reports can split
+        // line markdowns from blanket promos via
+        // pos_order.order_discount_amount.
+        $orderDiscount = (float) ($args['order_discount_amount'] ?? 0);
+        if ($orderDiscount > 0) {
+            $order['grand_total']      = round(max(0, $order['grand_total']      - core()->convertPrice($orderDiscount)), 2);
+            $order['base_grand_total'] = round(max(0, $order['base_grand_total'] - $orderDiscount), 2);
+        }
 
         $order['billing_address'] = $this->getCustomerAddress(
             $customer,

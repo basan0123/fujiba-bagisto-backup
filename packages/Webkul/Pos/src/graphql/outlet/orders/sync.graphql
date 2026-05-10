@@ -18,6 +18,8 @@ input syncOrderInput {
     trainingMode: Boolean @rename(attribute: "training_mode")
     orderItems: [SyncOrderItemInput] @rename(attribute: "order_items")
     isReturned: Boolean @rename(attribute: "is_returned")
+    orderDiscountAmount: Float @rename(attribute: "order_discount_amount")
+    orderDiscountReason: String @rename(attribute: "order_discount_reason")
 }
 
 input SyncOrderItemInput {
