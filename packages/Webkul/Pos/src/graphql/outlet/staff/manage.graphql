@@ -1,0 +1,63 @@
+# outlet/staff/manage.graphql — owner-only staff CRUD.
+
+extend type Query @guard(with: ["pos_user"]) {
+    getOutletStaff: [OutletStaff!]!
+        @field(resolver: "Webkul\\Pos\\Queries\\Outlet\\StaffQuery@list")
+}
+
+extend type Mutation @guard(with: ["pos_user"]) {
+    createOutletStaff(
+        input: createOutletStaffInput! @spread
+    ): outletStaffResult @field(resolver: "Webkul\\Pos\\Mutations\\Outlet\\StaffMutation@create")
+
+    updateOutletStaff(
+        input: updateOutletStaffInput! @spread
+    ): outletStaffResult @field(resolver: "Webkul\\Pos\\Mutations\\Outlet\\StaffMutation@update")
+
+    deactivateOutletStaff(
+        input: deactivateOutletStaffInput! @spread
+    ): outletStaffResult @field(resolver: "Webkul\\Pos\\Mutations\\Outlet\\StaffMutation@deactivate")
+}
+
+input createOutletStaffInput {
+    email: String!
+    password: String!
+    firstname: String!
+    lastname: String
+    role: String!
+    pin: String
+    status: Boolean
+    outletId: Int
+}
+
+input updateOutletStaffInput {
+    id: Int!
+    email: String
+    password: String
+    firstname: String
+    lastname: String
+    role: String
+    pin: String
+    status: Boolean
+}
+
+input deactivateOutletStaffInput {
+    id: Int!
+}
+
+type OutletStaff {
+    id: Int!
+    email: String!
+    firstname: String
+    lastname: String
+    role: String!
+    status: Boolean!
+    outletId: Int
+    hasPin: Boolean!
+}
+
+type outletStaffResult {
+    success: Boolean!
+    message: String
+    staff: OutletStaff
+}
