@@ -3,8 +3,12 @@
 namespace Fujiba\InventoryControl\Providers;
 
 use Fujiba\InventoryControl\Console\Commands\NormalizeBarcodes;
+use Fujiba\InventoryControl\Observers\ProductInventoryObserver;
+use Fujiba\InventoryControl\Observers\ProductOrderedInventoryObserver;
 use Illuminate\Support\Facades\Event;
 use Illuminate\Support\ServiceProvider;
+use Webkul\Product\Models\ProductInventoryProxy;
+use Webkul\Product\Models\ProductOrderedInventoryProxy;
 
 class InventoryControlServiceProvider extends ServiceProvider
 {
@@ -23,6 +27,23 @@ class InventoryControlServiceProvider extends ServiceProvider
 
         $this->registerDashboardCard();
         $this->registerBarcodeAssignEntryPoints();
+        $this->registerInventoryAutoReindex();
+    }
+
+    /**
+     * Synchronously refresh product_inventory_indices whenever stock or
+     * reservations change — guarantees cart sees realtime quantity even if
+     * the queue worker is stopped or backed up. Bagisto core only refreshes
+     * the index via a queued job fired on catalog.product.update.after; that
+     * has bitten us when (a) admins edit stock without saving the product,
+     * (b) the ChatPion sync writes inventories directly, (c) the queue worker
+     * is dead. The observer is idempotent and per-row, so the cost is one
+     * indexer pass per channel per inventory write — negligible.
+     */
+    protected function registerInventoryAutoReindex(): void
+    {
+        ProductInventoryProxy::observe(ProductInventoryObserver::class);
+        ProductOrderedInventoryProxy::observe(ProductOrderedInventoryObserver::class);
     }
 
     public function register(): void
