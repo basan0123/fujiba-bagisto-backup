@@ -2,12 +2,28 @@
 
 namespace Fujiba\InvoicesAdmin\DataGrids;
 
-use Illuminate\Support\Facades\DB;
 use Webkul\Admin\DataGrids\Sales\OrderInvoiceDataGrid;
 
 /**
  * Adds shipping-status + payment-method columns and matching filters to the
- * core /admin/sales/invoices grid (closes the original spec section 5.B).
+ * core /admin/sales/invoices grid.
+ *
+ * Canonical "shipped" predicate (mirrors the advanced screen at
+ * /admin/sales/orders?view=listview, the only screen K confirms is correct):
+ *
+ *   orders.fujiba_label_printed = 1  ⇒  shipped (green badge)
+ *   orders.fujiba_label_printed = 0  ⇒  not yet shipped (yellow badge)
+ *   orders.status = 'canceled'       ⇒  canceled (red badge)
+ *
+ * Reading orders.status alone is NOT enough — the bug class (e.g. #1558,
+ * #1546, #1544 on 2026-05-11) is a fully-shipped order whose status stayed
+ * at 'pending_payment' / 'processing' because OrderLabelPrintedController
+ * doesn't advance status. The label_printed flag is the single source of
+ * truth for "physically out the door."
+ *
+ * The filter "shipping_status" lets accounts cross-check that mismatch:
+ * pick "shipped" to see all label-printed rows regardless of orders.status,
+ * including ones with mismatched legacy status values.
  *
  * Default sort: pending invoices first, then pending_payment, then paid /
  * overdue. Operators wanted actionable rows at the top.
@@ -26,7 +42,10 @@ class FujibaInvoiceDataGrid extends OrderInvoiceDataGrid
 
         $this->addFilter('payment_method', 'order_payment.method');
         $this->addFilter('order_status', 'orders.status');
-        $this->addFilter('fujiba_label_printed', 'orders.fujiba_label_printed');
+        // The cross-check filter K asked for: pick "1" to see all
+        // label-printed rows (the canonical "shipped" predicate),
+        // independent of orders.status.
+        $this->addFilter('shipping_status', 'orders.fujiba_label_printed');
 
         // Default sort — actionable invoices at the top. Anything not listed
         // (e.g. canceled) sinks to the bottom via the ELSE 9 fallthrough.
@@ -47,21 +66,16 @@ class FujibaInvoiceDataGrid extends OrderInvoiceDataGrid
 
         $this->addColumn([
             'index'      => 'shipping_status',
-            'label'      => 'Shipping',
+            'label'      => '発送',
             'type'       => 'string',
             'searchable' => false,
             'filterable' => true,
             'sortable'   => false,
             'closure'    => function ($row) {
-                if ((int) ($row->fujiba_label_printed ?? 0) === 1) {
-                    return $row->order_status === 'completed' ? '配達済' : '発送済';
-                }
-                return match ($row->order_status) {
-                    'pending', 'pending_payment' => '未発送',
-                    'completed'                  => '配達済',
-                    'canceled'                   => 'キャンセル',
-                    default                      => $row->order_status,
-                };
+                return self::renderShippingBadge(
+                    (int) ($row->fujiba_label_printed ?? 0),
+                    (string) ($row->order_status ?? '')
+                );
             },
         ]);
 
@@ -76,10 +90,30 @@ class FujibaInvoiceDataGrid extends OrderInvoiceDataGrid
                 return match ($row->payment_method ?? '') {
                     'cashondelivery' => '代金引換',
                     'moneytransfer'  => '銀行振込',
+                    'cash'           => '現金',
                     ''               => '—',
                     default          => $row->payment_method,
                 };
             },
         ]);
+    }
+
+    /**
+     * Single shipping-status badge renderer — shared with FujibaOrderDataGrid.
+     * Green for shipped/completed, yellow for not-yet-shipped, red for canceled.
+     * Public + static so other grids (datagrid view of orders) reuse the same
+     * predicate. Don't duplicate this logic anywhere else — that's how the
+     * #1558-class bug sneaks back in.
+     */
+    public static function renderShippingBadge(int $labelPrinted, string $orderStatus): string
+    {
+        if ($orderStatus === 'canceled') {
+            return '<span style="display:inline-block;padding:2px 10px;border-radius:9999px;background:#fee2e2;color:#991b1b;font-size:12px;font-weight:600;">キャンセル</span>';
+        }
+        if ($labelPrinted === 1) {
+            $label = $orderStatus === 'completed' ? '配達済' : '発送済';
+            return '<span style="display:inline-block;padding:2px 10px;border-radius:9999px;background:#d1fae5;color:#065f46;font-size:12px;font-weight:600;">'.$label.'</span>';
+        }
+        return '<span style="display:inline-block;padding:2px 10px;border-radius:9999px;background:#fef3c7;color:#92400e;font-size:12px;font-weight:600;">未発送</span>';
     }
 }

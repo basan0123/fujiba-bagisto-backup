@@ -550,15 +550,21 @@
                                 @{{ paymentLabel(rec.payment_method) }}
                             </span>
                         </div>
-                        <button
+                        {{-- 3-way payment-method picker (pending orders only).
+                             cashondelivery (Sagawa COD, has surcharge) /
+                             moneytransfer (bank wire, accountant confirms) /
+                             cash (admin-only walk-in shop, no surcharge). --}}
+                        <select
                             v-if="canSwapPayment(rec)"
-                            class="ov-pay-swap"
+                            class="ov-select ov-pay-select"
+                            :value="rec.payment_method"
                             :title="t('swap_payment_hint')"
-                            @click="swapPayment(rec)"
+                            @change="changePaymentMethod(rec, $event)"
                         >
-                            <span>⇄</span>
-                            <span>@{{ rec.payment_method === 'cashondelivery' ? t('moneytransfer') : t('cashondelivery') }}@{{ t('change_to_suffix') }}</span>
-                        </button>
+                            <option value="cashondelivery">@{{ t('cashondelivery') }}</option>
+                            <option value="moneytransfer">@{{ t('moneytransfer') }}</option>
+                            <option value="cash">@{{ t('cash') }}</option>
+                        </select>
                     </td>
 
                     {{-- 5. Status (dropdown opens modal, never fires endpoint directly) --}}
@@ -1233,7 +1239,7 @@
                     profit: '利益', sub: '小計', cost: '原価', fees: '手数料', discount: '割引', cool: 'クール料',
                     cost_unset: '仕入価格未設定',
                     cost_unset_for: '原価未設定の商品: ',
-                    items: '点', cashondelivery: '代引', moneytransfer: '振込',
+                    items: '点', cashondelivery: '代引', moneytransfer: '振込', cash: '現金',
                     view: '詳細', edit_address: '住所編集', note: 'メモ',
                     confirm: '確定', sagawa_print: 'Sagawa', assign_tracking: '追跡番号',
                     edit_tracking: '追跡番号変更',
@@ -1443,6 +1449,7 @@
                     cashondelivery:   '代引',
                     moneytransfer:    '振込',
                     manual:           '振込', // production "Manual" = bank transfer
+                    cash:             '現金',
                     pos_cash:         'POS現金',
                     poscash:          'POS現金',
                 };
@@ -1451,7 +1458,9 @@
 
             canSwapPayment(rec) {
                 return rec.status === 'pending'
-                    && (rec.payment_method === 'cashondelivery' || rec.payment_method === 'moneytransfer');
+                    && (rec.payment_method === 'cashondelivery'
+                        || rec.payment_method === 'moneytransfer'
+                        || rec.payment_method === 'cash');
             },
 
             paymentChipClass(method) {
@@ -1459,6 +1468,7 @@
                 const key = String(method).toLowerCase().replace(/\s+/g, '');
                 if (key === 'cashondelivery') return 'ov-pay-chip-cod';
                 if (key === 'moneytransfer' || key === 'manual') return 'ov-pay-chip-transfer';
+                if (key === 'cash')                              return 'ov-pay-chip-cash';
                 return 'ov-pay-chip-other';
             },
 
@@ -1808,6 +1818,25 @@
             },
 
             // ─── payment swap ────────────────────────
+            // 3-way picker: cashondelivery / moneytransfer / cash.
+            // Invoked from the row <select> @change. Reverts the <select>
+            // back to the original value on failure so the UI doesn't lie.
+            changePaymentMethod(rec, event) {
+                const next = event?.target?.value;
+                if (!next || next === rec.payment_method) return;
+                this.$axios.post('{{ url(config('app.admin_url')) }}/api/orders/' + rec.id + '/payment-method', { method: next })
+                    .then(() => {
+                        this.flash('success', '支払方法を変更しました');
+                        this.loadPage(this.meta.current_page);
+                    })
+                    .catch(e => {
+                        if (event?.target) event.target.value = rec.payment_method;
+                        this.flashError(e, 'payment');
+                    });
+            },
+
+            // Legacy binary toggle — kept as a thin redirect so any external
+            // shortcut binding still works.
             swapPayment(rec) {
                 const next = rec.payment_method === 'cashondelivery' ? 'moneytransfer' : 'cashondelivery';
                 this.$axios.post('{{ url(config('app.admin_url')) }}/api/orders/' + rec.id + '/payment-method', { method: next })

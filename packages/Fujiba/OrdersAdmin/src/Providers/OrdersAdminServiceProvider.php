@@ -28,5 +28,17 @@ class OrdersAdminServiceProvider extends ServiceProvider
         $this->mergeConfigFrom(__DIR__ . '/../Config/acl.php', 'acl');
         $this->mergeConfigFrom(__DIR__ . '/../Config/carriers.php', 'carriers');
         $this->mergeConfigFrom(__DIR__ . '/../Config/menu.php', 'menu.admin');
+
+        // Fujiba-only payment methods (currently `cash` for walk-in shop).
+        $this->mergeConfigFrom(__DIR__ . '/../Config/payment_methods.php', 'payment_methods');
+
+        // Override core /admin/sales/orders?view=datagrid grid to add the
+        // shipping-status badge column + cross-check filter. The badge
+        // renderer is shared with FujibaInvoiceDataGrid so both screens
+        // use the same predicate (orders.fujiba_label_printed=1 = shipped).
+        $this->app->bind(
+            \Webkul\Admin\DataGrids\Sales\OrderDataGrid::class,
+            \Fujiba\OrdersAdmin\DataGrids\FujibaOrderDataGrid::class,
+        );
     }
 }

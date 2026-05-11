@@ -66,13 +66,24 @@ class OrderPaymentMethodController extends Controller
             'method_title' => core()->getConfigData('sales.payment_methods.' . $method . '.title') ?: $method,
         ]);
 
-        $methodLabel = $method === 'cashondelivery' ? '代金引換' : '銀行振込';
+        // Only cashondelivery (Sagawa) carries the 代引手数料. cash and
+        // moneytransfer both have zero surcharge — they go through the
+        // "else" branch above.
+        $methodLabel = match ($method) {
+            'cashondelivery' => '代金引換',
+            'cash'           => '現金',
+            'moneytransfer'  => '銀行振込',
+            default          => $method,
+        };
+        $feeNote = match ($method) {
+            'cashondelivery' => ' 代引手数料: ¥' . number_format($codFee) . ' 追加。',
+            'cash', 'moneytransfer' => ' 代引手数料を除外しました。',
+            default          => '',
+        };
         $this->orderCommentRepository->create([
             'order_id' => $order->id,
             'comment'  => "支払方法を「{$methodLabel}」に変更しました。" .
-                ($method === 'cashondelivery'
-                    ? ' 代引手数料: ¥' . number_format($codFee) . ' 追加。'
-                    : ' 代引手数料を除外しました。') .
+                $feeNote .
                 ' 合計: ¥' . number_format((float) $order->base_grand_total) .
                 ' (旧合計: ¥' . number_format($oldTotal) . ')',
         ]);
