@@ -51,3 +51,12 @@ yarn-error.log
 # Tenant/customer artifacts that shouldn't be tracked
 /public/upload
 /public/themes/default/storage
+
+# Operational state from the hourly ChatPion sync cron — these
+# files bump on every run and are not source.
+/storage/chatpion-sync/last_run_*.txt
+/storage/chatpion-sync/cron.log*
+
+# Deployment backups taken before pushing ChatPion-side PHP changes
+# to the onamae host. Operational artifacts, not source.
+/storage/chatpion-deploy/
