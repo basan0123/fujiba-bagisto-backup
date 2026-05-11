@@ -41,11 +41,26 @@
                                 class="grid"
                                 v-for="product in report.statistics"
                             >
-                                <p class="dark:text-white">
-                                    @{{ product.name }}
-                                </p>
+                                <div class="flex items-center gap-2.5">
+                                    <template v-if="product.thumbnail_url">
+                                        <img
+                                            :src="product.thumbnail_url"
+                                            :alt="product.name"
+                                            class="h-10 w-10 shrink-0 rounded object-cover"
+                                        />
+                                    </template>
+                                    <template v-else>
+                                        <span class="flex h-10 w-10 shrink-0 items-center justify-center rounded bg-gray-200 text-gray-500 dark:bg-gray-800 dark:text-gray-400">
+                                            <i class="icon-image text-xl"></i>
+                                        </span>
+                                    </template>
 
-                                <div class="flex items-center gap-5">
+                                    <p class="line-clamp-2 dark:text-white">
+                                        @{{ product.name }}
+                                    </p>
+                                </div>
+
+                                <div class="flex items-center gap-5 mt-1.5">
                                     <div class="relative h-2 w-full bg-slate-100">
                                         <div
                                             class="absolute left-0 h-2 bg-emerald-500"

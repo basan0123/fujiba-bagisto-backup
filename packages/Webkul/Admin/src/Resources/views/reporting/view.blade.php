@@ -188,9 +188,26 @@
                             v-if="reporting.statistics.records.length"
                             v-for="record in reporting.statistics.records"
                         >
-                            <p v-for="column in reporting.statistics.columns">
-                                @{{ record[column.key] }}
-                            </p>
+                            <template v-for="column in reporting.statistics.columns">
+                                <template v-if="column.type === 'image'">
+                                    <template v-if="record[column.key]">
+                                        <img
+                                            :src="record[column.key]"
+                                            :alt="record.name"
+                                            class="h-12 w-12 shrink-0 rounded object-cover"
+                                        />
+                                    </template>
+                                    <template v-else>
+                                        <span class="flex h-12 w-12 shrink-0 items-center justify-center rounded bg-gray-200 text-gray-500 dark:bg-gray-800 dark:text-gray-400">
+                                            <i class="icon-image text-xl"></i>
+                                        </span>
+                                    </template>
+                                </template>
+
+                                <p v-else>
+                                    @{{ record[column.key] }}
+                                </p>
+                            </template>
                         </div>
 
                         <div

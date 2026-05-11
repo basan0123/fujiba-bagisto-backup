@@ -757,6 +757,10 @@ class Reporting
             return [
                 'columns' => [
                     [
+                        'key' => 'thumbnail_url',
+                        'label' => '',
+                        'type' => 'image',
+                    ], [
                         'key' => 'id',
                         'label' => trans('admin::app.reporting.products.index.id'),
                     ], [
@@ -807,6 +811,10 @@ class Reporting
             return [
                 'columns' => [
                     [
+                        'key' => 'thumbnail_url',
+                        'label' => '',
+                        'type' => 'image',
+                    ], [
                         'key' => 'id',
                         'label' => trans('admin::app.reporting.products.index.id'),
                     ], [
