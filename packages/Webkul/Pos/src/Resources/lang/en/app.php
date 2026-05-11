@@ -38,6 +38,86 @@ return [
             'customer-missing'  => 'Customer not found.',
         ],
 
+        'role-gate' => [
+            'denied' => 'Your role (:role) is not allowed here. Required: :allowed.',
+        ],
+
+        'upload' => [
+            'empty'         => 'No image provided.',
+            'bad-encoding'  => 'Image base64 is invalid.',
+            'too-large'     => 'Image is larger than :limit.',
+            'bad-type'      => 'Only JPG and PNG are supported.',
+            'decode-failed' => 'Could not decode the image: :msg',
+        ],
+
+        'product' => [
+            'created'      => 'Product created.',
+            'updated'      => 'Product updated.',
+            'deleted'      => 'Product deleted.',
+            'not-found'    => 'Product not found in this outlet.',
+            'has-orders'   => 'Product has historical orders and cannot be hard-deleted.',
+        ],
+
+        'category' => [
+            'created'   => 'Category created.',
+            'updated'   => 'Category updated.',
+            'deleted'   => 'Category deleted.',
+            'not-found' => 'Category not found.',
+            'has-children' => 'Category has child categories.',
+        ],
+
+        'stock' => [
+            'adjusted'         => 'Stock adjusted.',
+            'wasted'           => 'Waste recorded.',
+            'transferred'      => 'Stock transferred.',
+            'reason-required'  => 'Reason is required.',
+            'bad-reason'       => 'Unknown reason :reason.',
+            'same-outlet'      => 'Source and destination must differ.',
+            'over-deduct'      => 'Cannot deduct more than current quantity (:qty).',
+            'no-source-stock'  => 'Source inventory source not found.',
+            'no-dest-source'   => 'Destination inventory source not found.',
+        ],
+
+        'staff' => [
+            'created'     => 'Staff member created.',
+            'updated'     => 'Staff member updated.',
+            'deactivated' => 'Staff member deactivated.',
+            'owner-required' => 'Owner-level access is required.',
+            'self-demote' => 'You cannot demote yourself from owner.',
+            'self-deactivate' => 'You cannot deactivate yourself.',
+            'email-taken' => 'This email is already used by another staff member.',
+            'bad-pin'     => 'PIN must be exactly 4 digits.',
+            'bad-role'    => 'Unknown role :role.',
+        ],
+
+        'orders' => [
+            'not-found'      => 'Order not found.',
+            'refund-success' => 'Refund recorded.',
+            'void-success'   => 'Order voided.',
+            'void-too-old'   => 'Voids are limited to the current shift.',
+            'bad-reason'     => 'Unknown reason :reason.',
+            'amount-required' => 'Refund amount must be positive.',
+            'manager-required-large' => 'Refunds over ¥3,000 require manager approval.',
+        ],
+
+        'shift' => [
+            'opened'           => 'Shift opened.',
+            'closed'           => 'Shift closed.',
+            'already-open'     => 'You already have an open shift.',
+            'none-open'        => 'No open shift to close.',
+            'variance-reason'  => 'Variance exceeds ¥500; reason is required.',
+            'movement-recorded'=> 'Cash movement recorded.',
+            'bad-direction'    => 'Direction must be `in` or `out`.',
+        ],
+
+        'invoice' => [
+            'generated'      => 'Invoice generated.',
+            'emailed'        => 'Invoice emailed.',
+            'order-not-found'=> 'Order not found.',
+            'already-exists' => 'Order already has an invoice.',
+            'no-customer-email' => 'Customer has no email on file.',
+        ],
+
         'cart' => [
             'already-applied'     => 'Coupon already applied!',
             'coupon-applied'      => 'Coupon applied successfully!',

@@ -15,6 +15,8 @@ use Webkul\Attribute\Repositories\AttributeFamilyRepository;
 use Webkul\Core\Rules\Slug;
 use Webkul\GraphQLAPI\Validators\CustomException;
 use Webkul\Pos\Helpers\BarcodeNormalizer;
+use Webkul\Pos\Helpers\ImageUploader;
+use Webkul\Pos\Helpers\RoleGate;
 use Webkul\Pos\Repositories\OutletProductRepository;
 use Webkul\Pos\Repositories\ProductBarcodeRepository;
 use Webkul\Pos\Repositories\ProductRequestRepository;
@@ -266,6 +268,8 @@ class ProductMutation extends Controller
      */
     public function createProduct($root, array $args, GraphQLContext $context): array
     {
+        RoleGate::requireManager($context->user());
+
         $barcode = isset($args['barcode']) ? trim((string) $args['barcode']) : '';
         if ($barcode !== '') {
             $barcode = BarcodeNormalizer::normalize($barcode) ?: $barcode;
@@ -667,6 +671,158 @@ class ProductMutation extends Controller
             'productId' => $productId,
             'gtin'      => $barcode,
             'scanValue' => $barcode,
+        ];
+    }
+
+    /**
+     * Merchant-management: update a product. Manager+owner only.
+     *
+     * Accepts the same shape as createProduct, plus optional taxCategoryId
+     * + status + description + imageBase64. Only fields actually present in
+     * the input are touched; everything else is preserved.
+     */
+    public function updateProduct($root, array $args, GraphQLContext $context): array
+    {
+        RoleGate::requireManager($context->user());
+
+        $validator = Validator::make($args, [
+            'id'             => 'required|integer',
+            'name'           => 'sometimes|required|string|max:190',
+            'price'          => 'sometimes|required|numeric|min:0',
+            'quantity'       => 'sometimes|required|integer|min:0',
+            'weight'         => 'sometimes|nullable|numeric|min:0',
+            'taxCategoryId'  => 'sometimes|nullable|integer',
+            'description'    => 'sometimes|nullable|string|max:5000',
+            'shortDescription' => 'sometimes|nullable|string|max:1000',
+            'status'         => 'sometimes|boolean',
+            'imageBase64'    => 'sometimes|nullable|string',
+            'imageName'      => 'sometimes|nullable|string|max:190',
+        ]);
+
+        if ($validator->fails()) {
+            throw new CustomException($validator->errors()->first());
+        }
+
+        $outlet = $context->user()->outlet;
+
+        // Authorize: product must belong to this outlet.
+        $belongs = DB::table('pos_outlet_product')
+            ->where('outlet_id', $outlet->id)
+            ->where('product_id', $args['id'])
+            ->exists();
+        if (! $belongs) {
+            throw new CustomException(trans('pos::app.outlet.product.not-found'));
+        }
+
+        $product = $this->productRepository->find($args['id']);
+        if (! $product) {
+            throw new CustomException(trans('pos::app.outlet.product.not-found'));
+        }
+
+        $defaultChannel = core()->getDefaultChannel();
+
+        $data = [
+            'channel'  => $defaultChannel->code,
+            'locale'   => core()->getRequestedLocaleCode(),
+            'sku'      => $product->sku,
+            'channels' => [$defaultChannel->id],
+        ];
+
+        // Only fields the caller sent are forwarded.
+        foreach (['name', 'price', 'weight', 'description', 'shortDescription', 'status'] as $k) {
+            if (array_key_exists($k, $args)) {
+                $mapped = match ($k) {
+                    'shortDescription' => 'short_description',
+                    default => $k,
+                };
+                $data[$mapped] = $args[$k];
+            }
+        }
+
+        if (array_key_exists('taxCategoryId', $args)) {
+            $data['tax_category_id'] = $args['taxCategoryId'];
+        }
+
+        if (array_key_exists('quantity', $args)) {
+            $data['manage_stock'] = 1;
+            $data['inventories'] = [$outlet->inventory_source_id => (int) $args['quantity']];
+        }
+
+        Event::dispatch('catalog.product.update.before', $product->id);
+        $product = $this->productRepository->update($data, $product->id);
+        Event::dispatch('catalog.product.update.after', $product);
+
+        // Optional image replacement.
+        if (! empty($args['imageBase64'])) {
+            $this->storeBase64Image($product, $args['imageBase64'], $args['imageName'] ?? null);
+        }
+
+        $product = $this->productRepository->find($product->id);
+
+        return [
+            'success' => true,
+            'message' => trans('pos::app.outlet.product.updated'),
+            'product' => $product,
+        ];
+    }
+
+    /**
+     * Merchant-management: delete a product. Manager+owner only.
+     *
+     * Soft-delete strategy: if the product has any historical order_items
+     * we flip status=0 + remove the pos_outlet_product link so the catalog
+     * stops showing it, but the catalog row stays for invoicing/reports.
+     * If there are no orders, we hard-delete.
+     */
+    public function deleteProduct($root, array $args, GraphQLContext $context): array
+    {
+        RoleGate::requireManager($context->user());
+
+        $validator = Validator::make($args, [
+            'id' => 'required|integer',
+        ]);
+
+        if ($validator->fails()) {
+            throw new CustomException($validator->errors()->first());
+        }
+
+        $outlet = $context->user()->outlet;
+
+        $belongs = DB::table('pos_outlet_product')
+            ->where('outlet_id', $outlet->id)
+            ->where('product_id', $args['id'])
+            ->exists();
+        if (! $belongs) {
+            throw new CustomException(trans('pos::app.outlet.product.not-found'));
+        }
+
+        $hasOrders = DB::table('order_items')
+            ->where('product_id', $args['id'])
+            ->exists();
+
+        if ($hasOrders) {
+            // Soft path: flip product status off + drop outlet assignment.
+            DB::table('products')
+                ->where('id', $args['id'])
+                ->update(['updated_at' => now()]);
+
+            DB::table('product_flat')
+                ->where('product_id', $args['id'])
+                ->update(['status' => 0, 'visible_individually' => 0, 'updated_at' => now()]);
+
+            DB::table('pos_outlet_product')
+                ->where('outlet_id', $outlet->id)
+                ->where('product_id', $args['id'])
+                ->delete();
+        } else {
+            // Hard delete.
+            $this->productRepository->delete($args['id']);
+        }
+
+        return [
+            'success' => true,
+            'message' => trans('pos::app.outlet.product.deleted'),
+            'softDeleted' => $hasOrders,
         ];
     }
 }

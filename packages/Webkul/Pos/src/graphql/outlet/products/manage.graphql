@@ -1,0 +1,44 @@
+# outlet/products/manage.graphql
+#
+# Manager+owner CRUD for the merchant-management surface. Cashier-grade
+# quick-create lives in custom.graphql.
+
+extend type Mutation @guard(with: ["pos_user"]) {
+    updateOutletProduct(
+        input: updateOutletProductInput! @spread
+    ): updateOutletProductResult @field(resolver: "Webkul\\Pos\\Mutations\\Outlet\\ProductMutation@updateProduct")
+
+    deleteOutletProduct(
+        input: deleteOutletProductInput! @spread
+    ): deleteOutletProductResult @field(resolver: "Webkul\\Pos\\Mutations\\Outlet\\ProductMutation@deleteProduct")
+}
+
+input updateOutletProductInput {
+    id: Int!
+    name: String
+    price: Float
+    quantity: Int
+    weight: Float
+    taxCategoryId: Int
+    description: String
+    shortDescription: String
+    status: Boolean
+    imageBase64: String
+    imageName: String
+}
+
+type updateOutletProductResult {
+    success: Boolean!
+    message: String
+    product: OutletProductResult
+}
+
+input deleteOutletProductInput {
+    id: Int!
+}
+
+type deleteOutletProductResult {
+    success: Boolean!
+    message: String
+    softDeleted: Boolean
+}
