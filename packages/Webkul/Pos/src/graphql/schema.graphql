@@ -7,3 +7,4 @@
 #import outlet/orders/*.graphql
 #import outlet/products/*.graphql
 #import outlet/reports/*.graphql
+#import outlet/stock/*.graphql

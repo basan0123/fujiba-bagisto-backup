@@ -1,0 +1,46 @@
+# outlet/stock/manage.graphql — adjust + transfer (waste already lives
+# in outlet/cashier/waste.graphql).
+
+extend type Mutation @guard(with: ["pos_user"]) {
+    stockAdjust(
+        input: stockAdjustInput! @spread
+    ): stockMutationResult @field(resolver: "Webkul\\Pos\\Mutations\\Outlet\\StockMutation@adjust")
+
+    stockTransfer(
+        input: stockTransferInput! @spread
+    ): stockTransferResult @field(resolver: "Webkul\\Pos\\Mutations\\Outlet\\StockMutation@transfer")
+}
+
+input stockAdjustInput {
+    productId: Int!
+    quantityDelta: Float!
+    inventorySourceId: Int
+    reason: String!
+    note: String
+    idempotencyKey: String
+}
+
+input stockTransferInput {
+    productId: Int!
+    fromInventorySourceId: Int!
+    toInventorySourceId: Int!
+    quantity: Float!
+    note: String
+    idempotencyKey: String
+}
+
+type stockMutationResult {
+    success: Boolean!
+    message: String
+    qtyBefore: Float
+    qtyAfter: Float
+    auditRowId: Int
+}
+
+type stockTransferResult {
+    success: Boolean!
+    message: String
+    fromQtyAfter: Float
+    toQtyAfter: Float
+    auditRowId: Int
+}
