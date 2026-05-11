@@ -6,12 +6,16 @@
 
     $codFee = (float) ($order->cod_fee ?? 0);
     $coolSurcharge = (float) ($order->cool_surcharge ?? 0);
-    $shippingAmount = (float) ($order->shipping_amount_incl_tax ?? $order->shipping_amount ?? 0);
     $discount = (float) ($order->discount_amount ?? 0);
     $tax = (float) ($order->tax_amount ?? 0);
+    $shippingBase = (float) ($order->shipping_amount ?? 0);
+    $shippingInclTax = (float) ($order->shipping_amount_incl_tax ?? 0);
+    // Prefer the inclusive mirror only when tax is actually applied; otherwise
+    // it's just a stale copy of shipping_amount that drifts after recalculation.
+    $shippingAmount = ($displayInclTax && $tax > 0 && $shippingInclTax > 0) ? $shippingInclTax : $shippingBase;
     $subTotalInclTax = (float) ($order->sub_total_incl_tax ?? 0);
     $subTotalBase = (float) ($order->sub_total ?? 0);
-    $subTotal = $displayInclTax && $subTotalInclTax > 0 ? $subTotalInclTax : $subTotalBase;
+    $subTotal = ($displayInclTax && $tax > 0 && $subTotalInclTax > 0) ? $subTotalInclTax : $subTotalBase;
     $grandTotal = (float) ($order->grand_total ?? 0);
     $currency = $order->order_currency_code;
     $paymentTitle = core()->getConfigData('sales.payment_methods.' . optional($order->payment)->method . '.title')
