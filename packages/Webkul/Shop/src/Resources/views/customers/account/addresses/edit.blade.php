@@ -1,10 +1,11 @@
 @php
+    // Channel-agnostic: messenger-onboarded customers lack real email/postcode/phone.
+    // Fujiba's kimono channel is coded `default`, so a channel-name gate misses it.
     $authCustomer = auth('customer')->user();
-    $isMessengerOptional = $authCustomer
-        && ! empty($authCustomer->chatpion_subscribe_id)
-        && in_array(optional(core()->getCurrentChannel())->code, ['mmfood', 'kimono'], true);
+    $isMessengerOptional = $authCustomer && ! empty($authCustomer->chatpion_subscribe_id);
     $emailOptional    = $isMessengerOptional;
     $postcodeRequired = core()->isPostCodeRequired() && ! $isMessengerOptional;
+    $phoneRequired    = ! $isMessengerOptional;
 @endphp
 <x-shop::layouts.account>
     <!-- Page Title -->
@@ -328,14 +329,17 @@
                 {!! view_render_event('bagisto.shop.customers.account.addresses.edit_form_controls.postcode.after', ['address' => $address]) !!}
 
                 <x-shop::form.control-group>
-                    <x-shop::form.control-group.label class="required">
+                    <x-shop::form.control-group.label class="{{ $phoneRequired ? 'required' : '' }}">
                         @lang('shop::app.customers.account.addresses.edit.phone')
+                        @if ($isMessengerOptional)
+                            <span style="font-size:11px;color:#94a3b8;font-weight:400;margin-left:4px">(任意 / Optional)</span>
+                        @endif
                     </x-shop::form.control-group.label>
 
                     <x-shop::form.control-group.control
                         type="text"
                         name="phone"
-                        rules="required|phone"
+                        rules="{{ $phoneRequired ? 'required|phone' : 'phone' }}"
                         :value="old('phone') ?? $address->phone"
                         :label="trans('shop::app.customers.account.addresses.edit.phone')"
                         :placeholder="trans('shop::app.customers.account.addresses.edit.phone')"

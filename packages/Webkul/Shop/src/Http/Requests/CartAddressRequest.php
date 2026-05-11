@@ -45,20 +45,24 @@ class CartAddressRequest extends FormRequest
      */
     private function mergeAddressRules(string $addressType): void
     {
-        // Messenger-logged-in customers on mmfood/kimono can leave email and
-        // postcode blank; OnepageController fills email from the customer
-        // record before saveAddresses() runs.
-        $messengerOptional = $this->messengerFieldsAreOptional();
+        // Messenger-onboarded customers (chatpion_subscribe_id present) lack a
+        // real email/postcode/phone regardless of which channel they shop on —
+        // on Fujiba the kimono channel is coded `default`, so a channel-name
+        // gate misses them. Drive the relax off the customer flag instead, and
+        // keep the legacy channel list as a fallback for guest checkout on
+        // mmfood-style storefronts.
+        $messengerCustomer = $this->customerIsMessengerOnboarded();
+        $channelRelaxes = $messengerCustomer || $this->channelRelaxesAddressFields();
 
-        $emailRules = $messengerOptional
+        $emailRules = $messengerCustomer
             ? ['nullable', 'email']
             : ['required', 'email'];
 
-        $postcodeRules = $messengerOptional
+        $postcodeRules = $channelRelaxes
             ? ['nullable', new PostCode]
             : (core()->isPostCodeRequired() ? ['required', new PostCode] : [new PostCode]);
 
-        $phoneRules = $messengerOptional
+        $phoneRules = $channelRelaxes
             ? ['nullable', new PhoneNumber]
             : ['required', new PhoneNumber];
 
@@ -90,14 +94,15 @@ class CartAddressRequest extends FormRequest
         $this->rules = array_merge($this->rules, $rules);
     }
 
-    private function messengerFieldsAreOptional(): bool
+    private function customerIsMessengerOnboarded(): bool
     {
         $customer = auth()->guard('customer')->user();
 
-        if (! $customer || empty($customer->chatpion_subscribe_id)) {
-            return false;
-        }
+        return $customer && ! empty($customer->chatpion_subscribe_id);
+    }
 
+    private function channelRelaxesAddressFields(): bool
+    {
         return in_array(
             optional(core()->getCurrentChannel())->code,
             ['mmfood', 'kimono'],

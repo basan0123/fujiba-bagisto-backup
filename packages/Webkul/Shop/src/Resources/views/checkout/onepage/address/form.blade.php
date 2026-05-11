@@ -1,28 +1,34 @@
 @php
     /**
-     * Detect whether this customer authenticated via a social provider (Facebook, Google…)
-     * OR via Messenger on the mmfood/kimono channels. In both cases the email field
-     * is treated as optional — social providers sometimes withhold email addresses,
-     * and Messenger customers were on-boarded with a synthetic email.
-     *
-     * For Messenger users on mmfood/kimono we also relax postcode (see below).
+     * Messenger-onboarded customers (chatpion_subscribe_id present) lack a
+     * real email/postcode/phone — they're synthetic accounts created from a
+     * Facebook subscriber. Drive the relax off the customer flag, not the
+     * channel code, because on Fujiba the kimono channel ships under code
+     * `default` and a name-gate (`['mmfood','kimono']`) misses it. Keep the
+     * legacy channel list as a guest-mode fallback for mmfood storefronts.
      */
     $authCustomer = auth('customer')->user();
+
+    $channelRelaxesByCode = in_array(
+        optional(core()->getCurrentChannel())->code,
+        ['mmfood', 'kimono'],
+        true
+    );
 
     $hasSocialLogin = $authCustomer
         ? \DB::table('customer_social_accounts')->where('customer_id', $authCustomer->id)->exists()
         : false;
 
-    $isMessengerOptional = $authCustomer
-        && ! empty($authCustomer->chatpion_subscribe_id)
-        && in_array(optional(core()->getCurrentChannel())->code, ['mmfood', 'kimono'], true);
+    $isMessengerOptional = $authCustomer && ! empty($authCustomer->chatpion_subscribe_id);
 
-    // Email optional when either social-login or messenger-on-target-channel.
+    // Email optional when social-login or messenger-onboarded.
     $emailOptional = $hasSocialLogin || $isMessengerOptional;
 
-    // Postcode optional only for messenger users on mmfood/kimono (social
-    // providers do not historically withhold postcode, so leave it alone).
-    $postcodeRequired = core()->isPostCodeRequired() && ! $isMessengerOptional;
+    // Phone/postcode relax: messenger customer (any channel) or guest on mmfood-like channel.
+    $channelRelaxes = $isMessengerOptional || $channelRelaxesByCode;
+
+    // Postcode required only when the channel does not relax it.
+    $postcodeRequired = core()->isPostCodeRequired() && ! $channelRelaxes;
 @endphp
 
 @pushOnce('styles')
@@ -97,7 +103,7 @@
 
             <!-- ── Email ── -->
             <div class="addr-field">
-                <label {{ $emailOptional ? '' : 'class="required"' }}>@lang('shop::app.checkout.onepage.address.email'){{ $emailOptional ? ' <span style="font-size:11px;color:#94a3b8;font-weight:400">(任意 / Optional)</span>' : '' }}</label>
+                <label {!! $emailOptional ? '' : 'class="required"' !!}>@lang('shop::app.checkout.onepage.address.email'){!! $emailOptional ? ' <span style="font-size:11px;color:#94a3b8;font-weight:400">(任意 / Optional)</span>' : '' !!}</label>
                 <x-shop::form.control-group.control
                     type="email"
                     ::name="controlName + '.email'"
@@ -124,7 +130,7 @@
             </div>
 
             <!-- ── Address ── -->
-            <p class="addr-section-title">@lang('shop::app.checkout.onepage.address.address')</p>
+            <p class="addr-section-title">@lang('shop::app.checkout.onepage.address.title')</p>
 
             <!-- Postcode → auto-fill -->
             <div class="addr-form-grid" style="align-items: start">

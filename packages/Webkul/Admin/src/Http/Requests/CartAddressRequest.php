@@ -3,6 +3,7 @@
 namespace Webkul\Admin\Http\Requests;
 
 use Illuminate\Foundation\Http\FormRequest;
+use Webkul\Checkout\Repositories\CartRepository;
 use Webkul\Core\Rules\PhoneNumber;
 use Webkul\Core\Rules\PostCode;
 
@@ -46,6 +47,11 @@ class CartAddressRequest extends FormRequest
      */
     private function mergeAddressRules(string $addressType)
     {
+        $channelRelaxes = $this->channelRelaxesAddressFields();
+
+        $postcodeRules = $channelRelaxes ? ['nullable', new PostCode] : ['required', new PostCode];
+        $phoneRules    = $channelRelaxes ? ['nullable', new PhoneNumber] : ['required', new PhoneNumber];
+
         $this->mergeWithRules([
             "{$addressType}.company_name" => ['nullable'],
             "{$addressType}.first_name" => ['required'],
@@ -55,9 +61,33 @@ class CartAddressRequest extends FormRequest
             "{$addressType}.city" => ['required'],
             "{$addressType}.country" => ['required'],
             "{$addressType}.state" => ['required'],
-            "{$addressType}.postcode" => ['required', new PostCode],
-            "{$addressType}.phone" => ['required', new PhoneNumber],
+            "{$addressType}.postcode" => $postcodeRules,
+            "{$addressType}.phone" => $phoneRules,
         ]);
+    }
+
+    /**
+     * mmfood/kimono storefronts accept Messenger-onboarded customers whose
+     * profiles lack a real postcode/phone, so admin order create/edit on
+     * those channels treats both fields as optional.
+     */
+    private function channelRelaxesAddressFields(): bool
+    {
+        $cartId = $this->route('id');
+        if (! $cartId) {
+            return false;
+        }
+
+        $cart = app(CartRepository::class)->find($cartId);
+        if (! $cart) {
+            return false;
+        }
+
+        return in_array(
+            optional($cart->channel)->code,
+            ['mmfood', 'kimono'],
+            true
+        );
     }
 
     /**

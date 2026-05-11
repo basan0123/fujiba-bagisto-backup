@@ -26,10 +26,13 @@ class AddressRequest extends FormRequest
      */
     public function rules()
     {
-        // Messenger-logged-in customers on mmfood/kimono can save addresses
-        // with a blank email and postcode. AddressController falls back to
-        // the stored customer email when needed.
-        $messengerOptional = $this->messengerFieldsAreOptional();
+        // Messenger-onboarded customers (chatpion_subscribe_id present) lack a
+        // real email/postcode/phone regardless of channel — on Fujiba the
+        // kimono channel is coded `default`, so a channel-name gate misses
+        // them. Drive the relax off the customer flag and keep the legacy
+        // channel list as a fallback for guest checkout on mmfood storefronts.
+        $messengerCustomer = $this->customerIsMessengerOnboarded();
+        $channelRelaxes = $messengerCustomer || $this->channelRelaxesAddressFields();
 
         return [
             'company_name' => ['nullable'],
@@ -39,23 +42,24 @@ class AddressRequest extends FormRequest
             'country' => core()->isCountryRequired() ? ['required'] : ['nullable'],
             'state' => core()->isStateRequired() ? ['required'] : ['nullable'],
             'city' => ['required', 'string'],
-            'postcode' => $messengerOptional
+            'postcode' => $channelRelaxes
                 ? ['nullable', new PostCode]
                 : (core()->isPostCodeRequired() ? ['required', new PostCode] : [new PostCode]),
-            'phone' => ['required', new PhoneNumber],
+            'phone' => $channelRelaxes ? ['nullable', new PhoneNumber] : ['required', new PhoneNumber],
             'vat_id' => [(new VatIdRule)->setCountry($this->input('country'))],
-            'email' => $messengerOptional ? ['nullable', 'email'] : ['required', 'email'],
+            'email' => $messengerCustomer ? ['nullable', 'email'] : ['required', 'email'],
         ];
     }
 
-    private function messengerFieldsAreOptional(): bool
+    private function customerIsMessengerOnboarded(): bool
     {
         $customer = auth()->guard('customer')->user();
 
-        if (! $customer || empty($customer->chatpion_subscribe_id)) {
-            return false;
-        }
+        return $customer && ! empty($customer->chatpion_subscribe_id);
+    }
 
+    private function channelRelaxesAddressFields(): bool
+    {
         return in_array(
             optional(core()->getCurrentChannel())->code,
             ['mmfood', 'kimono'],
