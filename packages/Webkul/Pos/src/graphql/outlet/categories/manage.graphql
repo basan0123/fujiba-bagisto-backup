@@ -1,0 +1,83 @@
+# outlet/categories/manage.graphql — manager+owner CRUD + drag-reorder.
+
+extend type Query @guard(with: ["pos_user"]) {
+    getOutletCategories(parentId: Int): [OutletCategory!]!
+        @field(resolver: "Webkul\\Pos\\Queries\\Outlet\\CategoryQuery@list")
+}
+
+extend type Mutation @guard(with: ["pos_user"]) {
+    createOutletCategory(
+        input: createOutletCategoryInput! @spread
+    ): outletCategoryMutationResult @field(resolver: "Webkul\\Pos\\Mutations\\Outlet\\CategoryMutation@create")
+
+    updateOutletCategory(
+        input: updateOutletCategoryInput! @spread
+    ): outletCategoryMutationResult @field(resolver: "Webkul\\Pos\\Mutations\\Outlet\\CategoryMutation@update")
+
+    deleteOutletCategory(
+        input: deleteOutletCategoryInput! @spread
+    ): outletCategoryDeleteResult @field(resolver: "Webkul\\Pos\\Mutations\\Outlet\\CategoryMutation@delete")
+
+    reorderOutletCategories(
+        input: reorderOutletCategoriesInput! @spread
+    ): outletCategoryReorderResult @field(resolver: "Webkul\\Pos\\Mutations\\Outlet\\CategoryMutation@reorder")
+}
+
+input createOutletCategoryInput {
+    name: String!
+    slug: String
+    description: String
+    parentId: Int
+    status: Boolean
+    position: Int
+}
+
+input updateOutletCategoryInput {
+    id: Int!
+    name: String
+    slug: String
+    description: String
+    parentId: Int
+    status: Boolean
+    position: Int
+}
+
+input deleteOutletCategoryInput {
+    id: Int!
+}
+
+input reorderOutletCategoriesInput {
+    items: [reorderItem!]!
+}
+
+input reorderItem {
+    id: Int!
+    position: Int!
+}
+
+type OutletCategory {
+    id: Int!
+    name: String!
+    slug: String
+    description: String
+    parentId: Int
+    status: Boolean!
+    position: Int!
+}
+
+type outletCategoryMutationResult {
+    success: Boolean!
+    message: String
+    category: OutletCategory
+}
+
+type outletCategoryDeleteResult {
+    success: Boolean!
+    message: String
+}
+
+type outletCategoryReorderResult {
+    success: Boolean!
+    message: String
+    count: Int
+}

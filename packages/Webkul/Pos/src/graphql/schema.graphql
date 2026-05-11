@@ -1,5 +1,6 @@
 #import outlet/agent/*.graphql
 #import outlet/cashier/*.graphql
+#import outlet/categories/*.graphql
 #import outlet/common/*.graphql
 #import outlet/customers/*.graphql
 #import outlet/home/*.graphql
