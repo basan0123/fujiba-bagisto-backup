@@ -1,0 +1,48 @@
+# outlet/orders/manage.graphql — refundOrder + voidOrder
+# (returnOrder lives in outlet/orders/orders.graphql).
+
+extend type Mutation @guard(with: ["pos_user"]) {
+    refundOrder(
+        input: refundOrderInput! @spread
+    ): refundOrderResult @field(resolver: "Webkul\\Pos\\Mutations\\Outlet\\RefundMutation@refund")
+
+    voidOrder(
+        input: voidOrderInput! @spread
+    ): voidOrderResult @field(resolver: "Webkul\\Pos\\Mutations\\Outlet\\RefundMutation@void")
+}
+
+input refundOrderInput {
+    orderId: Int!
+    amount: Float!
+    target: String!
+    reason: String!
+    note: String
+    items: [refundLineItem!]
+    idempotencyKey: String
+}
+
+input refundLineItem {
+    itemId: Int!
+    qty: Int!
+}
+
+input voidOrderInput {
+    orderId: Int!
+    reason: String!
+    note: String
+    idempotencyKey: String
+}
+
+type refundOrderResult {
+    success: Boolean!
+    message: String
+    auditRowId: Int
+    amount: Float
+    target: String
+}
+
+type voidOrderResult {
+    success: Boolean!
+    message: String
+    auditRowId: Int
+}
