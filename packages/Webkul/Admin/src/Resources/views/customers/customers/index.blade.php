@@ -158,6 +158,21 @@
                             </label>
                         @endif
 
+                        <template v-if="record.image_url">
+                            <img
+                                :src="record.image_url"
+                                :alt="record.full_name"
+                                class="h-10 w-10 shrink-0 rounded-full object-cover"
+                            />
+                        </template>
+                        <template v-else>
+                            <span
+                                class="flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-gray-200 text-sm font-semibold uppercase text-gray-700 dark:bg-gray-800 dark:text-gray-200"
+                            >
+                                @{{ (record.full_name || '?').trim().charAt(0) }}
+                            </span>
+                        </template>
+
                         <div class="flex flex-col gap-1.5">
                             <p class="text-base font-semibold text-gray-800 dark:text-white">
                                 @{{ record.full_name }}
@@ -169,6 +184,13 @@
 
                             <p class="text-gray-600 dark:text-gray-300">
                                 @{{ record.phone ?? 'N/A' }}
+                            </p>
+
+                            <p
+                                class="text-xs text-gray-500 dark:text-gray-400"
+                                v-if="record.last_cart_at"
+                            >
+                                Cart: @{{ record.last_cart_at }}
                             </p>
                         </div>
                     </div>
