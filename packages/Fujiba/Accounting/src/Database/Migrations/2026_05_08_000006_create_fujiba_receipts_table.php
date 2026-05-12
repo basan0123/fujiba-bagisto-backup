@@ -8,6 +8,10 @@ return new class extends Migration
 {
     public function up(): void
     {
+        if (Schema::hasTable('fujiba_receipts')) {
+            return;
+        }
+
         Schema::create('fujiba_receipts', function (Blueprint $table) {
             $table->id();
             $table->unsignedInteger('channel_id')->nullable();

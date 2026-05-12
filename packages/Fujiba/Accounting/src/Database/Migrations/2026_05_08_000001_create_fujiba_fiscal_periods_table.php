@@ -8,6 +8,10 @@ return new class extends Migration
 {
     public function up(): void
     {
+        if (Schema::hasTable('fujiba_fiscal_periods')) {
+            return;
+        }
+
         Schema::create('fujiba_fiscal_periods', function (Blueprint $table) {
             $table->id();
             $table->string('name', 32);

@@ -12,6 +12,10 @@ return new class extends Migration
      */
     public function up(): void
     {
+        if (Schema::hasTable('fujiba_invoice_registrants')) {
+            return;
+        }
+
         Schema::create('fujiba_invoice_registrants', function (Blueprint $table) {
             $table->string('t_number', 14)->primary();
             $table->string('name', 255);

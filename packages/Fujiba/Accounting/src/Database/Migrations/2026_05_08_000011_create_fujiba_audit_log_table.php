@@ -11,6 +11,10 @@ return new class extends Migration
      */
     public function up(): void
     {
+        if (Schema::hasTable('fujiba_audit_log')) {
+            return;
+        }
+
         Schema::create('fujiba_audit_log', function (Blueprint $table) {
             $table->bigIncrements('id');
             $table->string('table_name', 64);

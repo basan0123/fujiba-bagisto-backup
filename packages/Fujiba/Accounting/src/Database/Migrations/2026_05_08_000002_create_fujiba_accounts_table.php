@@ -8,6 +8,10 @@ return new class extends Migration
 {
     public function up(): void
     {
+        if (Schema::hasTable('fujiba_accounts')) {
+            return;
+        }
+
         Schema::create('fujiba_accounts', function (Blueprint $table) {
             $table->id();
             $table->string('code', 8)->unique();        // 4-digit (or extended) account code

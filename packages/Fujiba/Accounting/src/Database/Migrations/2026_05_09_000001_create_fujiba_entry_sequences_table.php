@@ -12,6 +12,10 @@ return new class extends Migration
      */
     public function up(): void
     {
+        if (Schema::hasTable('fujiba_entry_sequences')) {
+            return;
+        }
+
         Schema::create('fujiba_entry_sequences', function (Blueprint $table) {
             $table->char('year_month', 7)->primary();   // "2026-05"
             $table->unsignedInteger('last_seq')->default(0);

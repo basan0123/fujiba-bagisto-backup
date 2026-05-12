@@ -40,7 +40,10 @@ class AccountingServiceProvider extends ServiceProvider
 {
     public function boot(): void
     {
-        $this->loadMigrationsFrom(__DIR__ . '/../Database/Migrations');
+        if ($this->app->environment('testing')) {
+            $this->loadMigrationsFrom(__DIR__ . '/../Database/Migrations');
+        }
+
         $this->loadTranslationsFrom(__DIR__ . '/../Resources/lang', 'accounting');
         $this->loadViewsFrom(__DIR__ . '/../Resources/views', 'accounting');
         $this->loadRoutesFrom(__DIR__ . '/../Routes/admin.php');

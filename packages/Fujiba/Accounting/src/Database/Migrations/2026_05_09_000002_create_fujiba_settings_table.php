@@ -12,6 +12,10 @@ return new class extends Migration
      */
     public function up(): void
     {
+        if (Schema::hasTable('fujiba_settings')) {
+            return;
+        }
+
         Schema::create('fujiba_settings', function (Blueprint $table) {
             $table->string('key', 100)->primary();
             $table->text('value')->nullable();

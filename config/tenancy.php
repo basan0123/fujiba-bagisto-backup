@@ -52,6 +52,7 @@ return [
             'packages/Fujiba/AutoLogin/database/migrations',
             'packages/Fujiba/TikTokShop/database/migrations/tenant',
             'packages/Fujiba/FacebookCatalog/database/migrations/tenant',
+            'packages/Fujiba/Accounting/src/Database/Migrations',
         ],
         '--realpath' => true,
     ],

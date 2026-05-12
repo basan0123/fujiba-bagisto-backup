@@ -8,6 +8,10 @@ return new class extends Migration
 {
     public function up(): void
     {
+        if (Schema::hasTable('fujiba_tax_rates')) {
+            return;
+        }
+
         Schema::create('fujiba_tax_rates', function (Blueprint $table) {
             $table->id();
             $table->string('code', 64)->unique();       // e.g. consumption_standard, withholding_a

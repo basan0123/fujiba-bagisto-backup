@@ -22,10 +22,48 @@ class MigrationTest extends TestCase
             'fujiba_timecards',
             'fujiba_payroll_slips',
             'fujiba_audit_log',
+            'fujiba_entry_sequences',
+            'fujiba_settings',
         ];
 
         foreach ($tables as $table) {
             $this->assertTrue(Schema::hasTable($table), "Missing table: {$table}");
+        }
+    }
+
+    public function test_accounting_migrations_are_registered_in_tenancy_config(): void
+    {
+        $paths = config('tenancy.migration_parameters.--path', []);
+
+        $registered = collect($paths)->contains(
+            fn ($p) => str_contains($p, 'Fujiba/Accounting/src/Database/Migrations')
+        );
+
+        $this->assertTrue(
+            $registered,
+            'Accounting migration path must be listed in tenancy.migration_parameters.--path '.
+            'so tenants:migrate runs Accounting tables on every tenant DB. '.
+            'Without it admin/accounting throws 500 (see /admin/accounting 2026-05-11 incident).'
+        );
+    }
+
+    public function test_create_table_migrations_guard_with_has_table(): void
+    {
+        $createMigrations = glob(__DIR__.'/../../src/Database/Migrations/*_create_*.php');
+
+        $this->assertNotEmpty($createMigrations, 'No create_*.php migrations found');
+
+        foreach ($createMigrations as $file) {
+            $contents = file_get_contents($file);
+            $name = basename($file);
+
+            $this->assertMatchesRegularExpression(
+                '/Schema::hasTable\(\s*[\'"]fujiba_[a-z_]+[\'"]\s*\)/',
+                $contents,
+                "Migration {$name} must guard Schema::create with Schema::hasTable() ".
+                "to satisfy the project idempotency rule (feedback_migration_idempotency.md). ".
+                "Without the guard, re-running tenants:migrate on a partially-migrated tenant crashes."
+            );
         }
     }
 
