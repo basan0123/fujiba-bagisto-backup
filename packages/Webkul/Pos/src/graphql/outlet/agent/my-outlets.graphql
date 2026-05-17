@@ -1,0 +1,14 @@
+#outlet/agent/my-outlets.graphql
+#
+# Returns every outlet in the current tenant. Used by the in-app
+# StoreSwitcher to render a picker without the cashier hard-coding
+# email addresses.
+#
+# Authorization: pos_user guard — any authenticated cashier can list
+# outlets (UI only needs to know what exists). The actual cross-outlet
+# data isolation is enforced per query (pos_outlet_product, etc).
+
+extend type Query @guard(with: ["pos_user"]) {
+    getMyOutlets: [Outlet!]!
+        @field(resolver: "Webkul\\Pos\\Queries\\Agent\\OutletsQuery@list")
+}
