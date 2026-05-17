@@ -1,0 +1,37 @@
+#outlet/imports/manage.graphql — synchronous CSV imports.
+#
+# The client sends `csvText` as a plain string (base64-encoded uploads
+# can land in a future polish via the @upload directive). The server
+# parses inline and returns a per-row result set so the cashier sees
+# exactly which rows failed and why. No background-job dependency —
+# Bagisto's queue isn't reliably tenant-aware.
+
+extend type Mutation @guard(with: ["pos_user"]) {
+    importCustomersFromCsv(
+        input: csvImportInput! @spread
+    ): csvImportResult @field(resolver: "Webkul\\Pos\\Mutations\\Outlet\\CsvImportMutation@customers")
+
+    importStockFromCsv(
+        input: csvImportInput! @spread
+    ): csvImportResult @field(resolver: "Webkul\\Pos\\Mutations\\Outlet\\CsvImportMutation@stock")
+}
+
+input csvImportInput {
+    csvText: String!
+    dryRun: Boolean
+}
+
+type csvImportResult {
+    success: Boolean!
+    message: String
+    totalRows: Int!
+    successCount: Int!
+    failureCount: Int!
+    skippedCount: Int!
+    errors: [csvImportRowError!]!
+}
+
+type csvImportRowError {
+    row: Int!
+    message: String!
+}
