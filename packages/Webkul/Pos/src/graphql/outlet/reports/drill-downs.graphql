@@ -1,0 +1,76 @@
+#outlet/reports/drill-downs.graphql — five aggregation queries used
+# by the Reports drill-down screens. All take an optional date range
+# (default: last 30 days inclusive) and scope to the current outlet
+# via the pos_order join.
+
+extend type Query @guard(with: ["pos_user"]) {
+    getSaleReportByProduct(
+        first: Int,
+        page: Int,
+        dateFrom: String,
+        dateTo: String
+    ): ReportByProductResponse @field(resolver: "Webkul\\Pos\\Queries\\Reports\\DrillDownQuery@byProduct")
+
+    getSaleReportByCashier(
+        dateFrom: String,
+        dateTo: String
+    ): [ReportByCashierRow!]! @field(resolver: "Webkul\\Pos\\Queries\\Reports\\DrillDownQuery@byCashier")
+
+    getPaymentBreakdown(
+        dateFrom: String,
+        dateTo: String
+    ): [ReportByPaymentRow!]! @field(resolver: "Webkul\\Pos\\Queries\\Reports\\DrillDownQuery@byPayment")
+
+    getTaxReport(
+        dateFrom: String,
+        dateTo: String
+    ): [ReportByTaxRow!]! @field(resolver: "Webkul\\Pos\\Queries\\Reports\\DrillDownQuery@byTax")
+
+    getDateRangeReport(
+        dateFrom: String!,
+        dateTo: String!
+    ): [ReportByDayRow!]! @field(resolver: "Webkul\\Pos\\Queries\\Reports\\DrillDownQuery@byDay")
+}
+
+type ReportByProductResponse {
+    paginatorInfo: PaginatorInfo!
+    data: [ReportByProductRow!]!
+}
+
+type ReportByProductRow {
+    productId: Int!
+    sku: String
+    name: String
+    qty: Int!
+    revenue: Float!
+    orderCount: Int!
+}
+
+type ReportByCashierRow {
+    posUserId: Int!
+    posUserName: String!
+    orderCount: Int!
+    revenue: Float!
+    avgTicket: Float!
+}
+
+type ReportByPaymentRow {
+    method: String!
+    title: String!
+    orderCount: Int!
+    revenue: Float!
+}
+
+type ReportByTaxRow {
+    ratePercent: Float!
+    baseAmount: Float!
+    taxAmount: Float!
+}
+
+type ReportByDayRow {
+    date: String!
+    orderCount: Int!
+    revenue: Float!
+    cashAmount: Float!
+    otherAmount: Float!
+}
