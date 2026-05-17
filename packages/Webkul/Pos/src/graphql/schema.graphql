@@ -1,4 +1,5 @@
 #import outlet/agent/*.graphql
+#import outlet/audit/*.graphql
 #import outlet/cashier/*.graphql
 #import outlet/categories/*.graphql
 #import outlet/common/*.graphql

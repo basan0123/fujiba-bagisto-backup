@@ -1,0 +1,33 @@
+#outlet/audit/manage.graphql — unified read view across the existing
+# per-action log tables (pos_refund_log + pos_customer_credit_log +
+# pos_stock_movement_log). No new schema; the resolver UNIONs the
+# three sources into a common shape for the StaffActivity screen.
+
+extend type Query @guard(with: ["pos_user"]) {
+    getAuditLog(
+        first: Int!,
+        page: Int!,
+        posUserId: Int,
+        action: String,
+        dateFrom: String,
+        dateTo: String
+    ): AuditLogResponse @field(resolver: "Webkul\\Pos\\Queries\\Audit\\AuditLogQuery@list")
+}
+
+type AuditLogResponse {
+    paginatorInfo: PaginatorInfo!
+    data: [AuditLogEntry!]!
+}
+
+type AuditLogEntry {
+    # Synthetic id — table prefix + row id; not stable for joins. UI key only.
+    id: String!
+    entityType: String!
+    entityId: Int!
+    posUserId: Int!
+    posUserName: String
+    action: String!
+    summary: String!
+    amount: Float
+    createdAt: String!
+}

@@ -1,0 +1,36 @@
+#outlet/stock/movements.graphql — read view over pos_stock_movement_log.
+
+extend type Query @guard(with: ["pos_user"]) {
+    getStockMovements(
+        first: Int!,
+        page: Int!,
+        productId: Int,
+        action: String,
+        dateFrom: String,
+        dateTo: String
+    ): StockMovementsResponse @field(resolver: "Webkul\\Pos\\Queries\\Stock\\StockMovementsQuery@list")
+}
+
+type StockMovementsResponse {
+    paginatorInfo: PaginatorInfo!
+    data: [StockMovementEntry!]!
+}
+
+type StockMovementEntry {
+    id: Int!
+    posUserId: Int!
+    posUserName: String
+    productId: Int!
+    productName: String
+    productSku: String
+    inventorySourceId: Int!
+    action: String!
+    qtyBefore: Float
+    qtyDelta: Float!
+    qtyAfter: Float
+    reason: String
+    note: String
+    toInventorySourceId: Int
+    idempotencyKey: String
+    createdAt: String!
+}
