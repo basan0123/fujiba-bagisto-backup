@@ -10,3 +10,4 @@
 #import outlet/reports/*.graphql
 #import outlet/staff/*.graphql
 #import outlet/stock/*.graphql
+#import outlet/tables/*.graphql

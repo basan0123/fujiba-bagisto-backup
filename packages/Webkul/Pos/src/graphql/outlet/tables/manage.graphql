@@ -1,0 +1,74 @@
+#outlet/tables/manage.graphql — restaurant floor plan CRUD.
+# Scope: every query / mutation scopes to the current pos_user's
+# outlet_id; cross-outlet table access is rejected server-side.
+
+extend type Query @guard(with: ["pos_user"]) {
+    getOutletTables: [PosTable!]!
+        @field(resolver: "Webkul\\Pos\\Queries\\Tables\\TablesQuery@list")
+
+    getOutletTable(id: Int!): PosTable
+        @field(resolver: "Webkul\\Pos\\Queries\\Tables\\TablesQuery@get")
+}
+
+extend type Mutation @guard(with: ["pos_user"]) {
+    createOutletTable(
+        input: createPosTableInput! @spread
+    ): posTableResult @field(resolver: "Webkul\\Pos\\Mutations\\Outlet\\TableMutation@create")
+
+    updateOutletTable(
+        input: updatePosTableInput! @spread
+    ): posTableResult @field(resolver: "Webkul\\Pos\\Mutations\\Outlet\\TableMutation@update")
+
+    deleteOutletTable(
+        input: deletePosTableInput! @spread
+    ): posTableResult @field(resolver: "Webkul\\Pos\\Mutations\\Outlet\\TableMutation@delete")
+
+    setPosTableStatus(
+        input: setPosTableStatusInput! @spread
+    ): posTableResult @field(resolver: "Webkul\\Pos\\Mutations\\Outlet\\TableMutation@setStatus")
+}
+
+input createPosTableInput {
+    label: String!
+    seatCount: Int
+    positionX: Int
+    positionY: Int
+    status: String
+    note: String
+}
+
+input updatePosTableInput {
+    id: Int!
+    label: String
+    seatCount: Int
+    positionX: Int
+    positionY: Int
+    status: String
+    note: String
+}
+
+input deletePosTableInput { id: Int! }
+
+input setPosTableStatusInput {
+    id: Int!
+    status: String!
+}
+
+type PosTable {
+    id: Int!
+    outletId: Int!
+    label: String!
+    seatCount: Int!
+    positionX: Int!
+    positionY: Int!
+    status: String!
+    note: String
+    createdAt: String!
+    updatedAt: String!
+}
+
+type posTableResult {
+    success: Boolean!
+    message: String
+    table: PosTable
+}
