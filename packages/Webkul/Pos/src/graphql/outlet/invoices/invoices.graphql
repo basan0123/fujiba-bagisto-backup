@@ -1,0 +1,132 @@
+#outlet\invoices — qualified-invoice (適格請求書) APIs for POS
+extend type Query @guard(with: ["pos_user"]) {
+    getQualifiedInvoices(
+        first: Int,
+        page: Int,
+        filter: String,
+        orderId: Int
+    ): [QualifiedInvoice!] @paginate(
+        type: "PAGINATOR",
+        builder: "Webkul\\Pos\\Queries\\Invoice\\InvoiceQuery@listInvoices",
+        defaultCount: 25
+    )
+
+    getQualifiedInvoice(id: ID!): QualifiedInvoice
+        @field(resolver: "Webkul\\Pos\\Queries\\Invoice\\InvoiceQuery@getInvoice")
+
+    # Orders with items still to invoice — powers the "+ create invoice"
+    # picker. Returns a flat list (no pagination — capped at limit) so
+    # the picker can render instantly.
+    getInvoiceableOrders(limit: Int): [InvoiceableOrder!]!
+        @field(resolver: "Webkul\\Pos\\Queries\\Invoice\\InvoiceQuery@listInvoiceableOrders")
+}
+
+extend type Mutation @guard(with: ["pos_user"]) {
+    sendQualifiedInvoiceEmail(
+        invoiceId: ID!,
+        toEmail: String
+    ): QualifiedInvoiceActionResult
+        @field(resolver: "Webkul\\Pos\\Mutations\\Outlet\\InvoiceMutation@sendEmail")
+
+    generateQualifiedInvoicePdf(
+        invoiceId: ID!
+    ): QualifiedInvoiceActionResult
+        @field(resolver: "Webkul\\Pos\\Mutations\\Outlet\\InvoiceMutation@generatePdf")
+
+    # Create a new invoice from an order. Cashier+ gated. Invoices every
+    # remaining qty_to_invoice line. Refuses if there's nothing left.
+    generateInvoice(orderId: Int!): generateInvoiceResult
+        @field(resolver: "Webkul\\Pos\\Mutations\\Outlet\\InvoiceMutation@generate")
+
+    # paid / pending / refunded. Cashier+ for paid/pending, manager+ for refunded.
+    setOrderPaymentStatus(orderId: Int!, status: String!): orderStatusResult
+        @field(resolver: "Webkul\\Pos\\Mutations\\Outlet\\InvoiceMutation@setPaymentStatus")
+
+    # pending / shipped / delivered. Cashier+ for all.
+    setOrderShippingStatus(orderId: Int!, status: String!): orderStatusResult
+        @field(resolver: "Webkul\\Pos\\Mutations\\Outlet\\InvoiceMutation@setShippingStatus")
+}
+
+type InvoiceableOrder {
+    id: Int!
+    incrementId: String
+    grandTotal: Float!
+    status: String
+    createdAt: String
+    customerName: String
+    customerEmail: String
+    qtyToInvoice: Int!
+}
+
+type generateInvoiceResult {
+    success: Boolean!
+    message: String
+    invoiceId: Int
+}
+
+type orderStatusResult {
+    success: Boolean!
+    message: String
+    orderId: Int
+    status: String
+}
+
+type QualifiedInvoice {
+    id: ID!
+    incrementId: String
+    orderId: Int
+    orderIncrementId: String
+    state: String
+    # Coarse status derived server-side for the native status controls.
+    paymentStatus: String   # 'paid' | 'pending' | 'refunded'
+    shippingStatus: String  # 'pending' | 'shipped' | 'delivered'
+    emailSent: Boolean
+    createdAt: String
+    grandTotal: Float
+    subTotal: Float
+    taxAmount: Float
+    shippingAmount: Float
+    discountAmount: Float
+    currencyCode: String
+
+    # Issuer (read from core_config_data + outlet)
+    issuerName: String
+    issuerAddress: String
+    issuerPhone: String
+    issuerRegistrationNumber: String
+
+    # Recipient (from order's customer + billing address)
+    recipientName: String
+    recipientEmail: String
+    recipientPhone: String
+    recipientAddress: String
+
+    items: [QualifiedInvoiceItem!]
+    taxBreakdown: [QualifiedInvoiceTaxLine!]
+}
+
+type QualifiedInvoiceItem {
+    id: ID!
+    sku: String
+    name: String
+    qty: Int
+    price: Float
+    taxPercent: Float
+    taxAmount: Float
+    total: Float
+    totalInclTax: Float
+}
+
+# Grouped tax breakdown — required by Japan 適格請求書 (qualified invoice) rules.
+# One row per distinct tax rate present in the invoice.
+type QualifiedInvoiceTaxLine {
+    ratePercent: Float
+    baseAmount: Float
+    taxAmount: Float
+}
+
+type QualifiedInvoiceActionResult {
+    success: Boolean!
+    message: String
+    pdfUrl: String
+}
