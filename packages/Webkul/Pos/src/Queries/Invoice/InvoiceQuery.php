@@ -44,6 +44,13 @@ class InvoiceQuery extends Controller
      * filter.allOutlets=true.
      *
      * Filters (all optional):
+     *   source      : invoice | pos | all
+     *                 - 'invoice' (DEFAULT): only invoice-builder invoices
+     *                   (order payment method = pos_invoice). This keeps the
+     *                   invoice list separate from normal POS sales — a POS
+     *                   cash sale auto-invoices but must NOT show here.
+     *                 - 'pos': only real POS sales (pos_cash/pos_card/pos_split).
+     *                 - 'all': both (for a combined view).
      *   status      : draft | created | shipped  (document status, via orders.status)
      *   payment     : unpaid | partial | paid     (derived from invoices.amount_paid)
      *   dateFrom/To : ISO date strings, on invoices.created_at
@@ -62,6 +69,23 @@ class InvoiceQuery extends Controller
             $qb->where(function ($w) use ($channelId, $outletId) {
                 $w->where('orders.channel_id', $channelId)
                   ->orWhere('pos_order.outlet_id', $outletId);
+            });
+        }
+
+        // Source separation: invoice-builder invoices vs POS sales. Resolved
+        // from the order's payment method (order_payment.method). Default
+        // 'invoice' so the invoice screen never shows POS cash-sale receipts.
+        $source = $input['source'] ?? 'invoice';
+        if ($source !== 'all') {
+            $qb->whereExists(function ($q) use ($source) {
+                $q->select(DB::raw(1))
+                  ->from('order_payment')
+                  ->whereColumn('order_payment.order_id', 'orders.id');
+                if ($source === 'pos') {
+                    $q->whereIn('order_payment.method', ['pos_cash', 'pos_card', 'pos_split']);
+                } else { // 'invoice'
+                    $q->where('order_payment.method', 'pos_invoice');
+                }
             });
         }
 

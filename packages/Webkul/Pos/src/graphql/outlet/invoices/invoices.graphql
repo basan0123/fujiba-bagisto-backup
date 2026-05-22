@@ -3,6 +3,9 @@ extend type Query @guard(with: ["pos_user"]) {
     getQualifiedInvoices(
         first: Int,
         page: Int,
+        # source: invoice (default) | pos | all — keeps invoice-builder
+        # invoices separate from normal POS cash-sale receipts.
+        source: String,
         # legacy: paid|pending — still honoured (maps to payment filter)
         filter: String,
         # document status: draft | created | shipped
@@ -37,6 +40,7 @@ extend type Query @guard(with: ["pos_user"]) {
 }
 
 input InvoiceFilterInput {
+    source: String
     status: String
     payment: String
     dateFrom: String
