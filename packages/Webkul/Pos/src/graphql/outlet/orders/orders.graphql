@@ -8,6 +8,10 @@ extend type Query @guard(with: ["pos_user"]) {
         builder: "Webkul\\Pos\\Queries\\Order\\OrderQuery@getOrders",
         defaultCount: 10
     )
+
+    # Single order by sales order id (outlet-scoped). Powers OrderDetail.
+    getOrder(id: Int!): OutletOrder
+        @field(resolver: "Webkul\\Pos\\Queries\\Order\\OrderQuery@getOrder")
 }
 
 extend type Mutation @guard(with: ["pos_user"]) {

@@ -34,4 +34,27 @@ class OrderQuery extends Controller
             })
             ->orderBy('pos_order.created_at');
     }
+
+    /**
+     * Single order (POS sale OR invoice-builder order) by its sales order id,
+     * scoped to the cashier's outlet. Powers the OrderDetail screen — replaces
+     * the old "fetch a wide page and find-by-id on the client" approach that
+     * 404'd whenever the order fell outside the fetched page.
+     *
+     * Unlike the list, this does NOT filter by payment method: the detail view
+     * is reachable from both the POS sale history and (for reprint/領収書) any
+     * order belonging to the outlet, so we resolve by id + outlet only.
+     */
+    public function getOrder($root, array $args, GraphQLContext $context)
+    {
+        $orderId = (int) ($args['id'] ?? 0);
+        if (! $orderId) {
+            return null;
+        }
+
+        return $this->orderRepository->query()
+            ->where('pos_order.outlet_id', $context->user()->outlet_id)
+            ->where('pos_order.order_id', $orderId)
+            ->first();
+    }
 }

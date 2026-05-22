@@ -8,4 +8,10 @@ extend type Query @guard(with: ["pos_user"]) {
         defaultCount: 10,
         model: "Webkul\\Customer\\Models\\Customer"
     )
+
+    # Single customer by id. Powers CustomerDetail — replaces the old
+    # fetch-a-page-and-find-by-id-client-side approach that 404'd when the
+    # customer fell outside the fetched page. @find resolves one model by id.
+    getCustomer(id: ID! @eq): Customer
+        @find(model: "Webkul\\Customer\\Models\\Customer")
 }
