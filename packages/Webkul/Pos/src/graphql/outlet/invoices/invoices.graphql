@@ -3,7 +3,17 @@ extend type Query @guard(with: ["pos_user"]) {
     getQualifiedInvoices(
         first: Int,
         page: Int,
+        # legacy: paid|pending — still honoured (maps to payment filter)
         filter: String,
+        # document status: draft | created | shipped
+        status: String,
+        # payment status: unpaid | partial | paid
+        payment: String,
+        dateFrom: String,
+        dateTo: String,
+        customer: String,
+        # owner-only: include every outlet's invoices
+        allOutlets: Boolean,
         orderId: Int
     ): [QualifiedInvoice!] @paginate(
         type: "PAGINATOR",
@@ -14,11 +24,52 @@ extend type Query @guard(with: ["pos_user"]) {
     getQualifiedInvoice(id: ID!): QualifiedInvoice
         @field(resolver: "Webkul\\Pos\\Queries\\Invoice\\InvoiceQuery@getInvoice")
 
+    # Summary numbers (counts per bucket, revenue, profit) for the same
+    # filter the list uses. profit/cost are null for cashiers.
+    getInvoiceStats(filter: InvoiceFilterInput): InvoiceStats
+        @field(resolver: "Webkul\\Pos\\Queries\\Invoice\\InvoiceQuery@getStats")
+
     # Orders with items still to invoice — powers the "+ create invoice"
     # picker. Returns a flat list (no pagination — capped at limit) so
     # the picker can render instantly.
     getInvoiceableOrders(limit: Int): [InvoiceableOrder!]!
         @field(resolver: "Webkul\\Pos\\Queries\\Invoice\\InvoiceQuery@listInvoiceableOrders")
+}
+
+input InvoiceFilterInput {
+    status: String
+    payment: String
+    dateFrom: String
+    dateTo: String
+    customer: String
+    allOutlets: Boolean
+    orderId: Int
+}
+
+input InvoiceDraftItemInput {
+    product_id: Int!
+    quantity: Int!
+    custom_price: Float
+    selected_configurable_option: Int
+    additional: String
+}
+
+type InvoiceStatBucket {
+    key: String!
+    count: Int!
+}
+
+type InvoiceStats {
+    totalCount: Int!
+    revenue: Float!
+    collected: Float!
+    outstanding: Float!
+    # null for cashiers (margin is owner/manager-only).
+    profit: Float
+    cost: Float
+    canSeeProfit: Boolean!
+    statusCounts: [InvoiceStatBucket!]!
+    paymentCounts: [InvoiceStatBucket!]!
 }
 
 extend type Mutation @guard(with: ["pos_user"]) {
@@ -45,6 +96,48 @@ extend type Mutation @guard(with: ["pos_user"]) {
     # pending / shipped / delivered. Cashier+ for all.
     setOrderShippingStatus(orderId: Int!, status: String!): orderStatusResult
         @field(resolver: "Webkul\\Pos\\Mutations\\Outlet\\InvoiceMutation@setShippingStatus")
+
+    # Standalone invoice builder: create a DRAFT order (no invoice/shipment).
+    # generateInvoice advances draft→created; setOrderShippingStatus→shipped.
+    createInvoiceDraft(
+        idempotency_key: String,
+        customer_id: Int,
+        customer_first_name: String,
+        customer_last_name: String,
+        customer_email: String,
+        customer_phone: String,
+        order_discount_amount: Float,
+        order_discount_reason: String,
+        note: String,
+        items: [InvoiceDraftItemInput!]!
+    ): invoiceDraftResult
+        @field(resolver: "Webkul\\Pos\\Mutations\\Outlet\\InvoiceBuilderMutation@createDraft")
+
+    # Record a (part-)payment. Derives unpaid/partial/paid and stamps paid_at
+    # when fully settled. Cashier+.
+    addInvoicePayment(
+        invoiceId: ID!,
+        amount: Float!,
+        method: String,
+        reference: String,
+        note: String
+    ): invoicePaymentResult
+        @field(resolver: "Webkul\\Pos\\Mutations\\Outlet\\InvoiceMutation@addPayment")
+}
+
+type invoiceDraftResult {
+    success: Boolean!
+    message: String
+    orderId: Int
+    invoiceId: Int
+}
+
+type invoicePaymentResult {
+    success: Boolean!
+    message: String
+    invoiceId: Int
+    amountPaid: Float
+    paymentStatus: String
 }
 
 type InvoiceableOrder {
@@ -78,8 +171,12 @@ type QualifiedInvoice {
     orderIncrementId: String
     state: String
     # Coarse status derived server-side for the native status controls.
-    paymentStatus: String   # 'paid' | 'pending' | 'refunded'
+    paymentStatus: String   # 'unpaid' | 'partial' | 'paid' | 'refunded'
+    documentStatus: String  # 'draft' | 'created' | 'shipped'
     shippingStatus: String  # 'pending' | 'shipped' | 'delivered'
+    amountPaid: Float
+    outstanding: Float
+    payments: [InvoicePayment!]
     emailSent: Boolean
     createdAt: String
     grandTotal: Float
@@ -103,6 +200,15 @@ type QualifiedInvoice {
 
     items: [QualifiedInvoiceItem!]
     taxBreakdown: [QualifiedInvoiceTaxLine!]
+}
+
+type InvoicePayment {
+    id: ID!
+    amount: Float!
+    method: String
+    reference: String
+    note: String
+    paidAt: String
 }
 
 type QualifiedInvoiceItem {

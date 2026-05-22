@@ -8,6 +8,13 @@ return [
         'overdue'  => '期限超過',
         'loading'  => '読み込み中…',
     ],
+    'reporting' => [
+        'products' => [
+            'waste'            => '廃棄',
+            'current-stock'    => '現在在庫',
+            'forecast-next-2m' => '今後2ヶ月予測',
+        ],
+    ],
     'chat' => [
         'title'         => '会話',
         'refresh'       => '再読み込み',

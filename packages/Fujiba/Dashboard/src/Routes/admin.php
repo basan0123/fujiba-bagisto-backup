@@ -7,6 +7,8 @@ use Fujiba\Dashboard\Http\Controllers\Admin\InventoryValueController;
 use Fujiba\Dashboard\Http\Controllers\Admin\OrdersByRegionController;
 use Fujiba\Dashboard\Http\Controllers\Admin\PaymentMethodsController;
 use Fujiba\Dashboard\Http\Controllers\Admin\SalesByStateController;
+use Fujiba\Dashboard\Http\Controllers\Admin\ShippingCostImportController;
+use Fujiba\Dashboard\Http\Controllers\Admin\ShippingPerformanceController;
 use Fujiba\Dashboard\Http\Controllers\Admin\SubscribersController;
 use Illuminate\Support\Facades\Route;
 
@@ -44,4 +46,17 @@ Route::middleware(['web', 'admin', 'auth:admin'])
 
         Route::get('subscribers', [SubscribersController::class, 'index'])
             ->name('subscribers');
+
+        Route::get('shipping-performance', [ShippingPerformanceController::class, 'index'])
+            ->name('shipping_performance');
+
+        Route::get('shipping-costs', [ShippingCostImportController::class, 'index'])
+            ->name('shipping_costs.index');
+
+        Route::post('shipping-costs/import', [ShippingCostImportController::class, 'import'])
+            ->name('shipping_costs.import');
+
+        Route::post('shipping-costs/order/{order}', [ShippingCostImportController::class, 'upsertManual'])
+            ->whereNumber('order')
+            ->name('shipping_costs.manual');
     });

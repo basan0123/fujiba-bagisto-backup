@@ -4,8 +4,11 @@ namespace Fujiba\OrdersAdmin\Http\Controllers;
 
 use Illuminate\Http\JsonResponse;
 use Illuminate\Routing\Controller;
+use Illuminate\Support\Carbon;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
+use Illuminate\Support\Facades\Schema;
+use Webkul\Sales\Models\Invoice;
 use Webkul\Sales\Models\Order;
 use Webkul\Sales\Repositories\OrderRepository;
 use Webkul\Sales\Repositories\ShipmentRepository;
@@ -41,10 +44,54 @@ class OrderLabelPrintedController extends Controller
 
         $order->update(['fujiba_label_printed' => 1]);
 
+        // COD = courier collects cash on delivery, so flipping label_printed
+        // is also the moment payment is confirmed. Stamp payment_confirmed_at
+        // and flip the invoice to paid atomically — see
+        // feedback_cod_listener_transaction_wrap.md.
+        $this->autoConfirmCodPayment($order);
+
         return response()->json([
             'message' => 'Label marked as printed.',
             'data'    => ['label_printed' => true],
         ]);
+    }
+
+    /**
+     * For COD orders, flip the pending invoice to paid and stamp the order's
+     * payment_confirmed_at — in one transaction so the two sides can't drift.
+     * Idempotent: re-runs are no-ops once invoice.state is already paid.
+     */
+    protected function autoConfirmCodPayment(Order $order): void
+    {
+        $method = optional($order->payment)->method;
+        if ($method !== 'cashondelivery') {
+            return;
+        }
+
+        DB::transaction(function () use ($order) {
+            $now = Carbon::now();
+
+            if (Schema::hasColumn('orders', 'payment_confirmed_at')
+                && ! $order->payment_confirmed_at
+            ) {
+                $payload = ['payment_confirmed_at' => $now];
+
+                // Mirror onto paid_at for dashboard Payments mode; don't
+                // overwrite an existing ChatPion-sourced value.
+                if (Schema::hasColumn('orders', 'paid_at') && ! $order->paid_at) {
+                    $payload['paid_at'] = $now;
+                }
+
+                $order->update($payload);
+            }
+
+            Invoice::where('order_id', $order->id)
+                ->where('state', '!=', Invoice::STATUS_PAID)
+                ->update([
+                    'state'      => Invoice::STATUS_PAID,
+                    'updated_at' => $now,
+                ]);
+        });
     }
 
     /**

@@ -13,7 +13,7 @@ return [
         'title'     => '発注サポート',
         'channel'   => 'チャネル',
         'lead-time' => 'リードタイム',
-        'window'    => '売上集計期間',
+        'window'    => '提案集計期間',
     ],
     'ui' => [
         'search-ph'       => '商品名・SKUで検索',
@@ -24,7 +24,7 @@ return [
         'stock'           => '在庫',
         'buy-at'          => '最終仕入れ',
         'cost'            => '原価',
-        'sale'            => '販売数',
+        'sale'            => '販売数（累計）',
         'waste'           => '廃棄',
         'suggested'       => '推奨発注数',
         'wish-qty'        => '希望発注数',

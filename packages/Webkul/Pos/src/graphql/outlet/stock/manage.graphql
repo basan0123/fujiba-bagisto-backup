@@ -1,6 +1,12 @@
 # outlet/stock/manage.graphql — adjust + transfer (waste already lives
 # in outlet/cashier/waste.graphql).
 
+extend type Query @guard(with: ["pos_user"]) {
+    # Global "allow sale when out of stock" flag
+    # (catalog.inventory.stock_options.back_orders).
+    getBackOrders: backOrdersResult @field(resolver: "Webkul\\Pos\\Mutations\\Outlet\\StockMutation@getBackOrders")
+}
+
 extend type Mutation @guard(with: ["pos_user"]) {
     stockAdjust(
         input: stockAdjustInput! @spread
@@ -9,6 +15,17 @@ extend type Mutation @guard(with: ["pos_user"]) {
     stockTransfer(
         input: stockTransferInput! @spread
     ): stockTransferResult @field(resolver: "Webkul\\Pos\\Mutations\\Outlet\\StockMutation@transfer")
+
+    # Toggle the global out-of-stock-sale flag. Manager-only.
+    setBackOrders(
+        enabled: Boolean!
+    ): backOrdersResult @field(resolver: "Webkul\\Pos\\Mutations\\Outlet\\StockMutation@setBackOrders")
+}
+
+type backOrdersResult {
+    success: Boolean!
+    enabled: Boolean!
+    message: String
 }
 
 input stockAdjustInput {

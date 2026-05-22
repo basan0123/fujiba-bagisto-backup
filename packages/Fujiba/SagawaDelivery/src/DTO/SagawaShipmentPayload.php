@@ -30,8 +30,10 @@ final class SagawaShipmentPayload
         public readonly string $iraiTel,
         public readonly ?string $shiteiDate,      // yyyyMMdd or null
         public readonly ?string $shiteiTimeCode,  // am/12/14/16/18/19 or null
-        public readonly ?string $daibikiKng = null, // COD amount in JPY (string of integer); null = prepaid
-        public readonly ?string $daibikiNm  = null, // COD payee name; null = prepaid
+        public readonly string  $daibikiFlg = '0',  // '0' prepaid | '1' COD (代金引換)
+        public readonly ?string $daibikiKng = null, // 代引金額 incl. tax, JPY integer; required when daibikiFlg=1
+        public readonly ?string $daibikiTax = null, // 代引消費税 (tax portion of daibikiKng); required when daibikiFlg=1
+        public readonly ?string $daibikiType = null, // 0 どちらでも | 1 現金 | 2 カード | null system default
         public readonly array  $meta = [],
     ) {}
 
@@ -57,8 +59,10 @@ final class SagawaShipmentPayload
             'iraiTel'          => $this->iraiTel,
             'shiteiDate'       => $this->shiteiDate,
             'shiteiTimeCode'   => $this->shiteiTimeCode,
+            'daibikiFlg'       => $this->daibikiFlg,
             'daibikiKng'       => $this->daibikiKng,
-            'daibikiNm'        => $this->daibikiNm,
+            'daibikiTax'       => $this->daibikiTax,
+            'daibikiType'      => $this->daibikiType,
             'meta'             => $this->meta,
         ];
     }

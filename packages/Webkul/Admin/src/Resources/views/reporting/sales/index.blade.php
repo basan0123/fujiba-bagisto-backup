@@ -113,6 +113,25 @@
                         placeholder="@lang('admin::app.reporting.sales.index.end-date')"
                     />
                 </x-admin::flat-picker.date>
+
+                <div class="inline-flex rounded-md border bg-white dark:border-gray-800 dark:bg-gray-900" role="group">
+                    <button
+                        type="button"
+                        @click="filters.mode = 'orders'"
+                        ::class="filters.mode === 'orders' ? 'bg-blue-600 text-white' : 'text-gray-600 dark:text-gray-300'"
+                        class="px-3 py-1.5 text-sm rounded-l-md transition-all hover:bg-gray-100 dark:hover:bg-gray-800"
+                    >
+                        Orders
+                    </button>
+                    <button
+                        type="button"
+                        @click="filters.mode = 'payments'"
+                        ::class="filters.mode === 'payments' ? 'bg-blue-600 text-white' : 'text-gray-600 dark:text-gray-300'"
+                        class="px-3 py-1.5 text-sm rounded-r-md transition-all hover:bg-gray-100 dark:hover:bg-gray-800"
+                    >
+                        Payments
+                    </button>
+                </div>
             </div>
         </script>
 
@@ -122,11 +141,17 @@
 
                 data() {
                     const KEY = 'fujiba_global_filters:' + window.location.host;
+                    // Per-session login fingerprint — see v-dashboard-filters. A
+                    // mismatch means a fresh login → reset the date range to the
+                    // server default; channel + mode survive across sessions.
+                    const SESS_KEY = KEY + ':session';
+                    const SESS_ID  = @json(session()->getId());
                     const ISO = /^\d{4}-\d{2}-\d{2}$/;
                     const defaults = {
                         channel: '',
                         start: "{{ $startDate->format('Y-m-d') }}",
                         end: "{{ $endDate->format('Y-m-d') }}",
+                        mode: 'orders',
                     };
 
                     let saved = {};
@@ -135,12 +160,25 @@
                         if (raw) saved = JSON.parse(raw) || {};
                     } catch (e) {}
 
-                    const restored = {};
-                    if (typeof saved.channel === 'string') restored.channel = saved.channel;
-                    if (saved.start && saved.end && ISO.test(saved.start) && ISO.test(saved.end) && saved.start <= saved.end) {
-                        restored.start = saved.start;
-                        restored.end = saved.end;
+                    let freshLogin = false;
+                    try {
+                        if (localStorage.getItem(SESS_KEY) !== SESS_ID) {
+                            freshLogin = true;
+                            localStorage.setItem(SESS_KEY, SESS_ID);
+                        }
+                    } catch (e) {}
+
+                    if (freshLogin) {
+                        delete saved.start;
+                        delete saved.end;
                     }
+
+                    if (saved.start && (!ISO.test(saved.start) || (saved.end && saved.start > saved.end))) {
+                        delete saved.start;
+                        delete saved.end;
+                    }
+                    if (saved.end && !ISO.test(saved.end)) delete saved.end;
+                    if (saved.mode && saved.mode !== 'orders' && saved.mode !== 'payments') delete saved.mode;
 
                     return {
                         storageKey: KEY,
@@ -153,7 +191,7 @@
                             ...@json(core()->getAllChannels()),
                         ],
 
-                        filters: { ...defaults, ...restored },
+                        filters: { ...defaults, ...saved },
                     }
                 },
 

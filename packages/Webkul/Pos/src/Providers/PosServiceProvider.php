@@ -36,15 +36,9 @@ class PosServiceProvider extends ServiceProvider
         $this->publishAssets();
 
         if (! $this->app->runningInConsole()) {
-            try {
-                if (core()->getConfigData('pos.settings.general.status')) {
-                    $this->mergeConfigFrom(
-                        dirname(__DIR__).'/Config/admin-menu.php', 'menu.admin'
-                    );
-                }
-            } catch (\Throwable $e) {
-                \Log::debug('PosServiceProvider: skipped config load - '.$e->getMessage());
-            }
+            $this->mergeConfigFrom(
+                dirname(__DIR__).'/Config/admin-menu.php', 'menu.admin'
+            );
         }
     }
 

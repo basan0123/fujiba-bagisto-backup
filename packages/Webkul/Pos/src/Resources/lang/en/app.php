@@ -70,6 +70,7 @@ return [
             'adjusted'         => 'Stock adjusted.',
             'wasted'           => 'Waste recorded.',
             'transferred'      => 'Stock transferred.',
+            'back-orders-saved'=> 'Out-of-stock sale setting saved.',
             'reason-required'  => 'Reason is required.',
             'bad-reason'       => 'Unknown reason :reason.',
             'same-outlet'      => 'Source and destination must differ.',
@@ -111,11 +112,17 @@ return [
         ],
 
         'invoice' => [
+            'title'          => 'Invoice',
             'generated'      => 'Invoice generated.',
             'emailed'        => 'Invoice emailed.',
             'order-not-found'=> 'Order not found.',
             'already-exists' => 'Order already has an invoice.',
             'no-customer-email' => 'Customer has no email on file.',
+            'draft-created'  => 'Draft invoice created.',
+            'not-a-draft'    => 'This invoice is no longer a draft.',
+            'payment-recorded' => 'Payment recorded.',
+            'payment-exceeds'  => 'Payment exceeds the outstanding balance.',
+            'invalid-amount'   => 'Enter a payment amount greater than zero.',
         ],
 
         'cart' => [

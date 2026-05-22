@@ -64,6 +64,22 @@ class OrderEventListener
                 return;
             }
 
+            // Draft invoices (POS invoice builder) create a real order that is
+            // NOT a confirmed sale — suppress the customer-facing 'order placed'
+            // notification. Core OrderRepository hard-sets status=pending and
+            // fires checkout.order.save.after BEFORE the builder can stamp
+            // status='draft', so we can't gate on the column here. Instead the
+            // builder sets a request-scoped flag (app('fujiba.suppress_order_placed'))
+            // around the create() call. Notifications resume on order.invoiced /
+            // order.shipped once the draft is advanced.
+            // (See Webkul\Pos\Mutations\Outlet\InvoiceBuilderMutation.)
+            if (
+                $eventKey === 'order.placed'
+                && (app()->bound('fujiba.suppress_order_placed') || $order->status === 'draft')
+            ) {
+                return;
+            }
+
             $vars     = $this->buildVars($order, $payload);
             $language = $this->resolveLanguage($order);
 

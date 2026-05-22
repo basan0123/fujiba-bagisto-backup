@@ -58,10 +58,16 @@ class GenerateInvoice
      */
     protected function prepareInvoiceData($order)
     {
-        $invoiceData = ['order_id' => $order->id];
+        $invoiceData = ['order_id' => $order->id, 'invoice' => ['items' => []]];
 
+        // Skip items that are already fully invoiced. Without this filter a
+        // re-fire of checkout.order.save.after on an already-invoiced order
+        // produces a ¥0 invoice with no rows. The repository's own guard
+        // catches it, but filtering here avoids the wasted call.
         foreach ($order->items as $item) {
-            $invoiceData['invoice']['items'][$item->id] = $item->qty_to_invoice;
+            if ((int) $item->qty_to_invoice > 0) {
+                $invoiceData['invoice']['items'][$item->id] = $item->qty_to_invoice;
+            }
         }
 
         return $invoiceData;

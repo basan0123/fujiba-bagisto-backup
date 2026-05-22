@@ -400,13 +400,16 @@
     import { useRouter } from 'vue-router';
     import { useI18n } from 'vue-i18n';
     import { useIndexedDB } from '@src/composable/indexed-db';
-    import { useMutation } from '@vue/apollo-composable';
+    import { useApolloClient, useMutation } from '@vue/apollo-composable';
     import { BULK_UPDATE_PRODUCTS } from '@src/graphql/products';
+    import { PRODUCTS } from '@src/graphql/home';
 
-    const router  = useRouter();
-    const { t }   = useI18n();
-    const emitter = inject('emitter');
-    const DB      = useIndexedDB();
+    const router       = useRouter();
+    const { t }        = useI18n();
+    const emitter      = inject('emitter');
+    const isOnline     = inject('isOnline', ref(true));
+    const DB           = useIndexedDB();
+    const apolloClient = useApolloClient();
 
     // ── Product data ─────────────────────────────────────────────
     const loading       = ref(true);
@@ -496,7 +499,38 @@
         return '0.01';
     }
 
+    // One-shot top-up: if IndexedDB is short, fetch the full outlet
+    // catalog from GraphQL in one call and upsert before rendering.
+    // The Settings/Sync page paginates at batchSize=20 and stops on any
+    // interruption, leaving partial caches (eg. 60 of 366 products).
+    // This guarantees the list renders the full catalog without depending
+    // on a completed sync session.
+    async function topUpFromServer() {
+        if (! isOnline.value) return;
+        try {
+            const { data } = await apolloClient.client.query({
+                query: PRODUCTS,
+                variables: { page: 1, first: 5000 },
+                fetchPolicy: 'network-only',
+            });
+            const items = data?.getOutletProducts?.data ?? [];
+            for (const item of items) {
+                try {
+                    await DB.updateItem('products', JSON.parse(JSON.stringify(item)));
+                } catch (e) {
+                    console.warn('topUp upsert failed for product', item?.id, e);
+                }
+            }
+        } catch (e) {
+            // Stay quiet on failure — IndexedDB still has whatever the
+            // last successful sync wrote, so the page degrades to the
+            // previous behaviour rather than breaking.
+            console.warn('Product top-up failed; using cached set:', e);
+        }
+    }
+
     onMounted(async () => {
+        await topUpFromServer();
         const raw = await DB.getAllItems('products');
 
         localProducts.value = raw.map(p => ({

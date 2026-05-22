@@ -160,7 +160,7 @@
                     <a
                         class="cursor-pointer px-4 py-2 text-sm text-gray-800 hover:bg-gray-100 dark:text-white dark:hover:bg-gray-950 sm:px-5 sm:text-base"
                         href="{{ route('admin.session.destroy') }}"
-                        onclick="event.preventDefault(); document.getElementById('adminLogout').submit();"
+                        onclick="event.preventDefault(); try { for (var i = localStorage.length - 1; i >= 0; i--) { var k = localStorage.key(i); if (k && k.indexOf('fujiba_global_filters:') === 0) localStorage.removeItem(k); } } catch (e) {} document.getElementById('adminLogout').submit();"
                     >
                         @lang('admin::app.components.layouts.header.logout')
                     </a>

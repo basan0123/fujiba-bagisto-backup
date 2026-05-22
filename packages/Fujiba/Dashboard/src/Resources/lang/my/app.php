@@ -3,6 +3,17 @@
 return [
     'dashboard' => [
 
+        // ───────────── range_presets (quick-range bar above filters) ─────────────
+        'range_presets' => [
+            'today'      => 'ယနေ့',
+            'yesterday'  => 'မနေ့က',
+            'this_month' => 'ဒီလ',
+            'last_month' => 'ပြီးခဲ့သည့်လ',
+            'last_3m'    => 'နောက်ဆုံး ၃ လ',
+            'this_year'  => 'ဒီနှစ်',
+            'all'        => 'အားလုံး',
+        ],
+
         // ───────────── common ─────────────
         'common' => [
             'loading'         => 'ဖွင့်နေသည်...',

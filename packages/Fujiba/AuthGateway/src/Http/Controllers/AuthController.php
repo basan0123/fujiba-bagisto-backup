@@ -236,16 +236,58 @@ class AuthController extends Controller
                 'message' => 'Your tenant database is unreachable. Contact support.',
             ], 422);
         }
-        $posUserId = (int) ($tenantModel->run(fn () =>
-            DB::table('pos_users')->where('email', $user->email)->value('id')
-        ) ?? 0);
+        // Resolve pos_user.id AND the channel/inventory_source for that user's
+        // outlet inside the tenant DB. The JWT MUST carry channel_id — the
+        // tenant-side middleware (ValidatePosJwtTenant / SetTenantStorageDisk)
+        // and image-path resolution read it from the token. Without it a
+        // multi-store login (e.g. the mmfood outlet) defaulted to channel 1
+        // and showed kimono products + tenants/1/ images after a store-switch.
+        $resolved = $tenantModel->run(function () use ($user) {
+            $posUserId = (int) (DB::table('pos_users')->where('email', $user->email)->value('id') ?? 0);
+            if (! $posUserId) {
+                return null;
+            }
 
-        if (! $posUserId) {
+            $outletId = (int) (DB::table('pos_users')->where('id', $posUserId)->value('outlet_id') ?? 0);
+            $outlet   = $outletId ? DB::table('pos_outlets')->where('id', $outletId)->first() : null;
+
+            $inventorySourceId = $outlet->inventory_source_id ?? null;
+
+            // Prefer the outlet's own channel_id column (added 2026-05-18);
+            // older clones lack it, so guard + fall back to the source→channel
+            // map. See [pos-jwt-channel-resolution].
+            $channelId = (property_exists($outlet ?? new \stdClass, 'channel_id') && ! empty($outlet->channel_id))
+                ? (int) $outlet->channel_id
+                : null;
+
+            if (! $channelId && $inventorySourceId) {
+                $channelId = (int) (DB::table('channel_inventory_sources')
+                    ->where('inventory_source_id', $inventorySourceId)
+                    ->value('channel_id') ?? 0);
+            }
+
+            if (! $channelId) {
+                $channelId = (int) (DB::table('channels')->value('id') ?? 1);
+            }
+            if (! $inventorySourceId) {
+                $inventorySourceId = (int) (DB::table('inventory_sources')->value('id') ?? 1);
+            }
+
+            return [
+                'pos_user_id'         => $posUserId,
+                'channel_id'          => $channelId,
+                'inventory_source_id' => (int) $inventorySourceId,
+            ];
+        });
+
+        if (! $resolved) {
             return response()->json([
                 'error'   => 'no_pos_user',
                 'message' => 'No POS user record found in your store. Contact support.',
             ], 422);
         }
+
+        $posUserId = $resolved['pos_user_id'];
 
         $token = $this->issueToken(
             posUserId: $posUserId,
@@ -254,7 +296,9 @@ class AuthController extends Controller
             name: $user->name,
             tenantId: $bridge->tenant_id,
             subdomain: $bridge->tenant_subdomain,
-            role: $bridge->role
+            role: $bridge->role,
+            channelId: $resolved['channel_id'],
+            inventorySourceId: $resolved['inventory_source_id'],
         );
 
         return response()->json([
@@ -264,6 +308,8 @@ class AuthController extends Controller
             'tenant_id'        => $bridge->tenant_id,
             'store_name'       => $tenantMeta->store_name,
             'role'             => $bridge->role,
+            'channel_id'          => $resolved['channel_id'],
+            'inventory_source_id' => $resolved['inventory_source_id'],
             'tenant_url'       => "https://{$bridge->tenant_subdomain}." . config('auth-gateway.tenant_subdomain_suffix'),
         ]);
     }
@@ -379,9 +425,11 @@ class AuthController extends Controller
         ?string $name,
         string $tenantId,
         string $subdomain,
-        string $role
+        string $role,
+        ?int $channelId = null,
+        ?int $inventorySourceId = null
     ): array {
-        return $this->jwt->issue([
+        $claims = [
             'sub'              => (string) $posUserId,
             'gateway_user_id'  => $gatewayUserId,
             'email'            => $email,
@@ -394,7 +442,20 @@ class AuthController extends Controller
             // can't be reused. Keep it consistent with the existing pos
             // login output (sha1(Webkul\Pos\Models\User::class)).
             'prv'              => sha1(\Webkul\Pos\Models\User::class),
-        ]);
+        ];
+
+        // channel_id / inventory_source_id let the tenant middleware scope
+        // products + image storage paths to the right outlet's channel. The
+        // legacy per-tenant /api/v1/pos/login already sets these; the gateway
+        // must match or a gateway-issued token defaults to channel 1.
+        if ($channelId !== null) {
+            $claims['channel_id'] = $channelId;
+        }
+        if ($inventorySourceId !== null) {
+            $claims['inventory_source_id'] = $inventorySourceId;
+        }
+
+        return $this->jwt->issue($claims);
     }
 
     protected function extractBearer(Request $req): ?string

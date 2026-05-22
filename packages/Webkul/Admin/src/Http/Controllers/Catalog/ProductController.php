@@ -329,6 +329,19 @@ class ProductController extends Controller
                 ->map(fn($o) => ['id' => $o->id, 'label' => $o->label ?: $o->admin_name])
             : collect();
 
+        $colorAttrId = DB::table('attributes')->where('code', 'color')->value('id');
+        $colorOptions = $colorAttrId
+            ? DB::table('attribute_options')
+                ->leftJoin('attribute_option_translations', function ($q) use ($locale) {
+                    $q->on('attribute_options.id', '=', 'attribute_option_translations.attribute_option_id')
+                      ->where('attribute_option_translations.locale', $locale);
+                })
+                ->where('attribute_options.attribute_id', $colorAttrId)
+                ->select('attribute_options.id', 'attribute_options.admin_name', 'attribute_option_translations.label')
+                ->get()
+                ->map(fn($o) => ['id' => $o->id, 'label' => $o->label ?: $o->admin_name])
+            : collect();
+
         $sourceAttrId = DB::table('attributes')->where('code', 'source_name')->value('id');
         $sourceOptions = $sourceAttrId
             ? DB::table('attribute_options')
@@ -351,6 +364,7 @@ class ProductController extends Controller
             'options' => [
                 'categories' => $categoryOptions,
                 'brands'     => $brandOptions,
+                'colors'     => $colorOptions,
                 'sources'    => $sourceOptions,
             ],
         ]);

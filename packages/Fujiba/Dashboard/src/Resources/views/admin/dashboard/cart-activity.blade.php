@@ -77,6 +77,14 @@
                                 <span v-else>+</span>
                             </span>
                             <span class="fujiba-ca-name">@{{ c.display_name }}</span>
+                            <span
+                                class="fujiba-ca-purchase-badge"
+                                :class="purchaseTier(c.purchase_count)"
+                                :title="`Purchased ${c.purchase_count || 0} time(s)`"
+                            >
+                                <i class="icon-cart"></i>
+                                @{{ c.purchase_count || 0 }}x
+                            </span>
                         </div>
                         <div class="fujiba-ca-line2" :class="'is-' + c.state">@{{ actionLabel(c) }}</div>
                     </div>
@@ -306,6 +314,27 @@
     .fujiba-ca-cart-icon.is-converted { background: #10b981; box-shadow: 0 0 0 2px rgba(16,185,129,0.18); }
     .fujiba-ca-cart-icon.is-abandoned { background: #ef4444; box-shadow: 0 0 0 2px rgba(239,68,68,0.18); }
     .fujiba-ca-cart-icon.is-active    { background: #3b82f6; box-shadow: 0 0 0 2px rgba(59,130,246,0.18); }
+
+    /* Purchase-count badge — mirrors /admin/customers tier palette */
+    .fujiba-ca-purchase-badge {
+        display: inline-flex; align-items: center; gap: 3px;
+        padding: 1px 7px;
+        border-radius: 9999px;
+        font-size: 10px;
+        font-weight: 700;
+        line-height: 1.5;
+        white-space: nowrap;
+        flex-shrink: 0;
+    }
+    .fujiba-ca-purchase-badge i { font-size: 10px; }
+    .fujiba-ca-purchase-badge.is-tier-zero   { background: #f3f4f6; color: #4b5563; }
+    .fujiba-ca-purchase-badge.is-tier-new    { background: #dbeafe; color: #1d4ed8; }
+    .fujiba-ca-purchase-badge.is-tier-repeat { background: #d1fae5; color: #047857; }
+    .fujiba-ca-purchase-badge.is-tier-loyal  { background: #fef3c7; color: #92400e; }
+    .dark .fujiba-ca-purchase-badge.is-tier-zero   { background: rgba(255,255,255,0.06); color: #d1d5db; }
+    .dark .fujiba-ca-purchase-badge.is-tier-new    { background: rgba(59,130,246,0.22); color: #93c5fd; }
+    .dark .fujiba-ca-purchase-badge.is-tier-repeat { background: rgba(16,185,129,0.22); color: #6ee7b7; }
+    .dark .fujiba-ca-purchase-badge.is-tier-loyal  { background: rgba(245,158,11,0.22); color: #fcd34d; }
 
     /* Tinted action labels for quick visual scan */
     .fujiba-ca-line2.is-converted { color: #059669; font-weight: 600; }
@@ -587,6 +616,14 @@
                         state_converted:    "@lang('fujiba::app.dashboard.cart_activity.state_converted')",
                     };
                     return dict[key] || key;
+                },
+
+                purchaseTier(n) {
+                    const x = Number(n) || 0;
+                    if (x === 0) return 'is-tier-zero';
+                    if (x <= 2) return 'is-tier-new';
+                    if (x <= 9) return 'is-tier-repeat';
+                    return 'is-tier-loyal';
                 },
 
                 stateLabel(state) {

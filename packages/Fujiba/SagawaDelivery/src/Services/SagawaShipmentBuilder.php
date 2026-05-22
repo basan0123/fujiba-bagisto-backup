@@ -3,7 +3,6 @@
 namespace Fujiba\SagawaDelivery\Services;
 
 use Fujiba\SagawaDelivery\DTO\SagawaShipmentPayload;
-use Fujiba\SagawaDelivery\Exceptions\SagawaCodNotConfiguredException;
 
 /**
  * Builds a SagawaShipmentPayload from an order-like source.
@@ -17,7 +16,7 @@ class SagawaShipmentBuilder
     /**
      * @param  array<string,mixed>  $sender      keys: name, postcode, prefecture, city, address, phone
      * @param  array{ okuri_code?: string, binsyu_code?: string }  $options
-     * @param  array<string,mixed>  $credential  per-tenant Sagawa contract; keys: daibiki_binsyu_code, daibiki_payee_name
+     * @param  array<string,mixed>  $credential  per-tenant Sagawa contract; supported key: daibiki_payment_type ('0' どちらでも | '1' 現金 | '2' カード)
      */
     public function __construct(
         private array $sender,
@@ -32,28 +31,15 @@ class SagawaShipmentBuilder
     {
         $ship = $order['shipping_address'] ?? [];
 
-        $isCod = ($order['payment_method'] ?? null) === 'cashondelivery';
+        $binsyuCode = $this->options['binsyu_code'] ?? '000';
 
-        if ($isCod) {
-            $codeFromContract = $this->credential['daibiki_binsyu_code'] ?? null;
-
-            if (! $codeFromContract) {
-                throw new SagawaCodNotConfiguredException(sprintf(
-                    'Sagawa COD requested for order %s but tenant %s has no daibiki_binsyu_code configured.',
-                    $order['id']        ?? '?',
-                    $order['tenant_id'] ?? '?',
-                ));
-            }
-
-            $binsyuCode = $codeFromContract;
-            $daibikiKng = (string) (int) ($order['grand_total'] ?? 0);
-            $daibikiNm  = $this->credential['daibiki_payee_name']
-                ?? (string) ($this->sender['name'] ?? '');
-        } else {
-            $binsyuCode = $this->options['binsyu_code'] ?? '000';
-            $daibikiKng = null;
-            $daibikiNm  = null;
-        }
+        $isCod      = ($order['payment_method'] ?? null) === 'cashondelivery';
+        $daibikiFlg = $isCod ? '1' : '0';
+        $daibikiKng = $isCod ? (string) (int) ($order['grand_total'] ?? 0) : null;
+        $daibikiTax = $isCod ? (string) (int) ($order['tax_amount']   ?? 0) : null;
+        $daibikiType = $isCod
+            ? ($this->credential['daibiki_payment_type'] ?? null)
+            : null;
 
         return new SagawaShipmentPayload(
             userManageNumber: $this->userManageNumber($order),
@@ -78,8 +64,10 @@ class SagawaShipmentBuilder
             shiteiDate:     $this->formatDate($order['delivery_date'] ?? null),
             shiteiTimeCode: $this->mapTimeCode($order['delivery_time'] ?? null),
 
-            daibikiKng: $daibikiKng,
-            daibikiNm:  $daibikiNm,
+            daibikiFlg:  $daibikiFlg,
+            daibikiKng:  $daibikiKng,
+            daibikiTax:  $daibikiTax,
+            daibikiType: $daibikiType,
 
             meta: array_filter([
                 'order_id'   => $order['id']         ?? null,

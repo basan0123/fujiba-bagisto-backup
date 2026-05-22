@@ -18,6 +18,7 @@ type OutletProductResult {
     quantity: Int
     weight: Float
     price: Float
+    cost: Float
     specialPrice: Float @rename(attribute: "special_price")
     specialPriceFrom: String @rename(attribute: "special_price_from")
     specialPriceTo: String @rename(attribute: "special_price_to")

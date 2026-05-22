@@ -737,7 +737,66 @@
                 "select_currency": "通貨を選択",
                 "save_btn_title": "保存"
             },
-            "save_success": "設定が正常に保存されました。"
+            "save_success": "設定が正常に保存されました。",
+            "save_error_generic": "保存できませんでした。もう一度お試しください。",
+            "coming_soon": "近日対応",
+            "stub": {
+                "body": "この設定はまだPOSに対応していません。順次対応してまいります。該当機能はBagisto管理画面からご利用いただけます。",
+                "back": "設定に戻る"
+            },
+            "sounds": {
+                "section_basic": "基本サウンド",
+                "payment_hint": "会計完了時にチャイムを鳴らします。",
+                "operation_hint": "カートやメニュー操作時にクリック音を鳴らします。",
+                "future_note": "カスタムサウンドおよびイベント別音量は今後のリリースで対応予定です。"
+            },
+            "groups": {
+                "register": "レジ設定",
+                "receipt": "レシート・レポート",
+                "security": "音声・機能制限",
+                "account": "アカウント・同期",
+                "support": "ヘルプ・サポート",
+                "legal": "アプリ情報",
+                "language_currency": "言語・通貨",
+                "hardware": "ハードウェア",
+                "other": "その他",
+                "items": {
+                    "basic": "レジ基本設定",
+                    "tax": "消費税",
+                    "timezones": "時間帯",
+                    "service_charge": "サービス料",
+                    "discount": "割引・割増",
+                    "payment": "支払い方法",
+                    "profile": "アカウント",
+                    "sync": "データ同期",
+                    "regional": "言語・地域",
+                    "shortcuts": "キーボードショートカット",
+                    "hardware": "レジ・プリンター",
+                    "display": "カスタマーディスプレイ",
+                    "receipt": "レシート",
+                    "x_z_report": "売上報告・点検・精算レシート",
+                    "restrictions": "機能制限",
+                    "sounds": "会計音・操作音",
+                    "training": "トレーニングモード",
+                    "training_value_on": "オン",
+                    "training_value_off": "オフ",
+                    "auto_change": "自動つり銭機利用",
+                    "payment_sound": "会計音",
+                    "operation_sound": "操作音",
+                    "language": "言語",
+                    "currency": "通貨",
+                    "printer": "プリンター設定",
+                    "scanner": "バーコードリーダー",
+                    "faq": "よくある質問・マニュアル",
+                    "contact": "お問い合わせ",
+                    "feedback": "Fujiba改善のご意見・ご要望",
+                    "peripherals": "周辺機器の購入",
+                    "terms": "利用規約",
+                    "privacy": "プライバシーポリシー",
+                    "account_deletion": "Fujiba ID 削除申請",
+                    "version": "バージョン"
+                }
+            }
         },
         "payment": {
             "title": "支払い",

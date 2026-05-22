@@ -20,12 +20,10 @@ class OrderPaymentMethodController extends Controller
     {
         $order = $this->orderRepository->findOrFail($id);
 
-        if ($order->status !== Order::STATUS_PENDING) {
-            return response()->json([
-                'message' => 'Payment method can only be changed while the order is pending.',
-            ], 422);
-        }
-
+        // Payment method is editable in any status — staff sometimes need to
+        // re-classify after the fact (e.g. flip cashondelivery → kpay once
+        // the customer pays via the mobile wallet at handover, even if the
+        // order has already moved to processing / completed).
         $payment = $order->payment;
 
         if (! $payment) {
@@ -66,18 +64,19 @@ class OrderPaymentMethodController extends Controller
             'method_title' => core()->getConfigData('sales.payment_methods.' . $method . '.title') ?: $method,
         ]);
 
-        // Only cashondelivery (Sagawa) carries the 代引手数料. cash and
-        // moneytransfer both have zero surcharge — they go through the
+        // Only cashondelivery (Sagawa) carries the 代引手数料. cash, kpay and
+        // moneytransfer all have zero surcharge — they go through the
         // "else" branch above.
         $methodLabel = match ($method) {
             'cashondelivery' => '代金引換',
             'cash'           => '現金',
+            'kpay'           => 'KPay',
             'moneytransfer'  => '銀行振込',
             default          => $method,
         };
         $feeNote = match ($method) {
             'cashondelivery' => ' 代引手数料: ¥' . number_format($codFee) . ' 追加。',
-            'cash', 'moneytransfer' => ' 代引手数料を除外しました。',
+            'cash', 'kpay', 'moneytransfer' => ' 代引手数料を除外しました。',
             default          => '',
         };
         $this->orderCommentRepository->create([

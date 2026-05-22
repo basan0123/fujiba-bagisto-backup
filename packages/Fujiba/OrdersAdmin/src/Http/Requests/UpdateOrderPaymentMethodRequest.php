@@ -14,9 +14,9 @@ class UpdateOrderPaymentMethodRequest extends FormRequest
     public function rules(): array
     {
         return [
-            // `cash` is the admin-only walk-in shop method (no COD surcharge —
+            // `cash` and `kpay` are admin-only methods (no COD surcharge —
             // that belongs only to Sagawa's cashondelivery).
-            'method' => 'required|string|in:cashondelivery,moneytransfer,cash',
+            'method' => 'required|string|in:cashondelivery,moneytransfer,cash,kpay',
         ];
     }
 }

@@ -6,6 +6,7 @@
 #import outlet/customers/*.graphql
 #import outlet/home/*.graphql
 #import outlet/imports/*.graphql
+#import outlet/invoices/*.graphql
 #import outlet/orders/*.graphql
 #import outlet/products/*.graphql
 #import outlet/reports/*.graphql

@@ -347,10 +347,32 @@ class ProductMutation extends Controller
             'status'     => 1,
         ]);
 
-        $defaultChannel = core()->getDefaultChannel();
+        // Resolve the agent's OWN channel — a quick-created product must be
+        // visible in the outlet the cashier is logged into. Falling back to
+        // core()->getDefaultChannel() put every mmfood quick-create on the
+        // kimono channel (default), so it never appeared in the mmfood POS.
+        // Prefer pos_outlets.channel_id (added 2026-05-18, guard for older
+        // clones), then the source→channel map, then the default channel.
+        $outletChannelId = property_exists($outlet, 'channel_id') && ! empty($outlet->channel_id)
+            ? (int) $outlet->channel_id
+            : (int) (DB::table('channel_inventory_sources')
+                ->where('inventory_source_id', $outlet->inventory_source_id)
+                ->value('channel_id') ?? 0);
+
+        $channel = $outletChannelId
+            ? (core()->getAllChannels()->firstWhere('id', $outletChannelId) ?? core()->getDefaultChannel())
+            : core()->getDefaultChannel();
+
+        // Optional category from the POS quick-create form. Only attach when
+        // the category actually exists (and isn't the root) to avoid FK errors.
+        $categoryId = isset($args['categoryId']) ? (int) $args['categoryId'] : 0;
+        $categoryIds = [];
+        if ($categoryId > 0 && DB::table('categories')->where('id', $categoryId)->exists()) {
+            $categoryIds = [$categoryId];
+        }
 
         $data = array_merge($args, [
-            'channel'           => $defaultChannel->code,
+            'channel'           => $channel->code,
             'locale'            => core()->getRequestedLocaleCode(),
             'sku'               => $product->sku,
             'name'              => $args['name'],
@@ -362,7 +384,8 @@ class ProductMutation extends Controller
             'status'            => 1,
             'manage_stock'      => 1,
             'inventories'       => [$outlet->inventory_source_id => $args['quantity']],
-            'channels'          => [$defaultChannel->id],
+            'channels'          => [$channel->id],
+            'categories'        => $categoryIds,
         ]);
 
         Event::dispatch('catalog.product.update.before', $product->id);
@@ -689,6 +712,7 @@ class ProductMutation extends Controller
             'id'             => 'required|integer',
             'name'           => 'sometimes|required|string|max:190',
             'price'          => 'sometimes|required|numeric|min:0',
+            'cost'           => 'sometimes|nullable|numeric|min:0',
             'quantity'       => 'sometimes|required|integer|min:0',
             'weight'         => 'sometimes|nullable|numeric|min:0',
             'taxCategoryId'  => 'sometimes|nullable|integer',
@@ -728,8 +752,9 @@ class ProductMutation extends Controller
             'channels' => [$defaultChannel->id],
         ];
 
-        // Only fields the caller sent are forwarded.
-        foreach (['name', 'price', 'weight', 'description', 'shortDescription', 'status'] as $k) {
+        // Only fields the caller sent are forwarded. `cost` is a normal
+        // product attribute (code=cost), so it rides along in the update data.
+        foreach (['name', 'price', 'cost', 'weight', 'description', 'shortDescription', 'status'] as $k) {
             if (array_key_exists($k, $args)) {
                 $mapped = match ($k) {
                     'shortDescription' => 'short_description',

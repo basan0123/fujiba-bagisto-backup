@@ -75,21 +75,34 @@
 
 <style>
     .fujiba-region-card {
-        background: linear-gradient(135deg,#0f172a 0%,#1e293b 100%) !important;
-        color: #fff !important;
-        border-radius: 16px !important;
+        background: #fff !important;
+        color: #1f2937 !important;
+        border-radius: 12px !important;
         padding: 18px !important;
-        box-shadow: 0 6px 20px -8px rgba(99,102,241,0.45),
-                    0 2px 4px rgba(15,23,42,0.10) !important;
+        box-shadow: 0 1px 2px rgba(15,23,42,0.04), 0 4px 12px -8px rgba(15,23,42,0.06) !important;
+        border: 1px solid rgba(15,23,42,0.06);
+        height: 100%;
+        display: flex;
+        flex-direction: column;
+    }
+    .dark .fujiba-region-card {
+        background: rgb(17,24,39) !important;
+        color: #f3f4f6 !important;
+        border-color: rgba(255,255,255,0.06);
+    }
+    .fujiba-region-card > .fujiba-region-grid,
+    .fujiba-region-card > .fujiba-region-empty {
+        flex: 1 1 auto;
     }
     .fujiba-region-title {
         font-size: 12px !important;
         font-weight: 700 !important;
         text-transform: uppercase !important;
         letter-spacing: 0.12em !important;
-        color: rgba(255,255,255,0.92) !important;
+        color: #1e3a8a !important;
         margin: 0 0 12px 0 !important;
     }
+    .dark .fujiba-region-title { color: #93c5fd !important; }
     .fujiba-region-grid {
         display: grid;
         grid-template-columns: minmax(0, 1.4fr) minmax(0, 1fr);
@@ -110,34 +123,48 @@
     .fujiba-region-map {
         position: relative;
         width: 100%;
-        background: rgba(255,255,255,0.03);
+        background: rgba(15,23,42,0.03);
         border-radius: 12px;
         padding: 12px;
     }
+    .dark .fujiba-region-map { background: rgba(255,255,255,0.03); }
     .fujiba-region-svg { width: 100%; height: auto; display: block; }
     .fujiba-region-hex {
-        stroke: rgba(15,23,42,0.6);
+        stroke: rgba(15,23,42,0.25);
         stroke-width: 1;
         cursor: pointer;
         transition: transform 150ms ease, filter 150ms ease;
         transform-origin: center;
         transform-box: fill-box;
     }
+    .dark .fujiba-region-hex { stroke: rgba(15,23,42,0.6); }
     .fujiba-region-hex:hover {
-        filter: brightness(1.3);
+        filter: brightness(1.1);
     }
+    .dark .fujiba-region-hex:hover { filter: brightness(1.3); }
     .fujiba-region-hex.is-selected {
-        stroke: #fff;
+        stroke: #1e3a8a;
         stroke-width: 2;
+        filter: brightness(1.05) drop-shadow(0 0 4px rgba(30,58,138,0.5));
+    }
+    .dark .fujiba-region-hex.is-selected {
+        stroke: #fff;
         filter: brightness(1.25) drop-shadow(0 0 4px rgba(255,255,255,0.6));
     }
     .fujiba-region-hex-label {
         font-size: 9px;
         font-weight: 700;
-        fill: rgba(255,255,255,0.85);
+        fill: #fff;
         text-anchor: middle;
         pointer-events: none;
         font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+        paint-order: stroke;
+        stroke: rgba(15,23,42,0.45);
+        stroke-width: 0.6px;
+    }
+    .dark .fujiba-region-hex-label {
+        fill: rgba(255,255,255,0.85);
+        stroke: none;
     }
 
     .fujiba-region-tooltip {
@@ -167,10 +194,11 @@
         gap: 8px;
         margin-top: 10px;
         font-size: 10px;
-        color: rgba(255,255,255,0.6);
+        color: #6b7280;
         text-transform: uppercase;
         letter-spacing: 0.08em;
     }
+    .dark .fujiba-region-legend { color: rgba(255,255,255,0.6); }
     .fujiba-region-legend-bar {
         flex: 1; height: 8px; border-radius: 4px;
         background: linear-gradient(90deg,#1e3a8a 0%,#3b82f6 35%,#8b5cf6 65%,#ec4899 100%);
@@ -185,9 +213,10 @@
         font-weight: 700;
         text-transform: uppercase;
         letter-spacing: 0.1em;
-        color: rgba(255,255,255,0.7);
+        color: #4b5563;
         margin-bottom: 4px;
     }
+    .dark .fujiba-region-list-header { color: rgba(255,255,255,0.7); }
     .fujiba-region-row {
         display: grid;
         grid-template-columns: 18px 1fr auto 56px;
@@ -198,25 +227,30 @@
         cursor: pointer;
         transition: background 150ms ease;
     }
-    .fujiba-region-row:hover { background: rgba(255,255,255,0.06); }
-    .fujiba-region-row.is-selected { background: rgba(99,102,241,0.18); }
+    .fujiba-region-row:hover { background: rgba(59,130,246,0.06); }
+    .dark .fujiba-region-row:hover { background: rgba(255,255,255,0.06); }
+    .fujiba-region-row.is-selected { background: rgba(99,102,241,0.12); }
+    .dark .fujiba-region-row.is-selected { background: rgba(99,102,241,0.18); }
     .fujiba-region-rank {
         font-size: 11px; font-weight: 700;
-        color: rgba(255,255,255,0.5);
+        color: #9ca3af;
         text-align: center;
         font-variant-numeric: tabular-nums;
     }
+    .dark .fujiba-region-rank { color: rgba(255,255,255,0.5); }
     .fujiba-region-row-name {
         font-size: 13px; font-weight: 600;
-        color: #fff;
+        color: #1f2937;
         white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
     }
+    .dark .fujiba-region-row-name { color: #f3f4f6; }
     .fujiba-region-row-bar-wrap {
         width: 80px; height: 6px;
-        background: rgba(255,255,255,0.08);
+        background: rgba(15,23,42,0.06);
         border-radius: 3px;
         overflow: hidden;
     }
+    .dark .fujiba-region-row-bar-wrap { background: rgba(255,255,255,0.08); }
     .fujiba-region-row-bar {
         height: 100%;
         background: linear-gradient(90deg,#3b82f6,#ec4899);
@@ -224,14 +258,16 @@
     }
     .fujiba-region-row-num {
         font-size: 13px; font-weight: 800;
-        color: #fff; text-align: right;
+        color: #111827; text-align: right;
         font-variant-numeric: tabular-nums;
     }
+    .dark .fujiba-region-row-num { color: #f9fafb; }
     .fujiba-region-empty {
         text-align: center;
         padding: 28px 12px;
-        color: rgba(255,255,255,0.6);
+        color: #6b7280;
     }
+    .dark .fujiba-region-empty { color: rgba(255,255,255,0.6); }
 </style>
 
 <div class="flex flex-col gap-2" id="fujiba-orders-by-region-card">

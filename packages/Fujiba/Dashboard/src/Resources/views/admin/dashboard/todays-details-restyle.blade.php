@@ -145,10 +145,17 @@
         display: grid;
         grid-template-columns: repeat(2, minmax(0, 1fr));
         gap: 12px;
-        align-items: start;
+        align-items: stretch;
     }
     .fujiba-todays-grid > [id^="fujiba-"][id$="-card"] {
         min-width: 0;
+        display: flex;
+        flex-direction: column;
+    }
+    .fujiba-todays-grid > [id^="fujiba-"][id$="-card"] > .fujiba-pie-card,
+    .fujiba-todays-grid > [id^="fujiba-"][id$="-card"] > .fujiba-sbs-card,
+    .fujiba-todays-grid > [id^="fujiba-"][id$="-card"] > [id$="-template"] {
+        flex: 1 1 auto;
     }
     @media (max-width: 1024px) {
         .fujiba-todays-grid {

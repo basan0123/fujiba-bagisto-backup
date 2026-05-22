@@ -246,4 +246,57 @@ class StockMutation
             'auditRowId'  => (int) $existing->id,
         ];
     }
+
+    // ── Global out-of-stock-sale flag ────────────────────────────────────
+    // Backed by the standard Bagisto config key
+    // catalog.inventory.stock_options.back_orders, which Simple::haveSufficientQuantity()
+    // reads to decide whether a zero-stock product is still saleable.
+    private const BACK_ORDERS_CODE = 'catalog.inventory.stock_options.back_orders';
+
+    public function getBackOrders($root, array $args, GraphQLContext $context): array
+    {
+        return [
+            'success' => true,
+            'enabled' => $this->readBackOrders(),
+        ];
+    }
+
+    public function setBackOrders($root, array $args, GraphQLContext $context): array
+    {
+        RoleGate::requireManager($context->user());
+
+        $enabled = (bool) ($args['enabled'] ?? false);
+
+        // Global (non-channel/locale) setting → channel_code/locale_code null.
+        // SystemConfig::getCoreConfig() reads core_config straight from the
+        // repository on every call (no cache layer), so this takes effect on
+        // the next saleability check immediately — no cache bust needed.
+        DB::table('core_config')->updateOrInsert(
+            ['code' => self::BACK_ORDERS_CODE, 'channel_code' => null, 'locale_code' => null],
+            ['value' => $enabled ? '1' : '0', 'updated_at' => now()],
+        );
+
+        return [
+            'success' => true,
+            'enabled' => $enabled,
+            'message' => trans('pos::app.outlet.stock.back-orders-saved'),
+        ];
+    }
+
+    private function readBackOrders(): bool
+    {
+        // Prefer the global row; fall back to core() helper (which honors the
+        // channel fallback chain) when the row isn't present.
+        $row = DB::table('core_config')
+            ->where('code', self::BACK_ORDERS_CODE)
+            ->whereNull('channel_code')
+            ->whereNull('locale_code')
+            ->value('value');
+
+        if ($row !== null) {
+            return (bool) (int) $row;
+        }
+
+        return (bool) core()->getConfigData(self::BACK_ORDERS_CODE);
+    }
 }

@@ -280,7 +280,23 @@
                             <p class="text-xs sm:text-sm text-gray-600 dark:text-gray-300">@{{ record.channel_name }}</p>
                         </div>
                         <div class="flex flex-col gap-1.5">
-                            <p class="text-sm sm:text-base text-gray-800 dark:text-white">@{{ record.full_name }}</p>
+                            <div class="flex items-center gap-2 flex-wrap">
+                                <p class="text-sm sm:text-base text-gray-800 dark:text-white">@{{ record.full_name }}</p>
+
+                                <span
+                                    class="inline-flex items-center gap-1 rounded-full px-2 py-0.5 text-xs font-semibold whitespace-nowrap"
+                                    :class="{
+                                        'bg-gray-100 text-gray-600 dark:bg-gray-800 dark:text-gray-300': Number(record.customer_order_count) === 0,
+                                        'bg-blue-100 text-blue-700 dark:bg-blue-900/40 dark:text-blue-300': Number(record.customer_order_count) >= 1 && Number(record.customer_order_count) <= 2,
+                                        'bg-green-100 text-green-700 dark:bg-green-900/40 dark:text-green-300': Number(record.customer_order_count) >= 3 && Number(record.customer_order_count) <= 9,
+                                        'bg-amber-100 text-amber-800 dark:bg-amber-900/40 dark:text-amber-300': Number(record.customer_order_count) >= 10,
+                                    }"
+                                    :title="`Purchased ${record.customer_order_count} time(s)`"
+                                >
+                                    <i class="icon-cart text-sm"></i>
+                                    @{{ record.customer_order_count || 0 }}x
+                                </span>
+                            </div>
                             <p class="text-xs sm:text-sm text-gray-600 dark:text-gray-300">@{{ record.customer_email }}</p>
                             <p class="text-xs sm:text-sm text-gray-600 dark:text-gray-300">@{{ record.location }}</p>
                         </div>

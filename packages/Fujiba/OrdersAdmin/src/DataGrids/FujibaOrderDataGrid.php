@@ -3,6 +3,7 @@
 namespace Fujiba\OrdersAdmin\DataGrids;
 
 use Fujiba\InvoicesAdmin\DataGrids\FujibaInvoiceDataGrid;
+use Illuminate\Support\Facades\DB;
 use Webkul\Admin\DataGrids\Sales\OrderDataGrid;
 
 /**
@@ -34,7 +35,21 @@ class FujibaOrderDataGrid extends OrderDataGrid
         // existed on production since 2026-04-28, see
         // packages/Fujiba/OrdersAdmin/src/Database/Migrations/
         // 2026_04_28_000002_add_fujiba_label_printed_to_orders_table.php.
-        $qb->addSelect('orders.fujiba_label_printed as fujiba_label_printed');
+        $qb->addSelect(
+            'orders.fujiba_label_printed as fujiba_label_printed',
+            'orders.shipping_method as shipping_method',
+        );
+
+        // Per-customer lifetime order count (keyed by email so guest repeat-
+        // buyers count too — registered customers' email == customers.email).
+        // Correlated subquery beats a GROUP BY rewrite because the outer
+        // grid already groupBy(orders.id) and the orders table indexes email.
+        $prefix = DB::getTablePrefix();
+        $qb->addSelect(DB::raw(
+            '(SELECT COUNT(*) FROM '.$prefix.'orders o2 '
+            .'WHERE o2.customer_email = '.$prefix.'orders.customer_email) '
+            .'as customer_order_count'
+        ));
 
         // Cross-check filter: shipping_status=1 selects every row with
         // label_printed=1, independent of orders.status. Surfaces the
@@ -58,7 +73,8 @@ class FujibaOrderDataGrid extends OrderDataGrid
             'closure'    => function ($row) {
                 return FujibaInvoiceDataGrid::renderShippingBadge(
                     (int) ($row->fujiba_label_printed ?? 0),
-                    (string) ($row->status ?? '')
+                    (string) ($row->status ?? ''),
+                    (string) ($row->shipping_method ?? '')
                 );
             },
         ]);

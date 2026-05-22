@@ -58,10 +58,11 @@
 .pos-card:active { transform: scale(0.97); }
 .pos-card.is-inactive { opacity: 0.55; }
 
-/* ═══ IMAGE — taller ═══ */
+/* ═══ IMAGE — 3:2 aspect ratio (width:height = 3:2) ═══ */
 .pos-card__img {
     width: 100%;
-    height: 220px;
+    aspect-ratio: 3 / 2;
+    height: auto;
     object-fit: cover;
     display: block;
     flex-shrink: 0;
@@ -69,7 +70,8 @@
 }
 .pos-card__no-img {
     width: 100%;
-    height: 220px;
+    aspect-ratio: 3 / 2;
+    height: auto;
     flex-shrink: 0;
     display: flex;
     align-items: center;
@@ -78,12 +80,24 @@
     color: #9ca3af;
     background: #f3f4f6;
 }
-#pos-grid.cols-1 .pos-card__img,
-#pos-grid.cols-1 .pos-card__no-img { height: 280px; }
-#pos-grid.cols-3 .pos-card__img,
-#pos-grid.cols-3 .pos-card__no-img { height: 160px; }
-#pos-grid.cols-4 .pos-card__img,
-#pos-grid.cols-4 .pos-card__no-img { height: 130px; }
+
+/* ═══ MOBILE (≤768px): shorter image height — wider aspect so it's flatter ═══ */
+@media(max-width:768px){
+  .pos-card__img,
+  .pos-card__no-img { aspect-ratio: 2 / 1; }
+}
+
+/* ═══ PC (≥769px): smaller cards overall — narrower grid tracks shrink both
+   width AND (via 3:2 aspect) height. Tracks fill the row, no gaps. ═══ */
+@media(min-width:769px){
+  #pos-grid,
+  #pos-grid.cols-1,
+  #pos-grid.cols-2,
+  #pos-grid.cols-3,
+  #pos-grid.cols-4 {
+    grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
+  }
+}
 
 /* ═══ BODY ═══ */
 .pos-card__body {
@@ -203,6 +217,10 @@
                 data-mode="price" onclick="mobileSetMode('price')">@lang('admin::app.catalog.products.views.mode-price')</button>
         <button type="button" class="mobile-mode-tab flex-shrink-0 px-3 sm:px-4 py-1.5 rounded-md text-xs sm:text-sm font-semibold whitespace-nowrap"
                 data-mode="category" onclick="mobileSetMode('category')">@lang('admin::app.catalog.products.views.mode-category')</button>
+        <button type="button" class="mobile-mode-tab flex-shrink-0 px-3 sm:px-4 py-1.5 rounded-md text-xs sm:text-sm font-semibold whitespace-nowrap"
+                data-mode="brand" onclick="mobileSetMode('brand')">@lang('admin::app.catalog.products.views.mode-brand')</button>
+        <button type="button" class="mobile-mode-tab flex-shrink-0 px-3 sm:px-4 py-1.5 rounded-md text-xs sm:text-sm font-semibold whitespace-nowrap"
+                data-mode="color" onclick="mobileSetMode('color')">@lang('admin::app.catalog.products.views.mode-color')</button>
       </div>
       <div class="flex gap-1 flex-shrink-0">
         <button type="button" class="pos-cols-btn" data-cols="1" onclick="mobileSetCols(1)" title="1 column" aria-label="1 column">
@@ -385,6 +403,9 @@
 
   let allProducts     = [];
   let categoryOptions = [];
+  // Color rows carry only the option id (color_attr.integer_value); this map
+  // resolves id → readable label from the API's options.colors block.
+  let colorLabelById  = {};
   let currentMode     = 'stock';
 
   let sheet = {
@@ -425,6 +446,10 @@
       categoryOptions = ((res.data.options || {}).categories || []).map(c => ({
         id: String(c.id), name: c.name || ('#' + c.id),
       }));
+      colorLabelById = {};
+      ((res.data.options || {}).colors || []).forEach(c => {
+        colorLabelById[String(c.id)] = c.label || c.name || ('#' + c.id);
+      });
       mobileFilterList();
     } catch (err) {
       console.error('Load error:', err);
@@ -473,6 +498,17 @@
       case 'category': {
         const cat = (p.category_names && p.category_names[0]) || p.categories || '—';
         return `<span style="color:#9333ea;font-size:9px;font-weight:600;overflow:hidden;display:-webkit-box;-webkit-line-clamp:1;-webkit-box-orient:vertical;">${esc(cat)}</span>`;
+      }
+      case 'brand': {
+        // `brand` is already the resolved label (COALESCE of translation/text_value).
+        const brand = p.brand || '—';
+        return `<span style="color:#d97706;font-size:9px;font-weight:600;overflow:hidden;display:-webkit-box;-webkit-line-clamp:1;-webkit-box-orient:vertical;">${esc(brand)}</span>`;
+      }
+      case 'color': {
+        // `color` is the option id; resolve to a readable label via colorLabelById.
+        const cid = p.color != null && p.color !== '' ? String(p.color) : '';
+        const color = cid ? (colorLabelById[cid] || cid) : '—';
+        return `<span style="color:#0d9488;font-size:9px;font-weight:600;overflow:hidden;display:-webkit-box;-webkit-line-clamp:1;-webkit-box-orient:vertical;">${esc(color)}</span>`;
       }
       default: return '';
     }

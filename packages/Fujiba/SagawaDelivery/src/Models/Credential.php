@@ -19,7 +19,7 @@ class Credential extends Model
         'enabled',
         'use_sagawa_rate', 'priority', 'preparation_days',
         'support_phone', 'support_hours', 'support_branch',
-        'daibiki_binsyu_code', 'daibiki_payee_name',
+        'daibiki_payment_type',
     ];
 
     protected $casts = [

@@ -39,6 +39,8 @@ class Outlet extends Model implements OutletContract
         'status',
         'receipt_id',
         'inventory_source_id',
+        'business_hours',
+        'tax_mode',
     ];
 
     /**

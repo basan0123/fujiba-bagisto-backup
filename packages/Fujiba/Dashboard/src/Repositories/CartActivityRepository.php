@@ -70,9 +70,34 @@ class CartActivityRepository
             return [];
         }
 
+        // Bulk-fetch lifetime order count per customer (registered users) and
+        // per customer_email (guests reusing same email). Two queries, then
+        // hashmap lookup per row — avoids N+1 against `orders`.
+        $customerIds = $rows->pluck('customer_id')->filter()->unique()->values()->all();
+        $emails      = $rows->pluck('customer_email')->filter()->unique()->values()->all();
+
+        $countsById = [];
+        if (! empty($customerIds)) {
+            $countsById = DB::table('orders')
+                ->select('customer_id', DB::raw('COUNT(*) as c'))
+                ->whereIn('customer_id', $customerIds)
+                ->groupBy('customer_id')
+                ->pluck('c', 'customer_id')
+                ->all();
+        }
+        $countsByEmail = [];
+        if (! empty($emails)) {
+            $countsByEmail = DB::table('orders')
+                ->select('customer_email', DB::raw('COUNT(*) as c'))
+                ->whereIn('customer_email', $emails)
+                ->groupBy('customer_email')
+                ->pluck('c', 'customer_email')
+                ->all();
+        }
+
         $now = Carbon::now();
 
-        return $rows->map(function ($row) use ($now) {
+        return $rows->map(function ($row) use ($now, $countsById, $countsByEmail) {
             $updatedAt = $row->updated_at ? Carbon::parse($row->updated_at) : null;
             $isActive  = $updatedAt
                 ? $updatedAt->diffInMinutes($now) <= self::ACTIVE_WINDOW_MINUTES
@@ -84,12 +109,20 @@ class CartActivityRepository
                 ? 'converted'
                 : ($isActive ? 'active' : 'abandoned');
 
+            $purchaseCount = 0;
+            if ($row->customer_id && isset($countsById[$row->customer_id])) {
+                $purchaseCount = (int) $countsById[$row->customer_id];
+            } elseif ($row->customer_email && isset($countsByEmail[$row->customer_email])) {
+                $purchaseCount = (int) $countsByEmail[$row->customer_email];
+            }
+
             return [
                 'cart_id'          => (int) $row->id,
                 'customer_id'      => $row->customer_id ? (int) $row->customer_id : null,
                 'is_guest'         => (bool) $row->is_guest,
                 'display_name'     => $this->displayName($row),
                 'email'            => $row->customer_real_email ?: $row->customer_email,
+                'purchase_count'   => $purchaseCount,
                 'phone'            => $row->customer_phone,
                 'avatar'           => $this->resolveAvatar($row),
                 'avatar_initial'   => $this->initial($row),

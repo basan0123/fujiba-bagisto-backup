@@ -2,6 +2,7 @@
 
 namespace Fujiba\OrdersAdmin\Http\Controllers;
 
+use Fujiba\OrdersAdmin\Services\FulfillmentRecalculator;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Routing\Controller;
@@ -37,6 +38,7 @@ class OrderItemEditController extends Controller
     public function __construct(
         protected OrderRepository $orderRepository,
         protected OrderItemRepository $orderItemRepository,
+        protected FulfillmentRecalculator $fulfillmentRecalculator,
     ) {}
 
     /**
@@ -49,7 +51,7 @@ class OrderItemEditController extends Controller
      */
     public function show(int $id): JsonResponse
     {
-        $order = $this->orderRepository->with(['items.product'])->findOrFail($id);
+        $order = $this->orderRepository->with(['items.product', 'payment'])->findOrFail($id);
 
         $productIds = $order->items->pluck('product_id')->filter()->unique()->values()->toArray();
         $info = $this->fetchProductInfo($productIds);
@@ -64,9 +66,12 @@ class OrderItemEditController extends Controller
                 'shipping_amount' => (float) $order->shipping_amount,
                 'tax_amount'      => (float) $order->tax_amount,
                 'discount_amount' => (float) $order->discount_amount,
+                'cod_fee'         => (float) ($order->cod_fee ?? 0),
+                'cool_surcharge'  => (float) ($order->cool_surcharge ?? 0),
                 'grand_total'     => (float) $order->grand_total,
                 'shipping_method' => $order->shipping_method,
                 'shipping_title'  => $order->shipping_title,
+                'payment_method'  => $order->payment?->method,
                 'editable'        => $this->isEditable($order),
             ],
             'items' => $order->items->map(function ($i) use ($info) {
@@ -246,7 +251,7 @@ class OrderItemEditController extends Controller
             'note'                 => 'nullable|string|max:1000',
         ]);
 
-        $order = $this->orderRepository->with(['items.product', 'channel'])->findOrFail($id);
+        $order = $this->orderRepository->with(['items.product', 'channel', 'payment'])->findOrFail($id);
 
         if (! $this->isEditable($order)) {
             return response()->json([
@@ -403,9 +408,24 @@ class OrderItemEditController extends Controller
             $discount     = $originalSubTotal > 0 ? round($originalDiscount * ($subTotal / $originalSubTotal), 4) : 0;
             $baseDiscount = $originalSubTotal > 0 ? round($originalBaseDiscount * ($subTotal / $originalSubTotal), 4) : 0;
 
-            $grand = round($subTotal + $taxTotal + $shipping - $discount, 4);
+            // COD fee + cool surcharge: re-resolve via the same recalculator
+            // the fulfillment switch uses, so the fee is correct for the new
+            // subtotal (Sagawa tiers: ¥330 ≤9999, ¥440 ≥10000) and so cool
+            // is dropped/re-applied if items changed. Persisted separately
+            // from shipping per memory feedback_admin_recompute_uses_engine_not_carrier.
+            $paymentMethod = $order->payment?->method;
+            $order->sub_total = $subTotal;   // recalc needs the new sub_total
+            $cod  = 0.0;
+            $cool = 0.0;
+            if ($paymentMethod === 'cashondelivery') {
+                $cod = $this->fulfillmentRecalculator->resolveCodFee($subTotal);
+            }
+            if ($this->fulfillmentRecalculator->orderNeedsCoolShipping($order)) {
+                $cool = (float) config('fujiba.fees.cool', 220);
+            }
 
-            $order->sub_total          = $subTotal;
+            $grand = round($subTotal + $taxTotal + $shipping + $cod + $cool - $discount, 4);
+
             $order->base_sub_total     = $subTotal;
             $order->tax_amount         = $taxTotal;
             $order->base_tax_amount    = $taxTotal;
@@ -413,6 +433,10 @@ class OrderItemEditController extends Controller
             $order->base_shipping_amount = $shipping;
             $order->discount_amount    = $discount;
             $order->base_discount_amount = $baseDiscount;
+            $order->cod_fee            = $cod;
+            $order->base_cod_fee       = $cod;
+            $order->cool_surcharge     = $cool;
+            $order->base_cool_surcharge = $cool;
             $order->grand_total        = $grand;
             $order->base_grand_total   = $grand;
             $order->save();
@@ -444,6 +468,8 @@ class OrderItemEditController extends Controller
                 'shipping_amount' => (float) $fresh->shipping_amount,
                 'tax_amount'      => (float) $fresh->tax_amount,
                 'discount_amount' => (float) $fresh->discount_amount,
+                'cod_fee'         => (float) ($fresh->cod_fee ?? 0),
+                'cool_surcharge'  => (float) ($fresh->cool_surcharge ?? 0),
                 'grand_total'     => (float) $fresh->grand_total,
             ],
             'items'   => $fresh->items->map(fn ($i) => [

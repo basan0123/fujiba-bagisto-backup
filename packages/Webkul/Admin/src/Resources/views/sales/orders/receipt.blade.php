@@ -49,7 +49,8 @@
     <title>レシート — Order #{{ $order->increment_id }}</title>
     <style>
         *,*::before,*::after{box-sizing:border-box}
-        body{font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,"Hiragino Sans","Noto Sans JP",sans-serif;margin:0;background:#f4f4f5;color:#111827;-webkit-font-smoothing:antialiased}
+        html,body{max-width:100%;overflow-x:hidden}
+        body{font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,"Hiragino Sans","Noto Sans JP",sans-serif;margin:0;background:#f4f4f5;color:#111827;-webkit-font-smoothing:antialiased;word-wrap:break-word;overflow-wrap:break-word}
         .wrap{max-width:760px;margin:0 auto;padding:16px}
         .card{background:#fff;border:1px solid #e5e7eb;border-radius:12px;overflow:hidden;margin-bottom:14px}
         .head{display:flex;justify-content:space-between;align-items:center;gap:12px;padding:16px 20px;border-bottom:1px solid #e5e7eb;background:#fafafa}
@@ -107,23 +108,43 @@
         .cod-card .head{background:#ffedd5}
 
         @media (max-width:480px){
-            .wrap{padding:8px}
-            .head{padding:12px 14px;flex-wrap:wrap}
-            .head h1{font-size:16px}
-            .row{padding:12px 14px;gap:10px}
-            .img{flex:0 0 88px;width:88px;height:88px}
-            .name{font-size:14px}
-            .qty{font-size:18px}
-            .qty.big{font-size:24px}
-            .qcol{min-width:80px}
-            .meta-grid{grid-template-columns:1fr}
-            .ship-top{padding:14px 16px}
-            .ship-top .name{font-size:22px}
-            .ship-top .addr{font-size:17px}
-            .ship-top .phone{font-size:20px}
-            .delivery-banner{padding:12px 14px;gap:10px}
-            .delivery-banner .date{font-size:18px}
-            .delivery-banner .time{font-size:16px}
+            .wrap{padding:6px}
+            .card{border-radius:8px;margin-bottom:10px}
+            .head{padding:10px 12px;flex-wrap:wrap}
+            .head h1{font-size:15px}
+            .summary{padding:8px 12px;font-size:12px}
+            .summary .qty-total{font-size:18px}
+            .summary .qty-total b{font-size:20px}
+            .row{padding:10px 12px;gap:8px}
+            .img{flex:0 0 64px;width:64px;height:64px}
+            .info{min-width:0;overflow:hidden}
+            .name{font-size:13px;word-break:break-word;overflow-wrap:anywhere}
+            .sku{font-size:10px}
+            .price{font-size:12px}
+            .qty{font-size:16px}
+            .qty.big{font-size:22px}
+            .qcol{min-width:64px}
+            .subtotal{font-size:12px}
+            .totals{padding:12px 14px}
+            .totals .line{font-size:13px}
+            .totals .grand{font-size:16px}
+            .meta-grid{grid-template-columns:1fr;padding:12px 14px}
+            .ship-top{padding:12px 14px;margin-bottom:10px}
+            .ship-top .name{font-size:18px}
+            .ship-top .company{font-size:14px}
+            .ship-top .addr{font-size:14px}
+            .ship-top .post{font-size:15px}
+            .ship-top .phone{font-size:17px}
+            .delivery-banner{padding:10px 12px;gap:8px}
+            .delivery-banner .date{font-size:16px}
+            .delivery-banner .time{font-size:14px}
+            .cod-banner{padding:10px 12px;flex-wrap:wrap;font-size:13px}
+            .cod-banner .amt{font-size:14px}
+            /* anything that absolutely refuses to shrink (long SKUs, long
+               phone-formatted numbers, copy-paste address blocks) gets a
+               horizontal scrollbar instead of bursting the viewport. */
+            .scroll-x{overflow-x:auto;-webkit-overflow-scrolling:touch}
+            .ship-top,.delivery-banner,.cod-banner{max-width:100%}
         }
         @media print{
             body{background:#fff}

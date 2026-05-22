@@ -13,7 +13,7 @@ return [
         'title'     => 'Reorder Support',
         'channel'   => 'Channel',
         'lead-time' => 'Lead time',
-        'window'    => 'Sales window',
+        'window'    => 'Suggest window',
     ],
     'ui' => [
         'search-ph'       => 'Search by name or SKU',
@@ -24,7 +24,7 @@ return [
         'stock'           => 'Stock',
         'buy-at'          => 'Buy at',
         'cost'            => 'Cost',
-        'sale'            => 'Sales',
+        'sale'            => 'Sales (all-time)',
         'waste'           => 'Waste',
         'suggested'       => 'Suggested',
         'wish-qty'        => 'Wish qty',

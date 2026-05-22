@@ -166,16 +166,20 @@ class ReorderController
 
         $rows = $q->limit(2000)->get();
 
-        $ids        = $rows->pluck('id')->map(fn ($v) => (int) $v)->all();
-        $stockMap   = $this->stockResolver->forChannel($channelId, $ids);
-        $salesMap   = $this->salesAggregator->forChannel($channelId, $window, $ids);
-        $pendingMap = $this->pendingAggregator->forChannel($channelId, $ids);
+        $ids          = $rows->pluck('id')->map(fn ($v) => (int) $v)->all();
+        $stockMap     = $this->stockResolver->forChannel($channelId, $ids);
+        // Windowed sales drive the suggested-qty math (avg daily × lead time).
+        $windowSales  = $this->salesAggregator->forChannel($channelId, $window, $ids);
+        // All-time sales are what the "Sale Count" column shows.
+        $allTimeSales = $this->salesAggregator->allTimeForChannel($channelId, $ids);
+        $pendingMap   = $this->pendingAggregator->forChannel($channelId, $ids);
 
-        $payload = $rows->map(function ($r) use ($stockMap, $salesMap, $pendingMap, $window, $channelCode) {
-            $stock      = (int) ($stockMap[$r->id] ?? 0);
-            $sold       = (int) ($salesMap[$r->id] ?? 0);
-            $pending    = (int) ($pendingMap[$r->id] ?? 0);
-            $suggested  = $this->calculator->suggest($sold, $window, $stock, $channelCode);
+        $payload = $rows->map(function ($r) use ($stockMap, $windowSales, $allTimeSales, $pendingMap, $window, $channelCode) {
+            $stock        = (int) ($stockMap[$r->id] ?? 0);
+            $soldWindow   = (int) ($windowSales[$r->id] ?? 0);
+            $soldAllTime  = (int) ($allTimeSales[$r->id] ?? 0);
+            $pending      = (int) ($pendingMap[$r->id] ?? 0);
+            $suggested    = $this->calculator->suggest($soldWindow, $window, $stock, $channelCode);
 
             return [
                 'id'            => (int) $r->id,
@@ -188,7 +192,8 @@ class ReorderController
                 'buy_at'        => $r->buy_at,
                 'waste_count'   => (int) ($r->waste_count ?? 0),
                 'stock'         => $stock,
-                'sale_count'    => $sold,
+                // Column shows all-time sold; suggestion uses the windowed value.
+                'sale_count'    => $soldAllTime,
                 'pending_qty'   => $pending,
                 'suggested_qty' => $suggested,
             ];

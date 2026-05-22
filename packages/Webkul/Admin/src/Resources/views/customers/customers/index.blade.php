@@ -61,7 +61,7 @@
             </template>
 
             <template v-else>
-                <div class="row grid grid-cols-1 md:grid-cols-[2fr_1fr_1fr] grid-rows-1 gap-1 items-center border-b px-4 py-2.5 dark:border-gray-800 min-w-full">
+                <div class="row hidden md:grid grid-cols-[2fr_1fr_1fr] grid-rows-1 gap-1 items-center border-b px-4 py-2.5 dark:border-gray-800 min-w-full">
                     <div
                         class="flex select-none items-center gap-2.5"
                         v-for="(columnGroup, index) in [['full_name', 'email', 'phone'], ['status', 'gender', 'group', 'customer_id'], ['revenue', 'order_count', 'address_count']]"
@@ -119,6 +119,51 @@
                         </p>
                     </div>
                 </div>
+
+                <div class="md:hidden flex items-center justify-between gap-2 border-b px-4 py-2 dark:border-gray-800">
+                    @if ($hasPermission)
+                        <label
+                            class="flex w-max cursor-pointer select-none items-center gap-1"
+                            for="mass_action_select_all_records_mobile"
+                        >
+                            <input
+                                type="checkbox"
+                                name="mass_action_select_all_records_mobile"
+                                id="mass_action_select_all_records_mobile"
+                                class="peer hidden"
+                                :checked="['all', 'partial'].includes(applied.massActions.meta.mode)"
+                                @change="selectAll"
+                            >
+                            <span
+                                class="icon-uncheckbox cursor-pointer rounded-md text-2xl"
+                                :class="[
+                                    applied.massActions.meta.mode === 'all' ? 'peer-checked:icon-checked peer-checked:text-blue-600' : (
+                                        applied.massActions.meta.mode === 'partial' ? 'peer-checked:icon-checkbox-partial peer-checked:text-blue-600' : ''
+                                    ),
+                                ]"
+                            ></span>
+                        </label>
+                    @endif
+
+                    <select
+                        class="flex-1 rounded-md border border-gray-200 bg-white px-2 py-1 text-sm text-gray-700 dark:border-gray-800 dark:bg-gray-900 dark:text-gray-200"
+                        :value="applied.sort.column"
+                        @change="(e) => { const col = available.columns.find(c => c.index === e.target.value); if (col) sort(col); }"
+                    >
+                        <option
+                            v-for="col in available.columns.filter(c => c.sortable)"
+                            :key="col.index"
+                            :value="col.index"
+                        >@{{ col.label }}</option>
+                    </select>
+
+                    <button
+                        class="rounded-md border border-gray-200 px-2 py-1 text-base text-gray-700 dark:border-gray-800 dark:text-gray-200"
+                        @click="() => { const col = available.columns.find(c => c.index === applied.sort.column); if (col) sort(col); }"
+                    >
+                        <i :class="[applied.sort.order === 'asc' ? 'icon-down-stat': 'icon-up-stat']"></i>
+                    </button>
+                </div>
             </template>
         </template>
 
@@ -173,12 +218,38 @@
                             </span>
                         </template>
 
-                        <div class="flex flex-col gap-1.5">
-                            <p class="text-base font-semibold text-gray-800 dark:text-white">
-                                @{{ record.full_name }}
-                            </p>
+                        <div class="flex flex-col gap-1.5 min-w-0 flex-1">
+                            <div class="flex items-center gap-2 flex-wrap">
+                                <p class="text-base font-semibold text-gray-800 dark:text-white truncate">
+                                    @{{ record.full_name }}
+                                </p>
 
-                            <p class="text-gray-600 dark:text-gray-300">
+                                <span
+                                    class="inline-flex items-center gap-1 rounded-full px-2 py-0.5 text-xs font-semibold whitespace-nowrap"
+                                    :class="{
+                                        'bg-gray-100 text-gray-600 dark:bg-gray-800 dark:text-gray-300': Number(record.order_count) === 0,
+                                        'bg-blue-100 text-blue-700 dark:bg-blue-900/40 dark:text-blue-300': Number(record.order_count) >= 1 && Number(record.order_count) <= 2,
+                                        'bg-green-100 text-green-700 dark:bg-green-900/40 dark:text-green-300': Number(record.order_count) >= 3 && Number(record.order_count) <= 9,
+                                        'bg-amber-100 text-amber-800 dark:bg-amber-900/40 dark:text-amber-300': Number(record.order_count) >= 10,
+                                    }"
+                                    :title="`Purchased ${record.order_count} time(s)`"
+                                >
+                                    <i class="icon-cart text-sm"></i>
+                                    @{{ record.order_count || 0 }}x
+                                </span>
+
+                                <span
+                                    class="md:hidden inline-flex items-center"
+                                    :class="{
+                                        'label-canceled': record.status == '',
+                                        'label-active': record.status === 1,
+                                    }"
+                                >
+                                    @{{ record.status ? '@lang('admin::app.customers.customers.index.datagrid.active')' : '@lang('admin::app.customers.customers.index.datagrid.inactive')' }}
+                                </span>
+                            </div>
+
+                            <p class="text-gray-600 dark:text-gray-300 truncate">
                                 @{{ record.email }}
                             </p>
 
@@ -192,10 +263,35 @@
                             >
                                 Cart: @{{ record.last_cart_at }}
                             </p>
+
+                            <div class="md:hidden flex items-center justify-between gap-x-4 pt-1">
+                                <div class="flex flex-col gap-0.5">
+                                    <p class="text-base font-semibold text-gray-800 dark:text-white">
+                                        @{{ $admin.formatPrice(record.revenue) }}
+                                    </p>
+                                    <p class="text-xs text-gray-500 dark:text-gray-400">
+                                        @{{ "@lang('admin::app.customers.customers.index.datagrid.address')".replace(':address', record.address_count) }}
+                                        ·
+                                        @{{ "@lang('admin::app.customers.customers.index.datagrid.id-value')".replace(':id', record.customer_id) }}
+                                    </p>
+                                </div>
+
+                                <div class="flex items-center">
+                                    <a
+                                        class="icon-login cursor-pointer p-1.5 text-2xl hover:rounded-md hover:bg-gray-200 dark:hover:bg-gray-800 ltr:ml-1 rtl:mr-1"
+                                        :href=`{{ route('admin.customers.customers.login_as_customer', '') }}/${record.customer_id}`
+                                        target="_blank"
+                                    ></a>
+                                    <a
+                                        class="icon-sort-right rtl:icon-sort-left cursor-pointer p-1.5 text-2xl hover:rounded-md hover:bg-gray-200 dark:hover:bg-gray-800 ltr:ml-1 rtl:mr-1"
+                                        :href=`{{ route('admin.customers.customers.view', '') }}/${record.customer_id}`
+                                    ></a>
+                                </div>
+                            </div>
                         </div>
                     </div>
 
-                    <div class="flex flex-col gap-1.5 ps-8 md:ps-0">
+                    <div class="hidden md:flex flex-col gap-1.5 ps-8 md:ps-0">
                         <div class="flex gap-1.5">
                             <span
                                 :class="{
@@ -228,7 +324,7 @@
                         </p>
                     </div>
 
-                    <div class="flex items-center justify-between gap-x-4 ps-8 md:ps-0">
+                    <div class="hidden md:flex items-center justify-between gap-x-4 ps-8 md:ps-0">
                         <div class="flex flex-col gap-1.5">
                             <p class="text-base font-semibold text-gray-800 dark:text-white">
                                 @{{ $admin.formatPrice(record.revenue) }}

@@ -3748,6 +3748,10 @@ return [
             'not-available' => '利用可能なレコードはありません。',
             'start-date' => '開始日',
             'year' => '年',
+            'font-size' => '文字サイズ',
+            'full-width' => '全幅',
+            'reset-layout' => 'レイアウト初期化',
+            'layout-hint' => '見出しをクリックで並び替え・端をドラッグで幅変更・見出しをドラッグで順序変更',
         ],
 
         'empty' => [

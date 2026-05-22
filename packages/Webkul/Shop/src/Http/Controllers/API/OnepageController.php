@@ -113,7 +113,7 @@ class OnepageController extends APIController
 
         return new JsonResource([
             'redirect' => false,
-            'data' => Payment::getSupportedPaymentMethods(),
+            'data' => Payment::getSupportedPaymentMethods('shop'),
         ]);
     }
 
@@ -141,7 +141,7 @@ class OnepageController extends APIController
         Cart::collectTotals();
 
         $cart = Cart::getCart();
-        $paymentMethods = Payment::getSupportedPaymentMethods();
+        $paymentMethods = Payment::getSupportedPaymentMethods('shop');
         $codFee = $this->calculateCODFee($cart);
 
         $totalQty = (int) ($cart->items_qty ?? $cart->items->sum('quantity'));

@@ -4,19 +4,13 @@
        row holding [channel?, start, end, Orders/Payments toggle]. On phones the
        toggle gets squeezed onto the calendar's row and is barely tappable.
        Force the row to wrap and let each control fill its own line. */
+    /* NOTE: mobile-row layout for the dashboard filter bar now lives in
+       packages/Webkul/Admin/.../dashboard/index.blade.php (the .fj-dash-*
+       classes). The legacy block here is intentionally trimmed to avoid
+       fighting that layout (it used to force the toggle to its own row;
+       now channel + toggle share a row 50/50). Kept the
+       date-picker input width:100% so flatpickr inputs fill their parent. */
     @media (max-width: 640px) {
-        .fujiba-filter-row {
-            width: 100% !important;
-            display: flex !important;
-            flex-wrap: wrap !important;
-            gap: 8px !important;
-        }
-        /* Calendar inputs: 2-up so they share a row */
-        .fujiba-filter-row v-date-picker,
-        .fujiba-filter-row .v-date-picker {
-            flex: 1 1 calc(50% - 4px) !important;
-            min-width: 0 !important;
-        }
         .fujiba-filter-row v-date-picker .relative,
         .fujiba-filter-row v-date-picker .relative > input,
         .fujiba-filter-row .v-date-picker .relative,
@@ -25,24 +19,17 @@
         .fujiba-filter-row span.relative > input {
             width: 100% !important;
         }
-        /* Orders/Payments segmented control: full width, equal halves */
-        .fujiba-filter-row [role="group"] {
-            width: 100% !important;
-            display: flex !important;
-        }
         .fujiba-filter-row [role="group"] > button {
-            flex: 1 1 50% !important;
-            padding: 10px 12px !important;
             font-weight: 600 !important;
         }
     }
 
-    /* ─── Quick-range preset bar ─── */
+    /* ─── Quick-range preset bar (compact) ─── */
     .fujiba-range-presets {
         display: flex;
         flex-wrap: wrap;
-        gap: 6px;
-        margin-bottom: 10px;
+        gap: 4px;
+        margin-bottom: 6px;
     }
     .fujiba-range-presets button {
         appearance: none;
@@ -50,10 +37,11 @@
         border: 1px solid rgba(15,23,42,0.12);
         background: #fff;
         color: #374151;
-        font-size: 13px;
-        line-height: 1.2;
-        padding: 7px 12px;
+        font-size: 12px;
+        line-height: 1.15;
+        padding: 3px 9px;
         border-radius: 999px;
+        min-height: 0;
         transition: background 160ms ease, color 160ms ease, border-color 160ms ease;
     }
     .fujiba-range-presets button:hover {
@@ -79,17 +67,69 @@
         border-color: #3b82f6;
     }
     @media (max-width: 640px) {
-        .fujiba-range-presets {
-            justify-content: stretch;
-        }
+        .fujiba-range-presets { gap: 4px; margin-bottom: 6px; }
         .fujiba-range-presets button {
-            flex: 1 1 calc(33% - 6px);
-            padding: 9px 10px;
+            flex: 0 1 auto;
+            padding: 3px 9px;
+            font-size: 12px;
         }
     }
 </style>
 
 <script>
+/* ─── Filter relay shim ───────────────────────────────────────────────
+   Problem: the core store-stats widgets (総売上 / 訪問者 / よく売れている商品 /
+   売上最多の顧客) subscribe to the shared `reporting-filter-updated` emitter
+   event in their own mounted() hook. The <v-dashboard-filters> component sits
+   EARLIER in the DOM, so its initial mounted() emit fires BEFORE those widgets
+   register their listeners — mitt has no event replay, so the first emit is
+   lost and those widgets fall back to their own dateless default fetch and
+   then never reflect the active date range.
+
+   Fix (additive, no core override): remember the most recent filter payload on
+   window.__fjLastFilter by wrapping emitter.emit, and re-broadcast it once on
+   the next tick after load so any late subscriber receives the current filter.
+   Subsequent user changes already propagate normally. */
+(function () {
+    'use strict';
+
+    function installRelay() {
+        var em = window.emitter;
+        if (! em || em.__fjRelayInstalled) return !! (em && em.__fjRelayInstalled);
+
+        var origEmit = em.emit.bind(em);
+        em.emit = function (type, evt) {
+            if (type === 'reporting-filter-updated' && evt && typeof evt === 'object') {
+                window.__fjLastFilter = Object.assign({}, evt);
+            }
+            return origEmit(type, evt);
+        };
+        em.__fjRelayInstalled = true;
+        return true;
+    }
+
+    // Re-broadcast the latest filter so widgets that subscribed after the
+    // first emit pick it up. Runs a couple of times to cover staggered mounts.
+    function rebroadcast() {
+        var em = window.emitter;
+        if (! em || ! window.__fjLastFilter) return;
+        em.emit('reporting-filter-updated', Object.assign({}, window.__fjLastFilter));
+    }
+
+    var tries = 0;
+    (function waitForEmitter() {
+        if (installRelay()) {
+            // Give all dashboard widgets a moment to mount + subscribe, then
+            // replay the current filter once so none are stuck on stale dates.
+            setTimeout(rebroadcast, 400);
+            setTimeout(rebroadcast, 1200);
+            return;
+        }
+        if (tries++ > 80) return;
+        setTimeout(waitForEmitter, 50);
+    })();
+})();
+
 (function () {
     'use strict';
 
@@ -106,8 +146,19 @@
     function addMonths(d, n)   { return new Date(d.getFullYear(), d.getMonth() + n, d.getDate()); }
     function startOfYear(d)    { return new Date(d.getFullYear(), 0, 1); }
 
+    var LABELS = {
+        today:      @json(trans('fujiba::app.dashboard.range_presets.today')),
+        yesterday:  @json(trans('fujiba::app.dashboard.range_presets.yesterday')),
+        this_month: @json(trans('fujiba::app.dashboard.range_presets.this_month')),
+        last_month: @json(trans('fujiba::app.dashboard.range_presets.last_month')),
+        last_3m:    @json(trans('fujiba::app.dashboard.range_presets.last_3m')),
+        this_year:  @json(trans('fujiba::app.dashboard.range_presets.this_year')),
+        all:        @json(trans('fujiba::app.dashboard.range_presets.all')),
+    };
+
     function presets() {
         var today = new Date();
+        var yesterday = new Date(today.getFullYear(), today.getMonth(), today.getDate() - 1);
         var thisMonthStart = startOfMonth(today);
         var lastMonthStart = startOfMonth(addMonths(today, -1));
         var lastMonthEnd   = endOfMonth(addMonths(today, -1));
@@ -117,12 +168,13 @@
         var allStart       = new Date(today.getFullYear() - 5, 0, 1);
 
         return [
-            { key: 'today',      label: '今日',     start: fmt(today),          end: fmt(today) },
-            { key: 'this_month', label: '今月',     start: fmt(thisMonthStart), end: fmt(today) },
-            { key: 'last_month', label: '先月',     start: fmt(lastMonthStart), end: fmt(lastMonthEnd) },
-            { key: 'last_3m',   label: '直近3ヶ月', start: fmt(threeMonthsAgo), end: fmt(today) },
-            { key: 'this_year', label: '今年',     start: fmt(yearStart),      end: fmt(today) },
-            { key: 'all',       label: '全期間',   start: fmt(allStart),       end: fmt(today) },
+            { key: 'today',      label: LABELS.today,      start: fmt(today),          end: fmt(today) },
+            { key: 'yesterday',  label: LABELS.yesterday,  start: fmt(yesterday),      end: fmt(yesterday) },
+            { key: 'this_month', label: LABELS.this_month, start: fmt(thisMonthStart), end: fmt(today) },
+            { key: 'last_month', label: LABELS.last_month, start: fmt(lastMonthStart), end: fmt(lastMonthEnd) },
+            { key: 'last_3m',    label: LABELS.last_3m,    start: fmt(threeMonthsAgo), end: fmt(today) },
+            { key: 'this_year',  label: LABELS.this_year,  start: fmt(yearStart),      end: fmt(today) },
+            { key: 'all',        label: LABELS.all,        start: fmt(allStart),       end: fmt(today) },
         ];
     }
 
@@ -141,7 +193,7 @@
             var t1 = (btns[1].textContent || '').trim().toLowerCase();
             if (t0 !== 'orders' || t1 !== 'payments') continue;
 
-            var row = g.closest('.flex.gap-1\\.5') || g.parentElement;
+            var row = g.closest('.fj-dash-filters') || g.closest('.flex.gap-1\\.5') || g.parentElement;
             if (!row) continue;
             var fps = row.querySelectorAll('input.flatpickr-input');
             if (fps.length < 2) continue;

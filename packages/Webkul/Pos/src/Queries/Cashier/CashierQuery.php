@@ -38,17 +38,40 @@ class CashierQuery extends Controller
         $cashPaymentSale = $order->cash_payment_sale ?? 0;
         $otherPaymentSale = $order->other_payment_sale ?? 0;
 
-        $expectedDrawerAmount = $openingAmount + $cashPaymentSale;
+        // Petty-cash in/out recorded today for this cashier. `income`
+        // (cash in) adds to the drawer; `expense` (cash out) subtracts.
+        // Without this the expected figure ignored movements and the
+        // close-out variance never reconciled.
+        $cashMovementsTotal = $this->getTodaysCashMovementsTotal($context->user());
+
+        $expectedDrawerAmount = $openingAmount + $cashPaymentSale + $cashMovementsTotal;
         $differenceAmount = $cashPaymentSale + $otherPaymentSale;
 
         return [
             'opening_amount'         => core()->convertPrice($openingAmount),
             'cash_payment_sale'      => core()->convertPrice($cashPaymentSale),
             'other_payment_sale'     => core()->convertPrice($otherPaymentSale),
+            'cash_movements_total'   => core()->convertPrice($cashMovementsTotal),
             'expected_drawer_amount' => core()->convertPrice($expectedDrawerAmount),
             'difference_amount'      => core()->convertPrice($differenceAmount),
             'remark'                 => $drawer->remark,
         ];
+    }
+
+    /**
+     * Sum today's petty-cash movements for the cashier as a signed total:
+     * income (cash in) positive, expense (cash out) negative.
+     */
+    protected function getTodaysCashMovementsTotal(object $user): float
+    {
+        $sums = DB::table('pos_cash_movements')
+            ->where('user_id', $user->id)
+            ->whereDate('movement_date', today()->toDateString())
+            ->selectRaw("COALESCE(SUM(CASE WHEN type = 'income' THEN amount ELSE 0 END), 0) as income")
+            ->selectRaw("COALESCE(SUM(CASE WHEN type = 'expense' THEN amount ELSE 0 END), 0) as expense")
+            ->first();
+
+        return (float) ($sums->income ?? 0) - (float) ($sums->expense ?? 0);
     }
 
     /**

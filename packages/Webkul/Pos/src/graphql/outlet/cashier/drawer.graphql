@@ -23,6 +23,7 @@ type CashierDrawer {
     openingAmount: String @rename(attribute: "opening_amount")
     cashPaymentSale: String @rename(attribute: "cash_payment_sale")
     otherPaymentSale: String @rename(attribute: "other_payment_sale")
+    cashMovementsTotal: String @rename(attribute: "cash_movements_total")
     expectedDrawerAmount: String @rename(attribute: "expected_drawer_amount")
     differenceAmount: String @rename(attribute: "difference_amount")
     remark: String

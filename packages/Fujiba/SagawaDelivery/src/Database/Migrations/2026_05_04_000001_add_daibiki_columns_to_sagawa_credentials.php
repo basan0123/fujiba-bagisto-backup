@@ -14,11 +14,9 @@ return new class extends Migration
     public function up(): void
     {
         Schema::connection($this->getConnection())->table('sagawa_credentials', function (Blueprint $table) {
-            if (! Schema::connection($this->getConnection())->hasColumn('sagawa_credentials', 'daibiki_binsyu_code')) {
-                $table->string('daibiki_binsyu_code', 8)->nullable()->after('api_endpoint');
-            }
-            if (! Schema::connection($this->getConnection())->hasColumn('sagawa_credentials', 'daibiki_payee_name')) {
-                $table->string('daibiki_payee_name', 50)->nullable()->after('daibiki_binsyu_code');
+            if (! Schema::connection($this->getConnection())->hasColumn('sagawa_credentials', 'daibiki_payment_type')) {
+                // Sagawa Biz-Logi `daibikiType`: '0' どちらでも | '1' 現金 | '2' カード/Jデビット | null=システム設定
+                $table->string('daibiki_payment_type', 1)->nullable()->after('api_endpoint');
             }
         });
     }
@@ -26,11 +24,8 @@ return new class extends Migration
     public function down(): void
     {
         Schema::connection($this->getConnection())->table('sagawa_credentials', function (Blueprint $table) {
-            if (Schema::connection($this->getConnection())->hasColumn('sagawa_credentials', 'daibiki_payee_name')) {
-                $table->dropColumn('daibiki_payee_name');
-            }
-            if (Schema::connection($this->getConnection())->hasColumn('sagawa_credentials', 'daibiki_binsyu_code')) {
-                $table->dropColumn('daibiki_binsyu_code');
+            if (Schema::connection($this->getConnection())->hasColumn('sagawa_credentials', 'daibiki_payment_type')) {
+                $table->dropColumn('daibiki_payment_type');
             }
         });
     }

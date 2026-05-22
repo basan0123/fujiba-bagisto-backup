@@ -5,26 +5,36 @@
 
 <style>
     .fujiba-sbs-card {
-        background: linear-gradient(135deg,#0f172a 0%,#1e293b 100%) !important;
-        color: #fff !important;
-        border-radius: 16px !important;
+        background: #fff !important;
+        color: #1f2937 !important;
+        border-radius: 12px !important;
         padding: 18px !important;
-        box-shadow: 0 6px 20px -8px rgba(99,102,241,0.45),
-                    0 2px 4px rgba(15,23,42,0.10) !important;
+        box-shadow: 0 1px 2px rgba(15,23,42,0.04), 0 4px 12px -8px rgba(15,23,42,0.06) !important;
+        border: 1px solid rgba(15,23,42,0.06);
+        height: 100%;
+        display: flex;
+        flex-direction: column;
+    }
+    .dark .fujiba-sbs-card {
+        background: rgb(17,24,39) !important;
+        color: #f3f4f6 !important;
+        border-color: rgba(255,255,255,0.06);
     }
     .fujiba-sbs-title {
         font-size: 12px !important;
         font-weight: 700 !important;
         text-transform: uppercase !important;
         letter-spacing: 0.12em !important;
-        color: rgba(255,255,255,0.92) !important;
+        color: #1e3a8a !important;
         margin: 0 0 4px 0 !important;
     }
+    .dark .fujiba-sbs-title { color: #93c5fd !important; }
     .fujiba-sbs-subtitle {
         font-size: 11px;
-        color: rgba(255,255,255,0.55);
+        color: #6b7280;
         margin: 0 0 14px 0;
     }
+    .dark .fujiba-sbs-subtitle { color: rgba(255,255,255,0.55); }
     .fujiba-sbs-totals {
         display: flex; gap: 18px; margin-bottom: 14px;
         font-variant-numeric: tabular-nums;
@@ -32,13 +42,15 @@
     .fujiba-sbs-total-block { display: flex; flex-direction: column; }
     .fujiba-sbs-total-label {
         font-size: 10px;
-        color: rgba(255,255,255,0.55);
+        color: #6b7280;
         text-transform: uppercase;
         letter-spacing: 0.08em;
     }
+    .dark .fujiba-sbs-total-label { color: rgba(255,255,255,0.55); }
     .fujiba-sbs-total-value {
-        font-size: 18px; font-weight: 800; color: #fff;
+        font-size: 18px; font-weight: 800; color: #111827;
     }
+    .dark .fujiba-sbs-total-value { color: #f9fafb; }
     .fujiba-sbs-list {
         display: flex; flex-direction: column; gap: 6px;
         max-height: 420px; overflow-y: auto;
@@ -46,8 +58,9 @@
     }
     .fujiba-sbs-list::-webkit-scrollbar { width: 6px; }
     .fujiba-sbs-list::-webkit-scrollbar-thumb {
-        background: rgba(255,255,255,0.15); border-radius: 3px;
+        background: rgba(15,23,42,0.15); border-radius: 3px;
     }
+    .dark .fujiba-sbs-list::-webkit-scrollbar-thumb { background: rgba(255,255,255,0.15); }
     .fujiba-sbs-row {
         display: grid;
         grid-template-columns: 22px minmax(0, 1.2fr) minmax(120px, 2fr) auto;
@@ -57,30 +70,35 @@
         border-radius: 6px;
         transition: background 150ms ease;
     }
-    .fujiba-sbs-row:hover { background: rgba(255,255,255,0.06); }
+    .fujiba-sbs-row:hover { background: rgba(59,130,246,0.06); }
+    .dark .fujiba-sbs-row:hover { background: rgba(255,255,255,0.06); }
     .fujiba-sbs-rank {
         font-size: 11px; font-weight: 700;
-        color: rgba(255,255,255,0.5);
+        color: #9ca3af;
         text-align: center;
         font-variant-numeric: tabular-nums;
     }
+    .dark .fujiba-sbs-rank { color: rgba(255,255,255,0.5); }
     .fujiba-sbs-name {
         font-size: 13px; font-weight: 600;
-        color: #fff;
+        color: #1f2937;
         white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
     }
+    .dark .fujiba-sbs-name { color: #f3f4f6; }
     .fujiba-sbs-name-orders {
         font-size: 10px; font-weight: 500;
-        color: rgba(255,255,255,0.5);
+        color: #9ca3af;
         margin-left: 6px;
     }
+    .dark .fujiba-sbs-name-orders { color: rgba(255,255,255,0.5); }
     .fujiba-sbs-bar-wrap {
         position: relative;
         height: 10px;
-        background: rgba(255,255,255,0.08);
+        background: rgba(15,23,42,0.06);
         border-radius: 5px;
         overflow: hidden;
     }
+    .dark .fujiba-sbs-bar-wrap { background: rgba(255,255,255,0.08); }
     .fujiba-sbs-bar {
         height: 100%;
         background: linear-gradient(90deg,#3b82f6 0%,#8b5cf6 60%,#ec4899 100%);
@@ -89,24 +107,30 @@
     }
     .fujiba-sbs-amount {
         font-size: 13px; font-weight: 800;
-        color: #fff; text-align: right;
+        color: #111827; text-align: right;
         font-variant-numeric: tabular-nums;
         white-space: nowrap;
     }
+    .dark .fujiba-sbs-amount { color: #f9fafb; }
     .fujiba-sbs-empty {
         text-align: center;
         padding: 28px 12px;
-        color: rgba(255,255,255,0.6);
+        color: #6b7280;
     }
+    .dark .fujiba-sbs-empty { color: rgba(255,255,255,0.6); }
     .fujiba-sbs-unmapped {
         margin-top: 10px;
         padding: 8px 10px;
-        background: rgba(255,255,255,0.04);
+        background: rgba(15,23,42,0.04);
         border-radius: 6px;
         font-size: 11px;
-        color: rgba(255,255,255,0.55);
+        color: #6b7280;
         display: flex; justify-content: space-between;
         font-variant-numeric: tabular-nums;
+    }
+    .dark .fujiba-sbs-unmapped {
+        background: rgba(255,255,255,0.04);
+        color: rgba(255,255,255,0.55);
     }
     @media (max-width: 640px) {
         .fujiba-sbs-card { padding: 14px !important; max-width: 100% !important; overflow: hidden !important; }

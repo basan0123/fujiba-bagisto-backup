@@ -3,6 +3,17 @@
 return [
     'dashboard' => [
 
+        // ───────────── range_presets (quick-range bar above filters) ─────────────
+        'range_presets' => [
+            'today'      => 'Today',
+            'yesterday'  => 'Yesterday',
+            'this_month' => 'This month',
+            'last_month' => 'Last month',
+            'last_3m'    => 'Last 3 months',
+            'this_year'  => 'This year',
+            'all'        => 'All time',
+        ],
+
         // ───────────── common ─────────────
         'common' => [
             'loading'         => 'Loading...',
@@ -88,6 +99,47 @@ return [
             'title'        => 'Delivery fees collected',
             'subtitle'     => 'Shipping charged to customers',
             'empty_state'  => 'No deliveries in this period',
+        ],
+
+        // ───────────── Shipping performance (margin + free-ship subsidy) ─────────────
+        'shipping_performance' => [
+            'title'                => 'Shipping Performance',
+            'loading'              => 'Loading…',
+            'collected'            => 'Collected from Customers',
+            'carrier_cost'         => 'Actual Carrier Cost',
+            'margin'               => 'Margin',
+            'margin_hint'          => 'Positive = collected exceeds carrier billing',
+            'over_n_orders'        => 'across :count orders',
+            'fully_reconciled'     => 'All orders reconciled',
+            'pending_n'            => ':count orders pending carrier invoice',
+            'free_shipping_block'  => 'Free Shipping Applied',
+            'free_orders'          => 'Free-Shipped Orders',
+            'subsidy'              => 'Shipping Subsidised',
+            'avg_subsidy'          => 'Average per Order',
+            'by_rule'              => 'By threshold rule',
+            'rule_other'           => 'Other / unmatched rule',
+            'no_free_orders'       => 'No free-shipping orders in this period.',
+            'manage_costs'         => 'Manage carrier costs',
+            'import'               => [
+                'page_title'        => 'Carrier Shipping Costs',
+                'back_to_dashboard' => 'Back to dashboard',
+                'upload_section'    => 'Import carrier invoice CSV',
+                'csv_file'          => 'CSV file',
+                'carrier_code'      => 'Carrier (default)',
+                'billing_month'     => 'Billing month (default)',
+                'submit'            => 'Import',
+                'format_hint'       => 'CSV header: tracking_number, carrier_cost [, billing_month, carrier_code, notes]. Or use order_id instead of tracking_number.',
+                'recent_section'    => 'Recent entries',
+                'empty_state'       => 'No carrier costs recorded yet.',
+                'done'              => 'Imported :count rows.',
+                'saved'             => 'Saved.',
+                'read_failed'       => 'Could not read CSV file.',
+                'empty'             => 'CSV file is empty.',
+                'bad_header'        => 'CSV must include either tracking_number or order_id, plus carrier_cost.',
+                'unknown_order'     => 'Order not found.',
+                'unmatched_header'  => ':count rows could not be matched to an order',
+                'last_month_label'  => 'last month :m',
+            ],
         ],
 
         // ───────────── W2/W3: inventory_value ─────────────

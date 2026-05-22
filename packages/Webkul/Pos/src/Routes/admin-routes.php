@@ -18,6 +18,8 @@ Route::group([
     'middleware' => ['admin', 'pos'],
     'prefix'     => config('app.admin_url').'/pos',
 ], function () {
+    Route::redirect('/', config('app.admin_url').'/pos/outlets')->name('admin.pos.index');
+
     Route::controller(UsersController::class)->prefix('users')->group(function () {
         Route::get('', 'index')->name('admin.pos.users.index');
 

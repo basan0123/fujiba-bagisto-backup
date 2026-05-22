@@ -7,6 +7,10 @@
 <style>
 /* ---------- layout ---------- */
 .lc-wrap{display:flex;height:calc(100vh - 120px);overflow:hidden;border:1px solid #e2e8f0;border-radius:8px;background:#fff}
+/* iOS-safe viewport unit when supported — accounts for the dynamic browser chrome
+   (URL bar, bottom toolbar) that vh ignores, so the chat area doesn't extend past
+   the visible viewport on mobile Safari/Chrome. */
+@supports (height: 100dvh){.lc-wrap{height:calc(100dvh - 120px)}}
 /* sidebar */
 .lc-sidebar{width:280px;min-width:280px;display:flex;flex-direction:column;border-right:1px solid #e2e8f0}
 .lc-sidebar-header{background:linear-gradient(135deg,#3d94fd,#6cbdfc);padding:12px 14px}
@@ -90,10 +94,20 @@
 ::-webkit-scrollbar-thumb{background:#cbd5e1;border-radius:4px}
 /* responsive */
 @media(max-width:768px){
+    /* Mobile: collapse to fill the visible viewport. The admin layout above
+       this view adds extra top/bottom padding that breaks the 120px constant
+       used on desktop, so we override with a smaller deduction and prefer
+       100dvh which excludes the iOS dynamic browser chrome. */
+    .lc-wrap{height:calc(100vh - 80px)}
+    @supports (height: 100dvh){.lc-wrap{height:calc(100dvh - 80px)}}
     .lc-sidebar{width:100%;position:absolute;z-index:10;height:100%;background:#fff;transition:transform .25s}
     .lc-sidebar.hidden{transform:translateX(-100%)}
     .lc-panel{display:none}
-    .lc-chat{width:100%}
+    .lc-chat{width:100%;min-height:0}
+    /* Stop the messages column from pushing the textarea off-screen when the
+       on-screen keyboard pops up — the flex parent must allow shrinking. */
+    .lc-messages{min-height:0}
+    .lc-footer{padding-bottom:max(8px,env(safe-area-inset-bottom))}
 }
 </style>
 @endpush

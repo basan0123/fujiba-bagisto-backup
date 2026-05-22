@@ -352,9 +352,13 @@ class OrderMutation
     /**
      * Get Tax Percentage
      *
+     * Public so the standalone invoice-builder (InvoiceBuilderMutation)
+     * can resolve the same outlet-based tax rate without duplicating the
+     * tax-category/zip lookup.
+     *
      * @return float
      */
-    private function getTaxPercentage($product, $outlet)
+    public function getTaxPercentage($product, $outlet)
     {
         $taxCategoryId = $product->tax_category_id;
 
@@ -417,19 +421,25 @@ class OrderMutation
      */
     private function getCustomerAddress(object $customer, string $type, object $outlet): array
     {
+        // The addresses table declares address/city/state/country/postcode as
+        // NOT NULL, so a POS order whose outlet is missing any of these (walk-in
+        // sale, partially-configured outlet) used to 500 the entire syncOrder
+        // with "Column 'address' cannot be null". Coalesce every column to a
+        // safe non-null default so a sale can always complete; the outlet's
+        // real values win when present.
         return [
             'address_type' => $type,
-            'first_name'   => $customer->first_name,
-            'last_name'    => $customer->last_name,
+            'first_name'   => $customer->first_name ?: 'Walk-in',
+            'last_name'    => $customer->last_name ?: 'Customer',
             'gender'       => $customer->gender,
             'company_name' => $customer->company_name,
             'email'        => $customer->email,
-            'phone'        => $customer->phone ?? $outlet->phone,
-            'address'      => $outlet->address,
-            'city'         => $outlet->city,
-            'state'        => $outlet->state,
-            'country'      => $outlet->country,
-            'postcode'     => $outlet->postcode,
+            'phone'        => $customer->phone ?: ($outlet->phone ?: ''),
+            'address'      => $outlet->address ?: ($outlet->name ?: '-'),
+            'city'         => $outlet->city     ?: '-',
+            'state'        => $outlet->state    ?: '-',
+            'country'      => $outlet->country  ?: 'JP',
+            'postcode'     => $outlet->postcode ?: '0000000',
         ];
     }
 

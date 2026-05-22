@@ -20,7 +20,7 @@ class PaymentController extends Controller
     public function __invoke(): JsonResponse
     {
         try {
-            $supported = Payment::getSupportedPaymentMethods();
+            $supported = Payment::getSupportedPaymentMethods('shop');
         } catch (\Throwable $e) {
             $supported = ['payment_methods' => []];
         }

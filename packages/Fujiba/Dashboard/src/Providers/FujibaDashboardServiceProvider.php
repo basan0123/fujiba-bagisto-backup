@@ -13,11 +13,13 @@ use Fujiba\Dashboard\Listeners\CartStatusListener;
 use Fujiba\Dashboard\Listeners\FilterEnhancementsListener;
 use Fujiba\Dashboard\Listeners\OrdersByRegionListener;
 use Fujiba\Dashboard\Listeners\SalesByStateListener;
+use Fujiba\Dashboard\Listeners\SavedFilterHelperListener;
 use Fujiba\Dashboard\Listeners\TodaysDetailsRestyleListener;
 use Fujiba\Dashboard\Listeners\HeroStripListener;
 use Fujiba\Dashboard\Listeners\InventoryValueListener;
 use Fujiba\Dashboard\Listeners\PaymentMethodsListener;
 use Fujiba\Dashboard\Listeners\PosVsOnlineListener;
+use Fujiba\Dashboard\Listeners\ShippingPerformanceListener;
 use Fujiba\Dashboard\Listeners\SubscribersListener;
 use Fujiba\Dashboard\Listeners\TodaysGridCloseListener;
 use Fujiba\Dashboard\Listeners\TodaysGridOpenListener;
@@ -53,6 +55,14 @@ class FujibaDashboardServiceProvider extends ServiceProvider
             return "<?php echo e(app(\\Fujiba\\Dashboard\\Support\\ShortPrice::class)->format({$expression})); ?>";
         });
 
+        // Expose window.fjSavedFilter() on every admin page (before Vue mounts)
+        // so dashboard + reporting stat widgets self-load the saved global-filter
+        // period in mounted() instead of racing the filter component's emit.
+        Event::listen(
+            'bagisto.admin.layout.vue-app-mount.before',
+            [SavedFilterHelperListener::class, 'handle']
+        );
+
         Event::listen(
             'bagisto.admin.dashboard.overall_details.before',
             [HeroStripListener::class, 'handle']
@@ -72,6 +82,15 @@ class FujibaDashboardServiceProvider extends ServiceProvider
         Event::listen(
             'bagisto.admin.dashboard.overall_details.before',
             [BusinessOverviewListener::class, 'handle']
+        );
+
+        // Shipping Performance: collected vs carrier-billed shipping (margin)
+        // + free-shipping subsidy count. Reads `order_shipping_costs` (manual /
+        // CSV) and `shipping_rule_logs`. Renders directly below the Business
+        // Overview block.
+        Event::listen(
+            'bagisto.admin.dashboard.overall_details.before',
+            [ShippingPerformanceListener::class, 'handle']
         );
 
         // Order matters: Inventory Value renders before

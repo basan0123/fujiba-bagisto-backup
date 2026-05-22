@@ -217,7 +217,20 @@ if (!$channelId) {
     {
         $setting = $this->getSetting($request);
 
-        // Query local chatpion_import DB filtered by this page's fb_bot_id
+        // Prefer live upstream Chatpion API — local chatpion_import is stale
+        // because the hourly sync is disabled.
+        $chatpion = new ChatpionFailoverService($setting);
+        $upstream = $chatpion->apiPost('livechat_canned_responses', [
+            'whatsapp_bot_id' => $setting->fb_bot_id,
+        ]);
+
+        if (is_array($upstream) && ($upstream['status'] ?? null) === 'success') {
+            $rows = is_array($upstream['data'] ?? null) ? $upstream['data'] : [];
+
+            return response()->json(array_values($rows));
+        }
+
+        // Upstream unreachable — fall back to local chatpion_import (stale).
         $canned = \DB::connection('chatpion_import')
             ->table('canned_response')
             ->where('page_id', $setting->fb_bot_id)
@@ -286,7 +299,86 @@ if (!$channelId) {
     {
         $setting = $this->getSetting($request);
 
-        // Query local chatpion_import DB filtered by this page's fb_bot_id
+        // Prefer live upstream Chatpion API — local chatpion_import is stale
+        // because the hourly sync is disabled (phantom-reservation incident).
+        // Daily admin edits to flows on fujiba.shop only show up here when we
+        // query the upstream directly.
+        $chatpion = new ChatpionFailoverService($setting);
+        $upstream = $chatpion->apiGet('livechat_bot_flows', [
+            'whatsapp_bot_id' => $setting->fb_bot_id,
+        ]);
+
+        // Upstream returns either a flat array of flow rows, or {status:error,...}.
+        // When the upstream patch lands, rows include page_id and we can filter
+        // upstream-side. Until then we filter locally using the (postback_id,
+        // bot_name) → page_id mapping from chatpion_import.messenger_bot_postback.
+        if (is_array($upstream) && (! isset($upstream['status']) || $upstream['status'] !== 'error')) {
+            $rows = array_values(array_filter($upstream, fn ($r) => is_array($r) && ! empty($r['postback_id'])));
+
+            // Path A — upstream is patched and tells us the page_id directly.
+            if (! empty($rows) && array_key_exists('page_id', $rows[0])) {
+                $rows = array_values(array_filter(
+                    $rows,
+                    fn ($r) => (string) ($r['page_id'] ?? '') === (string) $setting->fb_bot_id
+                ));
+            } else {
+                // Path B — upstream returns flows across all pages. Disambiguate
+                // by (postback_id, bot_name) against the local mapping. Same
+                // postback_id can be cloned across pages with different names,
+                // so we key on the pair. Rows we can't map are dropped to avoid
+                // leaking flows from another channel into this picker.
+                $pageId = (string) $setting->fb_bot_id;
+
+                $localPairsForPage = \DB::connection('chatpion_import')
+                    ->table('messenger_bot_postback')
+                    ->where('page_id', $pageId)
+                    ->pluck('bot_name', 'postback_id')
+                    ->all();
+
+                $localPostbackPageCount = \DB::connection('chatpion_import')
+                    ->table('messenger_bot_postback')
+                    ->select('postback_id')
+                    ->selectRaw('COUNT(DISTINCT page_id) AS pages')
+                    ->groupBy('postback_id')
+                    ->pluck('pages', 'postback_id')
+                    ->all();
+
+                $rows = array_values(array_filter($rows, function ($r) use ($pageId, $localPairsForPage, $localPostbackPageCount) {
+                    $pb   = $r['postback_id'] ?? '';
+                    $name = (string) ($r['bot_name'] ?? '');
+
+                    // Direct (postback_id, bot_name) match on this page.
+                    if (isset($localPairsForPage[$pb]) && $localPairsForPage[$pb] === $name) {
+                        return true;
+                    }
+
+                    // Postback_id exists ONLY on this page locally — safe to keep
+                    // even when bot_name has been renamed upstream.
+                    if (isset($localPairsForPage[$pb])
+                        && ($localPostbackPageCount[$pb] ?? 0) <= 1) {
+                        return true;
+                    }
+
+                    // Unknown to local cache — drop. Keeps the picker scoped to
+                    // this channel rather than leaking sibling-channel flows.
+                    return false;
+                }));
+            }
+
+            $rows = array_values(array_filter(
+                $rows,
+                fn ($r) => ! in_array($r['postback_id'], $this->systemPostbacks, true)
+            ));
+
+            usort($rows, fn ($a, $b) => strcasecmp(
+                (string) ($a['bot_name'] ?? ''),
+                (string) ($b['bot_name'] ?? '')
+            ));
+
+            return response()->json($rows);
+        }
+
+        // Upstream unreachable — fall back to local chatpion_import (stale).
         $flows = \DB::connection('chatpion_import')
             ->table('messenger_bot')
             ->where('page_id', $setting->fb_bot_id)

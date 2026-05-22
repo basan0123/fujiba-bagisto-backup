@@ -8,6 +8,13 @@ return [
         'overdue'  => 'ကျော်လွန်',
         'loading'  => 'ဖွင့်နေသည်…',
     ],
+    'reporting' => [
+        'products' => [
+            'waste'            => 'စွန့်ပစ်',
+            'current-stock'    => 'လက်ရှိ စတော့',
+            'forecast-next-2m' => 'နောက် ၂ လ ခန့်မှန်း',
+        ],
+    ],
     'chat' => [
         'title'         => 'စကားဝိုင်း',
         'refresh'       => 'ပြန်ဖွင့်ရန်',

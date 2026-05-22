@@ -6,7 +6,7 @@
     @include('admin::catalog.products.partials.view-nav')
     @include('admin::catalog.products.partials.reservations-modal')
 
-    <div class="flex items-center justify-between gap-4 max-sm:flex-wrap">
+    <div class="flex items-center justify-between gap-4">
         <p class="text-xl font-bold text-gray-800 dark:text-white">
             @lang('admin::app.catalog.products.index.title')
         </p>
@@ -22,9 +22,10 @@
                 <v-create-product-form>
                     <button
                         type="button"
-                        class="primary-button"
+                        class="primary-button flex items-center justify-center !px-3 !py-2 !text-lg !leading-none font-bold"
+                        :title="trans('admin::app.catalog.products.index.create-btn')"
                     >
-                        @lang('admin::app.catalog.products.index.create-btn')
+                        +
                     </button>
                 </v-create-product-form>
             @endif
@@ -414,10 +415,11 @@
                 @if (bouncer()->hasPermission('catalog.products.create'))
                     <button
                         type="button"
-                        class="primary-button"
+                        class="primary-button flex items-center justify-center !px-3 !py-2 !text-lg !leading-none font-bold"
+                        :title="trans('admin::app.catalog.products.index.create-btn')"
                         @click="$refs.productCreateModal.toggle()"
                     >
-                        @lang('admin::app.catalog.products.index.create-btn')
+                        +
                     </button>
                 @endif
 

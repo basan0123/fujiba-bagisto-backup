@@ -8,6 +8,13 @@ return [
         'overdue'  => 'Overdue',
         'loading'  => 'Loading…',
     ],
+    'reporting' => [
+        'products' => [
+            'waste'            => 'Waste',
+            'current-stock'    => 'Current Stock',
+            'forecast-next-2m' => 'Forecast (Next 2 Mo.)',
+        ],
+    ],
     'chat' => [
         'title'         => 'Conversation',
         'refresh'       => 'Refresh',

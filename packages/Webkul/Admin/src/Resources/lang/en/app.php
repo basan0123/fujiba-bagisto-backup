@@ -3749,6 +3749,10 @@ return [
             'not-available' => 'No Records Available.',
             'start-date' => 'Start Date',
             'year' => 'Year',
+            'font-size' => 'Font',
+            'full-width' => 'Full width',
+            'reset-layout' => 'Reset Layout',
+            'layout-hint' => 'Click headers to sort · drag edges to resize · drag headers to reorder',
         ],
 
         'empty' => [

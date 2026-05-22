@@ -96,11 +96,29 @@ class AuthController extends Controller
                 if ($outlet) {
                     $inventorySourceId = $outlet->inventory_source_id;
 
-                    $cis = \DB::table('channel_inventory_sources')
-                        ->where('inventory_source_id', $inventorySourceId)
-                        ->first();
+                    // Prefer the outlet's OWN channel_id column — it is the
+                    // unambiguous source of truth. The channel_inventory_sources
+                    // lookup is ambiguous on Fujiba: kimono (1) and mmfood (2)
+                    // both share inventory_source_id=1, so that table returns
+                    // channel 1 for BOTH outlets and the mmfood agent was being
+                    // handed a kimono JWT (seeing kimono products on home).
+                    //
+                    // The pos_outlets.channel_id column only exists on tenants
+                    // migrated after 2026-05-18 — older clones (e.g. a6) lack it,
+                    // so guard with property_exists before reading to avoid an
+                    // "Undefined property" notice, then fall back to the
+                    // source→channel map (safe for single-channel tenants).
+                    $outletChannelId = property_exists($outlet, 'channel_id') ? $outlet->channel_id : null;
 
-                    $channelId = $cis ? $cis->channel_id : 1;
+                    if (! empty($outletChannelId)) {
+                        $channelId = (int) $outletChannelId;
+                    } else {
+                        $cis = \DB::table('channel_inventory_sources')
+                            ->where('inventory_source_id', $inventorySourceId)
+                            ->first();
+
+                        $channelId = $cis ? $cis->channel_id : 1;
+                    }
                 } else {
                     // Fallback to tenant's default channel
                     $channelId         = \DB::table('channels')->value('id') ?? 1;

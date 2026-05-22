@@ -13,9 +13,12 @@ use Mike42\Escpos\EscposImage;
 class PrintReceiptController extends Controller
 {
     // ── Font paths (served locally, no CDN required) ─────────────────────────
-    private const FONT_JA = '/var/www/bagisto/public/fonts/IPAGothic-Regular.ttf';
-    private const FONT_MM = '/var/www/bagisto/public/fonts/Pyidaungsu-Regular.ttf';
-    private const FONT_EN = '/var/www/bagisto/public/fonts/Hind-Regular.ttf';
+    // FONT_JA: Noto Sans JP covers hiragana, katakana, kanji AND full-width
+    // Latin/digits (Ａ, ＹＭＯ). IPA Gothic stays as a secondary fallback.
+    private const FONT_JA      = '/var/www/bagisto/public/fonts/NotoSansJP-Regular.ttf';
+    private const FONT_JA_ALT  = '/var/www/bagisto/public/fonts/IPAGothic-Regular.ttf';
+    private const FONT_MM      = '/var/www/bagisto/public/fonts/Pyidaungsu-Regular.ttf';
+    private const FONT_EN      = '/var/www/bagisto/public/fonts/Hind-Regular.ttf';
 
     /**
      * Print a synthetic sample receipt — used by the Receipt Settings
@@ -43,6 +46,11 @@ class PrintReceiptController extends Controller
         $receipt = $outlet
             ? DB::table('pos_receipts')->where('id', $outlet->receipt_id)->first()
             : null;
+        $rs      = $outlet
+            ? DB::table('pos_receipt_settings')->where('outlet_id', $outlet->id)->first()
+            : null;
+        $outlet  = $this->mergeReceiptSettingsIntoOutlet($outlet, $rs);
+        $receipt = $this->mergeReceiptSettingsIntoReceipt($receipt, $rs);
 
         // Synthetic order/items/credit — no DB write, no inventory touched.
         $order = (object) [
@@ -102,6 +110,9 @@ class PrintReceiptController extends Controller
         $items  = DB::table('order_items')->where('order_id', $posOrder->order_id)->get();
         $outlet = DB::table('pos_outlets')->where('id', $posOrder->outlet_id)->first();
         $receipt = $outlet ? DB::table('pos_receipts')->where('id', $outlet->receipt_id)->first() : null;
+        $rs      = $outlet ? DB::table('pos_receipt_settings')->where('outlet_id', $outlet->id)->first() : null;
+        $outlet  = $this->mergeReceiptSettingsIntoOutlet($outlet, $rs);
+        $receipt = $this->mergeReceiptSettingsIntoReceipt($receipt, $rs);
         $credit  = DB::table('pos_customer_credit')->where('order_id', $posOrder->order_id)->first();
         $agent   = auth('pos')->user();
 
@@ -142,17 +153,22 @@ class PrintReceiptController extends Controller
             if ($receiptType === 'ryoshuho') {
                 $p->text($this->center('領収証', $width));
             } elseif ($outlet?->name) {
-                $p->text($this->center($outlet->name, $width));
+                foreach ($this->splitLines($outlet->name) as $nameLine) {
+                    $p->text($this->center($nameLine, $width));
+                }
             }
 
-            $address = implode(', ', array_filter([
-                $outlet->address ?? null,
-                $outlet->city    ?? null,
-                $outlet->state   ?? null,
-            ]));
-            if ($address) {
-                foreach ($this->wordWrap($address, $width) as $line) {
-                    $p->text($line . "\n");
+            $addressParts = $this->splitLines($outlet->address ?? '');
+            $cityState = trim(implode(', ', array_filter([
+                $outlet->city  ?? null,
+                $outlet->state ?? null,
+            ])));
+            if ($cityState !== '') {
+                $addressParts[] = $cityState;
+            }
+            foreach ($addressParts as $part) {
+                foreach ($this->wordWrap($part, $width) as $line) {
+                    $p->text($this->center($line, $width));
                 }
             }
 
@@ -258,26 +274,20 @@ class PrintReceiptController extends Controller
     // ─────────────────────────────────────────────────────────────────────────
     // Unicode path — render receipt to a PNG bitmap with GD + TTF,
     // then encode as ESC/POS raster (bitImage).
-    // Uses Pyidaungsu for Myanmar, IPA Gothic for Japanese, Hind for Latin.
+    //
+    // Font is chosen per line (not per receipt): Pyidaungsu for Myanmar,
+    // IPA Gothic / Noto JP for Japanese (incl. kana, kanji and full-width
+    // Latin like Ａ/ＹＭＯ), Hind for plain Latin. Mixing one font for the
+    // whole receipt was rendering "Ａ6 PROJECT" and "エバーグリーンＹＭＯ"
+    // as ??? whenever any line elsewhere contained Myanmar.
     // ─────────────────────────────────────────────────────────────────────────
     private function printAsImage($order, $items, $outlet, $receipt, $credit, $agent, string $paperSize, string $allText, ?string $receiptType = null): JsonResponse
     {
-        // Detect which Unicode block dominates → pick font
-        $hasMM = (bool) preg_match('/[\x{1000}-\x{109F}\x{AA60}-\x{AA7F}]/u', $allText);
-        $hasJP = (bool) preg_match('/[\x{3000}-\x{9FFF}\x{F900}-\x{FAFF}]/u', $allText);
-
-        $fontPath = match (true) {
-            $hasMM  => self::FONT_MM,
-            $hasJP  => self::FONT_JA,
-            default => self::FONT_EN,
-        };
-
-        // Fallback chain if preferred font is missing
-        if (! file_exists($fontPath)) {
-            $fontPath = file_exists(self::FONT_EN) ? self::FONT_EN : null;
-        }
+        // Default font for non-text drawing primitives — picked from what's available.
+        $fontPath = file_exists(self::FONT_EN) ? self::FONT_EN
+                  : (file_exists(self::FONT_JA) ? self::FONT_JA
+                  : (file_exists(self::FONT_MM) ? self::FONT_MM : null));
         if (! $fontPath) {
-            // No TTF available — fall back to ESC/POS text with UTF-8 pass-through
             return $this->printAsEscpos($order, $items, $outlet, $receipt, $credit, $agent,
                 $paperSize === '58mm' ? 32 : 48);
         }
@@ -293,18 +303,26 @@ class PrintReceiptController extends Controller
             $lines[] = ['text' => '領収証', 'size' => 28, 'center' => true];
             $lines[] = ['text' => '（正式領収書）', 'size' => 18, 'center' => true];
         } elseif ($outlet?->name) {
-            $lines[] = ['text' => $outlet->name, 'size' => 26, 'center' => true];
+            foreach ($this->splitLines($outlet->name) as $nameLine) {
+                $lines[] = ['text' => $nameLine, 'size' => 26, 'center' => true];
+            }
         }
 
-        $address = implode(', ', array_filter([
-            $outlet->address ?? null,
-            $outlet->city    ?? null,
-            $outlet->state   ?? null,
-        ]));
-        if ($address) {
+        $addressParts = $this->splitLines($outlet->address ?? '');
+        $cityState    = trim(implode(', ', array_filter([
+            $outlet->city  ?? null,
+            $outlet->state ?? null,
+        ])));
+        if ($cityState !== '') {
+            $addressParts[] = $cityState;
+        }
+        if ($addressParts) {
             $maxAddrPx = $pxWidth - $margin * 2;
-            foreach ($this->gdWordWrap($address, 18, $fontPath, $maxAddrPx) as $addrLine) {
-                $lines[] = ['text' => $addrLine, 'size' => 18, 'center' => true];
+            foreach ($addressParts as $part) {
+                $partFont = $this->pickFontForLine($part);
+                foreach ($this->gdWordWrap($part, 18, $partFont, $maxAddrPx) as $addrLine) {
+                    $lines[] = ['text' => $addrLine, 'size' => 18, 'center' => true];
+                }
             }
         }
 
@@ -325,7 +343,10 @@ class PrintReceiptController extends Controller
             $rw      = abs($rbbox[4] - $rbbox[0]);
             $maxLeft = $pxWidth - $margin * 2 - $rw - 10;
 
-            $nameLines = $this->gdWordWrap($name, $fontSize, $fontPath, $maxLeft);
+            // Per-item font so a Myanmar product name doesn't force ??? on the
+            // next Japanese item.
+            $nameFont  = $this->pickFontForLine($name);
+            $nameLines = $this->gdWordWrap($name, $fontSize, $nameFont, $maxLeft);
 
             // First line: name left + price right
             $lines[] = ['text' => $nameLines[0], 'right' => $rval];
@@ -361,10 +382,15 @@ class PrintReceiptController extends Controller
         $lines[] = ['sep' => true];
         $lines[] = ['text' => 'Thank you!', 'center' => true];
 
-        // ── Calculate image height ────────────────────────────────────────────
+        // ── Calculate image height (size-aware so 26pt headings don't overlap)
         $imgH = 20; // top padding
         foreach ($lines as $line) {
-            $imgH += isset($line['sep']) ? 6 : $lineH;
+            if (isset($line['sep'])) {
+                $imgH += 6;
+                continue;
+            }
+            $sz = $line['size'] ?? $fontSize;
+            $imgH += (int) ($sz * 1.5);
         }
         $imgH += 20; // bottom padding
 
@@ -387,25 +413,28 @@ class PrintReceiptController extends Controller
             $text  = $line['text'] ?? '';
             $size  = $line['size'] ?? $fontSize;
             $cx    = $line['center'] ?? false;
+            $tFont = $this->pickFontForLine($text);
 
             if ($cx) {
                 // Center the text
-                $bbox = imagettfbbox($size, 0, $fontPath, $text);
+                $bbox = imagettfbbox($size, 0, $tFont, $text);
                 $tw   = abs($bbox[4] - $bbox[0]);
                 $tx   = (int) (($pxWidth - $tw) / 2);
-                imagettftext($img, $size, 0, $tx, $y + $size, $black, $fontPath, $text);
+                imagettftext($img, $size, 0, $tx, $y + $size, $black, $tFont, $text);
             } elseif (isset($line['right'])) {
-                // Left text + right-aligned value
-                imagettftext($img, $size, 0, $margin, $y + $size, $black, $fontPath, $text);
-                $rval = $line['right'];
-                $rbbox = imagettfbbox($size, 0, $fontPath, $rval);
+                // Left text + right-aligned value — right value is always
+                // ASCII digits so Latin font is safe.
+                imagettftext($img, $size, 0, $margin, $y + $size, $black, $tFont, $text);
+                $rval  = $line['right'];
+                $rFont = $this->pickFontForLine($rval);
+                $rbbox = imagettfbbox($size, 0, $rFont, $rval);
                 $rw    = abs($rbbox[4] - $rbbox[0]);
-                imagettftext($img, $size, 0, $pxWidth - $margin - $rw, $y + $size, $black, $fontPath, $rval);
+                imagettftext($img, $size, 0, $pxWidth - $margin - $rw, $y + $size, $black, $rFont, $rval);
             } else {
-                imagettftext($img, $size, 0, $margin, $y + $size, $black, $fontPath, $text);
+                imagettftext($img, $size, 0, $margin, $y + $size, $black, $tFont, $text);
             }
 
-            $y += $lineH;
+            $y += (int) ($size * 1.5);
         }
 
         // ── Save PNG to temp file ─────────────────────────────────────────────
@@ -442,6 +471,128 @@ class PrintReceiptController extends Controller
     }
 
     // ── Helpers ───────────────────────────────────────────────────────────────
+
+    /**
+     * Overlay pos_receipt_settings (cashier-editable, per-outlet) on top of the
+     * pos_outlets row so downstream rendering keeps reading `$outlet->name` etc.
+     * but actually prints the values configured under POS → Settings → Receipt.
+     *
+     * Falls back to outlet defaults when a field is blank or the settings row
+     * is missing.
+     */
+    private function mergeReceiptSettingsIntoOutlet($outlet, $rs)
+    {
+        if (! $outlet) {
+            return $outlet;
+        }
+
+        $merged = clone $outlet;
+
+        $storeName = isset($rs->store_name) ? trim((string) $rs->store_name) : '';
+        if ($storeName !== '') {
+            $merged->name = $storeName;
+        }
+
+        $addr1 = isset($rs->address_line1) ? trim((string) $rs->address_line1) : '';
+        $addr2 = isset($rs->address_line2) ? trim((string) $rs->address_line2) : '';
+        if ($addr1 !== '' || $addr2 !== '') {
+            // When settings provide address, take it over wholesale.
+            // Stuff both lines into ->address and blank city/state so the
+            // downstream join doesn't duplicate the outlet's old "kita, tokyo".
+            $merged->address = trim($addr1 . ($addr2 !== '' ? "\n" . $addr2 : ''));
+            $merged->city    = null;
+            $merged->state   = null;
+        }
+
+        if (isset($rs->phone) && trim((string) $rs->phone) !== '') {
+            $merged->phone = $rs->phone;
+        }
+
+        return $merged;
+    }
+
+    /**
+     * Mirror the footer message + logo from pos_receipt_settings onto the
+     * legacy pos_receipts row so the existing rendering code picks them up.
+     */
+    private function mergeReceiptSettingsIntoReceipt($receipt, $rs)
+    {
+        if (! $rs) {
+            return $receipt;
+        }
+
+        $merged = $receipt ? clone $receipt : (object) [];
+
+        $footer = isset($rs->footer_message) ? trim((string) $rs->footer_message) : '';
+        if ($footer !== '') {
+            // footer_content is treated as HTML elsewhere; escape + nl→br so
+            // plain-text from settings survives htmlToPlain() unchanged.
+            $merged->footer_content = nl2br(e($footer), false);
+        }
+
+        if (! empty($rs->logo_path)) {
+            $merged->logo         = $rs->logo_path;
+            $merged->display_logo = 1;
+        }
+
+        return $merged;
+    }
+
+    /**
+     * Split a multi-line string on CR/LF and return non-empty trimmed lines.
+     */
+    private function splitLines(?string $text): array
+    {
+        if ($text === null || $text === '') {
+            return [];
+        }
+        $lines = preg_split('/\r\n|\r|\n/', $text) ?: [];
+        $out   = [];
+        foreach ($lines as $line) {
+            $line = trim($line);
+            if ($line !== '') {
+                $out[] = $line;
+            }
+        }
+        return $out;
+    }
+
+    /**
+     * Pick a TTF that covers the script(s) in $text. Receipts mix Latin,
+     * full-width Latin (Ａ/ＹＭＯ), kana, kanji and Myanmar — one font for
+     * the whole receipt loses glyphs (prints ???). Choose per line.
+     *
+     * Precedence: Myanmar → Japanese (Noto JP > IPAGothic) → Latin (Hind).
+     * Caller must guarantee at least one font file exists.
+     */
+    private function pickFontForLine(string $text): string
+    {
+        $hasMM = (bool) preg_match('/[\x{1000}-\x{109F}\x{AA60}-\x{AA7F}]/u', $text);
+        if ($hasMM) {
+            return file_exists(self::FONT_MM) ? self::FONT_MM : $this->fallbackFont();
+        }
+
+        // Anything in kana/kanji/CJK-symbols/halfwidth+fullwidth → JP font.
+        $hasJP = (bool) preg_match(
+            '/[\x{3000}-\x{303F}\x{3040}-\x{309F}\x{30A0}-\x{30FF}\x{3400}-\x{4DBF}\x{4E00}-\x{9FFF}\x{F900}-\x{FAFF}\x{FF00}-\x{FFEF}]/u',
+            $text
+        );
+        if ($hasJP) {
+            if (file_exists(self::FONT_JA))     return self::FONT_JA;
+            if (file_exists(self::FONT_JA_ALT)) return self::FONT_JA_ALT;
+        }
+
+        return file_exists(self::FONT_EN) ? self::FONT_EN : $this->fallbackFont();
+    }
+
+    private function fallbackFont(): string
+    {
+        foreach ([self::FONT_EN, self::FONT_JA, self::FONT_JA_ALT, self::FONT_MM] as $f) {
+            if (file_exists($f)) return $f;
+        }
+        // Caller in printAsImage already short-circuits if none exist.
+        return self::FONT_EN;
+    }
 
     /**
      * Measure the pixel width of a string rendered with imagettftext.
@@ -575,13 +726,19 @@ class PrintReceiptController extends Controller
         $e     = fn ($v) => htmlspecialchars((string) ($v ?? ''), ENT_QUOTES, 'UTF-8');
         $fmt   = fn ($v) => number_format((float) ($v ?? 0), 2);
 
-        $title = $receiptType === 'ryoshuho' ? '領収証' : ($outlet?->name ?? 'Receipt');
+        $storeNameLines = $this->splitLines($outlet?->name ?? '');
+        $title = $receiptType === 'ryoshuho'
+            ? '領収証'
+            : ($storeNameLines[0] ?? 'Receipt');
 
-        $address = implode(', ', array_filter([
-            $outlet->address ?? null,
-            $outlet->city    ?? null,
-            $outlet->state   ?? null,
-        ]));
+        $addressLines = $this->splitLines($outlet->address ?? '');
+        $cityState    = trim(implode(', ', array_filter([
+            $outlet->city  ?? null,
+            $outlet->state ?? null,
+        ])));
+        if ($cityState !== '') {
+            $addressLines[] = $cityState;
+        }
 
         $itemRows = '';
         foreach ($items as $item) {
@@ -640,12 +797,19 @@ class PrintReceiptController extends Controller
         $html .= '</div>';
         $html .= '<div class="rcpt">';
 
-        $html .= '<h1>' . $e($title) . '</h1>';
         if ($receiptType === 'ryoshuho') {
+            $html .= '<h1>' . $e($title) . '</h1>';
             $html .= '<div class="c" style="font-size:10px;margin-bottom:4px;">（正式領収書）</div>';
+        } else {
+            // Render every store-name line as its own centered heading so
+            // "A6 PROJECT\nASIA FOOD STORE" prints on two lines.
+            foreach ($storeNameLines ?: [$title] as $i => $nameLine) {
+                $html .= '<h1' . ($i > 0 ? ' style="margin-top:0"' : '') . '>'
+                       . $e($nameLine) . '</h1>';
+            }
         }
-        if ($address) {
-            $html .= '<div class="addr">' . $e($address) . '</div>';
+        foreach ($addressLines as $addrLine) {
+            $html .= '<div class="addr">' . $e($addrLine) . '</div>';
         }
         $html .= '<div class="c">' . $e($this->formatDate($order->created_at)) . '</div>';
         $html .= '<div class="c">Order #' . $e($order->id) . '</div>';

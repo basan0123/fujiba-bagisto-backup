@@ -41,6 +41,7 @@ input createOutletProductInput {
     quantity: Int!
     weight: Float
     barcode: String
+    categoryId: Int
     imageBase64: String
     imageName: String
 }

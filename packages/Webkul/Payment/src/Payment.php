@@ -9,25 +9,32 @@ class Payment
     /**
      * Returns all supported payment methods
      *
+     * @param  string  $context  'admin' (default) includes admin_only methods; 'shop' filters them out.
      * @return array
      */
-    public function getSupportedPaymentMethods()
+    public function getSupportedPaymentMethods($context = 'admin')
     {
         return [
-            'payment_methods' => $this->getPaymentMethods(),
+            'payment_methods' => $this->getPaymentMethods($context),
         ];
     }
 
     /**
      * Returns all supported payment methods
      *
+     * @param  string  $context  'admin' (default) includes admin_only methods; 'shop' filters them out.
      * @return array
      */
-    public function getPaymentMethods()
+    public function getPaymentMethods($context = 'admin')
     {
         $paymentMethods = [];
 
         foreach (Config::get('payment_methods') as $paymentMethodConfig) {
+            // admin_only methods (e.g. cash) must never appear on the storefront.
+            if ($context === 'shop' && ! empty($paymentMethodConfig['admin_only'])) {
+                continue;
+            }
+
             $paymentMethod = app($paymentMethodConfig['class']);
 
             if ($paymentMethod->isAvailable()) {

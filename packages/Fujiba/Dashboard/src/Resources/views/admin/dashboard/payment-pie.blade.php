@@ -5,38 +5,54 @@
 
 <style>
     .fujiba-pie-card {
-        background: linear-gradient(135deg,#0f172a 0%,#1e293b 100%) !important;
-        color: #fff !important;
-        border-radius: 16px !important;
+        background: #fff !important;
+        color: #1f2937 !important;
+        border-radius: 12px !important;
         padding: 18px 18px 20px !important;
-        box-shadow: 0 6px 20px -8px rgba(99,102,241,0.45),
-                    0 2px 4px rgba(15,23,42,0.10) !important;
+        box-shadow: 0 1px 2px rgba(15,23,42,0.04), 0 4px 12px -8px rgba(15,23,42,0.06) !important;
+        border: 1px solid rgba(15,23,42,0.06);
+        height: 100%;
+        display: flex;
+        flex-direction: column;
+    }
+    .dark .fujiba-pie-card {
+        background: rgb(17,24,39) !important;
+        color: #f3f4f6 !important;
+        border-color: rgba(255,255,255,0.06);
+    }
+    .fujiba-pie-card > .fujiba-pie-grid,
+    .fujiba-pie-card > .fujiba-pie-empty {
+        flex: 1 1 auto;
     }
     .fujiba-pie-title {
         font-size: 12px !important;
         font-weight: 700 !important;
         text-transform: uppercase !important;
         letter-spacing: 0.12em !important;
-        color: rgba(255,255,255,0.92) !important;
+        color: #1e3a8a !important;
         margin: 0 0 12px 0 !important;
     }
+    .dark .fujiba-pie-title { color: #93c5fd !important; }
     .fujiba-pie-grid {
-        display: grid;
-        grid-template-columns: 200px 1fr;
+        display: flex;
+        flex-direction: column;
+        align-items: stretch;
         gap: 18px;
-        align-items: center;
-    }
-    @media (max-width: 640px) {
-        .fujiba-pie-card { padding: 14px !important; max-width: 100% !important; overflow: hidden !important; }
-        .fujiba-pie-grid { grid-template-columns: 1fr; gap: 12px; }
-        .fujiba-pie-svg-wrap { margin: 0 auto; width: 160px !important; height: 160px !important; }
-        .fujiba-pie-center-num { font-size: 22px; }
-        .fujiba-pie-legend-row { font-size: 12px; }
-        .fujiba-pie-meta { font-size: 9px; margin-left: 18px; }
     }
     .fujiba-pie-svg-wrap {
         position: relative;
-        width: 200px; height: 200px;
+        width: clamp(220px, 32vw, 360px);
+        aspect-ratio: 1 / 1;
+        height: auto;
+        margin: 0 auto;
+    }
+    @media (max-width: 640px) {
+        .fujiba-pie-card { padding: 14px !important; max-width: 100% !important; overflow: hidden !important; }
+        .fujiba-pie-grid { gap: 12px; }
+        .fujiba-pie-svg-wrap { width: min(72vw, 260px); }
+        .fujiba-pie-center-num { font-size: 26px; }
+        .fujiba-pie-legend-row { font-size: 12px; }
+        .fujiba-pie-meta { font-size: 9px; margin-left: 18px; }
     }
     .fujiba-pie-svg {
         width: 100%; height: 100%;
@@ -49,9 +65,10 @@
     }
     .fujiba-pie-track {
         fill: none;
-        stroke: rgba(255,255,255,0.08);
+        stroke: rgba(15,23,42,0.06);
         stroke-width: 36;
     }
+    .dark .fujiba-pie-track { stroke: rgba(255,255,255,0.08); }
     .fujiba-pie-center {
         position: absolute;
         inset: 0;
@@ -62,20 +79,22 @@
         text-align: center;
     }
     .fujiba-pie-center-num {
-        font-size: 28px;
+        font-size: clamp(28px, 3vw, 40px);
         font-weight: 900;
-        color: #fff;
+        color: #111827;
         line-height: 1;
         font-variant-numeric: tabular-nums;
     }
+    .dark .fujiba-pie-center-num { color: #f9fafb; }
     .fujiba-pie-center-lbl {
         font-size: 10px;
         font-weight: 700;
         text-transform: uppercase;
         letter-spacing: 0.12em;
-        color: rgba(255,255,255,0.7);
+        color: #6b7280;
         margin-top: 4px;
     }
+    .dark .fujiba-pie-center-lbl { color: rgba(255,255,255,0.7); }
     .fujiba-pie-legend {
         display: flex;
         flex-direction: column;
@@ -96,31 +115,35 @@
     .fujiba-pie-method {
         flex: 1;
         font-weight: 600;
-        color: #fff;
+        color: #1f2937;
         white-space: nowrap;
         overflow: hidden;
         text-overflow: ellipsis;
     }
+    .dark .fujiba-pie-method { color: #f3f4f6; }
     .fujiba-pie-pct {
         font-weight: 800;
-        color: #fff;
+        color: #111827;
         font-variant-numeric: tabular-nums;
         min-width: 50px;
         text-align: right;
     }
+    .dark .fujiba-pie-pct { color: #f9fafb; }
     .fujiba-pie-meta {
         font-size: 10px;
-        color: rgba(255,255,255,0.6);
+        color: #6b7280;
         text-transform: uppercase;
         letter-spacing: 0.08em;
         margin-left: 22px;
         margin-top: -4px;
     }
+    .dark .fujiba-pie-meta { color: rgba(255,255,255,0.6); }
     .fujiba-pie-empty {
         text-align: center;
         padding: 28px 12px;
-        color: rgba(255,255,255,0.6);
+        color: #6b7280;
     }
+    .dark .fujiba-pie-empty { color: rgba(255,255,255,0.6); }
 </style>
 
 <div class="flex flex-col gap-2" id="fujiba-payment-pie-card">

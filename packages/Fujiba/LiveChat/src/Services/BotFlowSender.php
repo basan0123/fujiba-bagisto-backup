@@ -43,12 +43,29 @@ class BotFlowSender
             ->where('postback_id', $postbackId)
             ->first(['template_jsoncode', 'bot_name']);
 
+        // Local cache is stale (hourly sync disabled). If the flow isn't in
+        // chatpion_import, try the upstream livechat_send_bot_flow endpoint —
+        // Chatpion has the live template and will dispatch it via FB Graph.
         if (! $bot || ! $bot->template_jsoncode) {
-            Log::warning('SendBotFlow: bot flow not found', [
+            $chatpion = new ChatpionFailoverService($setting);
+            $upstream = $chatpion->apiPost('livechat_send_bot_flow', [
+                'whatsapp_bot_id' => $setting->fb_bot_id,
+                'subscriber_id'   => $subscriberId,
+                'postback_id'     => $postbackId,
+            ]);
+
+            $status = $upstream['status'] ?? 'error';
+            if ($status === 'success') {
+                return ['status' => 'success', 'message' => 'Bot flow sent (upstream)'];
+            }
+
+            Log::warning('SendBotFlow: bot flow not in local cache and upstream failed', [
                 'postbackId' => $postbackId,
                 'page_id'    => $setting->fb_bot_id,
+                'upstream'   => $upstream,
             ]);
-            return ['status' => 'error', 'message' => 'Bot flow not found for this page'];
+
+            return ['status' => 'error', 'message' => $upstream['message'] ?? 'Bot flow not found for this page'];
         }
 
         // 2. Get the page access token from local chatpion_import DB

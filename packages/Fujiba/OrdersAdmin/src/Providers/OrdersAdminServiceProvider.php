@@ -40,5 +40,16 @@ class OrdersAdminServiceProvider extends ServiceProvider
             \Webkul\Admin\DataGrids\Sales\OrderDataGrid::class,
             \Fujiba\OrdersAdmin\DataGrids\FujibaOrderDataGrid::class,
         );
+
+        // ChatPion-imported products have manage_stock=0 even though they
+        // carry real product_inventories + product_ordered_inventories rows.
+        // Bagisto core's ShipmentItemRepository::updateProductInventory()
+        // short-circuits on manage_stock=0, so shipping never deducts stock
+        // or clears reservations. Our subclass deducts based on row presence
+        // instead of the flag.
+        $this->app->bind(
+            \Webkul\Sales\Repositories\ShipmentItemRepository::class,
+            \Fujiba\OrdersAdmin\Repositories\FujibaShipmentItemRepository::class,
+        );
     }
 }

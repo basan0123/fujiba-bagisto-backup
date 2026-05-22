@@ -3,6 +3,8 @@ namespace App\Exceptions;
 
 use Illuminate\Auth\AuthenticationException;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Log;
+use Throwable;
 use Webkul\RestApi\Exceptions\Handler as RestApiHandler;
 
 /**
@@ -36,6 +38,26 @@ class Handler extends RestApiHandler
                 return response()->json(['error' => 'Unauthenticated.'], 401);
             }
             return redirect()->guest(route('superadmin.login'));
+        });
+
+        // POS GraphQL clients (mobile + cashier web) need real error
+        // messages, not Webkul's untranslated `rest-api::app.shop.errors.message`
+        // string. Intercept Throwable on /graphql before Webkul's catch-all
+        // renderable so the GraphQL layer can return a proper error envelope.
+        // /superadmin and /admin paths still fall through to Webkul.
+        $this->renderable(function (Throwable $e, Request $request) {
+            if (! $request->is('graphql') && ! $request->is('graphql/*')) {
+                return null;
+            }
+            Log::error('GraphQL server error: '.$e->getMessage(), [
+                'trace' => collect($e->getTrace())->take(8)->all(),
+            ]);
+            $payload = ['error' => $e->getMessage()];
+            if (config('app.debug')) {
+                $payload['file'] = $e->getFile().':'.$e->getLine();
+                $payload['type'] = get_class($e);
+            }
+            return response()->json($payload, 500);
         });
 
         parent::register();

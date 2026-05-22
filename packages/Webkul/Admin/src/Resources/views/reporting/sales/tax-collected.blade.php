@@ -173,7 +173,7 @@
             },
 
             mounted() {
-                this.getStats({});
+                this.getStats(window.fjSavedFilter ? window.fjSavedFilter() : {});
 
                 this.$emitter.on('reporting-filter-updated', this.getStats);
             },

@@ -9,6 +9,30 @@ extend type Mutation {
     ): AgentLoginResult @field(resolver: "Webkul\\Pos\\Mutations\\Outlet\\Agent\\SessionMutation@login")
 
     agentLogout: StatusResponse @guard(with: ["pos_user"]) @field(resolver: "Webkul\\Pos\\Mutations\\Outlet\\Agent\\SessionMutation@logout")
+
+    updateOutletProfile(
+        input: UpdateOutletProfileInput! @spread
+    ): UpdateOutletProfileResult @guard(with: ["pos_user"]) @field(resolver: "Webkul\\Pos\\Mutations\\Outlet\\OutletProfileMutation@update")
+}
+
+input UpdateOutletProfileInput {
+    name: String
+    phone: String
+    email: String
+    address: String
+    city: String
+    state: String
+    country: String
+    postcode: String
+    gstNumber: String
+    businessHours: String
+    taxMode: String
+}
+
+type UpdateOutletProfileResult {
+    success: Boolean!
+    message: String
+    outlet: Outlet
 }
 
 input AgentLoginInput {
@@ -35,6 +59,7 @@ type Agent {
     image: String
     imageUrl: String @rename(attribute: "image_url")
     reportType: String @rename(attribute: "report_type")
+    role: String
     status: Int!
     trainingMode: Boolean @rename(attribute: "training_mode")
     trainingPrintReceipt: Boolean @rename(attribute: "training_print_receipt")
@@ -61,6 +86,8 @@ type Outlet {
     status: Int
     receiptId: String @rename(attribute: "receipt_id")
     inventorySourceId: Int @rename(attribute: "inventory_source_id")
+    businessHours: String @rename(attribute: "business_hours")
+    taxMode: String @rename(attribute: "tax_mode")
     createdAt: String @rename(attribute: "created_at")
     updatedAt: String @rename(attribute: "updated_at")
     receipt: Receipt @hasOne (relation: "receipt")

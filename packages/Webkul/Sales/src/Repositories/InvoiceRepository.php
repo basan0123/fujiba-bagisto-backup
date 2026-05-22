@@ -42,6 +42,15 @@ class InvoiceRepository extends Repository
      */
     public function create(array $data, $invoiceState = null, $orderState = null)
     {
+        // Refuse to persist a phantom invoice when there's nothing to invoice.
+        // Without this guard any caller passing an empty/all-zero items map
+        // produces a row with total_qty=0, grand_total=0 and no invoice_items
+        // (e.g. ¥0 invoice s36 on order 1560 — 2026-05-12).
+        $items = $data['invoice']['items'] ?? [];
+        if (array_sum(array_map('intval', $items)) <= 0) {
+            return null;
+        }
+
         DB::beginTransaction();
 
         try {

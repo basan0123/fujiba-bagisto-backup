@@ -17,6 +17,7 @@ input updateOutletProductInput {
     id: Int!
     name: String
     price: Float
+    cost: Float
     quantity: Int
     weight: Float
     taxCategoryId: Int

@@ -38,6 +38,10 @@ class FujibaInvoiceDataGrid extends OrderInvoiceDataGrid
            ->addSelect(
                'order_payment.method as payment_method',
                'orders.fujiba_label_printed as fujiba_label_printed',
+               'orders.shipping_method as shipping_method',
+               // exposed for the row-level Receipt action below; the parent
+               // grid only selects orders.increment_id (string), not the PK.
+               'orders.id as order_pk',
            );
 
         $this->addFilter('payment_method', 'order_payment.method');
@@ -74,7 +78,8 @@ class FujibaInvoiceDataGrid extends OrderInvoiceDataGrid
             'closure'    => function ($row) {
                 return self::renderShippingBadge(
                     (int) ($row->fujiba_label_printed ?? 0),
-                    (string) ($row->order_status ?? '')
+                    (string) ($row->order_status ?? ''),
+                    (string) ($row->shipping_method ?? '')
                 );
             },
         ]);
@@ -96,6 +101,71 @@ class FujibaInvoiceDataGrid extends OrderInvoiceDataGrid
                 };
             },
         ]);
+
+        // Reorder: invoice id → customer → payment method → shipping status →
+        // everything else, with order_id pushed to the end. The two id columns
+        // (invoice + order) were eating too much horizontal space at the front;
+        // operators only need order_id to drill into the source order, not to
+        // scan the list.
+        $this->reorderColumns(
+            front: [
+                'increment_id',
+                'customer_full_name',
+                'payment_method',
+                'shipping_status',
+            ],
+            back: [
+                'order_id',
+            ],
+        );
+    }
+
+    /**
+     * Move named columns to the front and/or back of the grid in the given
+     * order; everything else keeps its relative order in the middle.
+     * Tolerates missing names by skipping them silently.
+     */
+    protected function reorderColumns(array $front = [], array $back = []): void
+    {
+        $byIndex = [];
+        foreach ($this->getColumns() as $col) {
+            $byIndex[$col->getIndex()] = $col;
+        }
+
+        $head = [];
+        foreach ($front as $name) {
+            if (isset($byIndex[$name])) {
+                $head[] = $byIndex[$name];
+                unset($byIndex[$name]);
+            }
+        }
+
+        $tail = [];
+        foreach ($back as $name) {
+            if (isset($byIndex[$name])) {
+                $tail[] = $byIndex[$name];
+                unset($byIndex[$name]);
+            }
+        }
+
+        $this->setColumns(array_merge($head, array_values($byIndex), $tail));
+    }
+
+    public function prepareActions()
+    {
+        parent::prepareActions();
+
+        // Receipt = the mobile-friendly print view operators hand to packers.
+        // Linking from invoices keeps them from bouncing through Orders just
+        // to print/share the picking slip.
+        $this->addAction([
+            'icon'   => 'icon-printer',
+            'title'  => 'レシート / Receipt',
+            'method' => 'GET',
+            'url'    => function ($row) {
+                return route('admin.sales.orders.receipt', $row->order_pk);
+            },
+        ]);
     }
 
     /**
@@ -105,10 +175,15 @@ class FujibaInvoiceDataGrid extends OrderInvoiceDataGrid
      * predicate. Don't duplicate this logic anywhere else — that's how the
      * #1558-class bug sneaks back in.
      */
-    public static function renderShippingBadge(int $labelPrinted, string $orderStatus): string
+    public static function renderShippingBadge(int $labelPrinted, string $orderStatus, string $shippingMethod = ''): string
     {
         if ($orderStatus === 'canceled') {
             return '<span style="display:inline-block;padding:2px 10px;border-radius:9999px;background:#fee2e2;color:#991b1b;font-size:12px;font-weight:600;">キャンセル</span>';
+        }
+        // Store Pickup orders have nothing to ship — they're handed over at the
+        // store (typically POS/cash). They must never display "未発送".
+        if ($shippingMethod === 'free_free') {
+            return '<span style="display:inline-block;padding:2px 10px;border-radius:9999px;background:#d1fae5;color:#065f46;font-size:12px;font-weight:600;">受取済</span>';
         }
         if ($labelPrinted === 1) {
             $label = $orderStatus === 'completed' ? '配達済' : '発送済';

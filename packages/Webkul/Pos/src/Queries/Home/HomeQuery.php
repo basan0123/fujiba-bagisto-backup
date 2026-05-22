@@ -43,6 +43,11 @@ class HomeQuery extends Controller
             'code' => 'general',
         ])->id;
 
+        // Cost (原価) lives in product_attribute_values for the `cost` attribute
+        // (type=price → float_value). Joined here so the POS can show
+        // per-product profit to staff/admin without an extra round-trip.
+        $costAttributeId = \DB::table('attributes')->where('code', 'cost')->value('id');
+
         $qb->select(
             'products.*',
             'product_flat.status as status',
@@ -52,10 +57,15 @@ class HomeQuery extends Controller
             'pos_product_barcode.gtin',
             'pos_product_barcode.scan_type',
             'pos_product_barcode.scan_value',
+            'pav_cost.float_value as cost',
         )
             ->leftJoin('product_flat', 'products.id', '=', 'product_flat.product_id')
             ->leftJoin('pos_product_barcode', 'products.id', '=', 'pos_product_barcode.product_id')
             ->leftJoin('pos_outlet_product', 'products.id', '=', 'pos_outlet_product.product_id')
+            ->leftJoin('product_attribute_values as pav_cost', function ($join) use ($costAttributeId) {
+                $join->on('products.id', '=', 'pav_cost.product_id')
+                    ->where('pav_cost.attribute_id', '=', $costAttributeId);
+            })
             ->leftJoin('product_inventories', function ($join) use ($params) {
                 $join->on('products.id', '=', 'product_inventories.product_id')
                     ->where('product_inventories.inventory_source_id', $params['inventory_source_id']);

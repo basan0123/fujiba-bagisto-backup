@@ -6,6 +6,7 @@ use Fujiba\OrdersAdmin\Http\Requests\UpdateOrderPaymentConfirmRequest;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Routing\Controller;
 use Illuminate\Support\Carbon;
+use Illuminate\Support\Facades\Schema;
 use Webkul\Sales\Repositories\OrderRepository;
 
 class OrderPaymentConfirmController extends Controller
@@ -18,11 +19,30 @@ class OrderPaymentConfirmController extends Controller
 
         $confirmed = (bool) $request->validated('confirmed');
         $note      = $request->validated('note');
+        $now       = $confirmed ? Carbon::now() : null;
 
-        $order->update([
-            'payment_confirmed_at' => $confirmed ? Carbon::now() : null,
+        $payload = [
+            'payment_confirmed_at' => $now,
             'payment_note'         => $note,
-        ]);
+        ];
+
+        // Mirror onto paid_at for dashboard Payments mode. On confirm, only
+        // stamp when paid_at is empty so we don't clobber a ChatPion-sourced
+        // value. On unconfirm, clear paid_at only if it matches the
+        // confirmation we're reverting (i.e. it was set by us, not by sync).
+        if (Schema::hasColumn('orders', 'paid_at')) {
+            if ($confirmed) {
+                if (! $order->paid_at) {
+                    $payload['paid_at'] = $now;
+                }
+            } elseif ($order->paid_at && $order->payment_confirmed_at
+                && (string) $order->paid_at === (string) $order->payment_confirmed_at
+            ) {
+                $payload['paid_at'] = null;
+            }
+        }
+
+        $order->update($payload);
 
         $fresh = $order->fresh();
 

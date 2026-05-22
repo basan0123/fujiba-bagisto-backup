@@ -3,6 +3,17 @@
 return [
     'dashboard' => [
 
+        // ───────────── range_presets (quick-range bar above filters) ─────────────
+        'range_presets' => [
+            'today'      => '今日',
+            'yesterday'  => '昨日',
+            'this_month' => '今月',
+            'last_month' => '先月',
+            'last_3m'    => '直近3ヶ月',
+            'this_year'  => '今年',
+            'all'        => '全期間',
+        ],
+
         // ───────────── common ─────────────
         'common' => [
             'loading'         => '読み込み中...',
@@ -88,6 +99,47 @@ return [
             'title'        => '配送料収入',
             'subtitle'     => '顧客から徴収した配送料',
             'empty_state'  => 'この期間内の配送はありません。',
+        ],
+
+        // ───────────── 配送パフォーマンス（マージン + 送料無料の補填） ─────────────
+        'shipping_performance' => [
+            'title'                => '配送パフォーマンス',
+            'loading'              => '読み込み中…',
+            'collected'            => 'お客様からの送料収入',
+            'carrier_cost'         => '実際の配送業者コスト',
+            'margin'               => '差額',
+            'margin_hint'          => 'プラス＝送料収入が業者請求を上回る',
+            'over_n_orders'        => '対象注文 :count 件',
+            'fully_reconciled'     => '全注文が照合済み',
+            'pending_n'            => '請求書未登録 :count 件',
+            'free_shipping_block'  => '送料無料の適用状況',
+            'free_orders'          => '送料無料の注文数',
+            'subsidy'              => '送料無料による負担額',
+            'avg_subsidy'          => '注文あたり平均',
+            'by_rule'              => '無料ルール別',
+            'rule_other'           => 'その他 / 未マッチ',
+            'no_free_orders'       => 'この期間に送料無料の注文はありません。',
+            'manage_costs'         => '配送業者コストを管理',
+            'import'               => [
+                'page_title'        => '配送業者コスト',
+                'back_to_dashboard' => 'ダッシュボードへ戻る',
+                'upload_section'    => '配送業者請求 CSV のインポート',
+                'csv_file'          => 'CSV ファイル',
+                'carrier_code'      => '配送業者（既定）',
+                'billing_month'     => '請求月（既定）',
+                'submit'            => 'インポート',
+                'format_hint'       => 'CSV ヘッダ: tracking_number, carrier_cost [, billing_month, carrier_code, notes]。または tracking_number の代わりに order_id を使用可能。',
+                'recent_section'    => '最近の登録',
+                'empty_state'       => '登録された業者コストはまだありません。',
+                'done'              => ':count 行をインポートしました。',
+                'saved'             => '保存しました。',
+                'read_failed'       => 'CSV ファイルを読み込めませんでした。',
+                'empty'             => 'CSV ファイルが空です。',
+                'bad_header'        => 'CSV には tracking_number または order_id と、carrier_cost が必要です。',
+                'unknown_order'     => '注文が見つかりません。',
+                'unmatched_header'  => ':count 行を注文と照合できませんでした',
+                'last_month_label'  => '最終月 :m',
+            ],
         ],
 
         // ───────────── W2/W3: inventory_value ─────────────

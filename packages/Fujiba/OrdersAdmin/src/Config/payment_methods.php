@@ -23,4 +23,14 @@ return [
         'sort'        => 3,
         'admin_only'  => true,
     ],
+
+    'kpay' => [
+        'code'        => 'kpay',
+        'title'       => 'KPay',
+        'description' => 'KPay (Myanmar mobile wallet). Admin-only — recorded by staff after KPay transfer is confirmed in-app.',
+        'class'       => \Webkul\Payment\Payment\MoneyTransfer::class,
+        'active'      => true,
+        'sort'        => 4,
+        'admin_only'  => true,
+    ],
 ];

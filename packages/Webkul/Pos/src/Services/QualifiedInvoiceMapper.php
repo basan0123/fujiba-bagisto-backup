@@ -97,14 +97,46 @@ class QualifiedInvoiceMapper
             default     => 'pending',
         };
 
-        // Payment status derived from the invoice state ('paid' / 'pending' /
-        // 'canceled' → 'refunded'). The native control uses this to
-        // pre-select the segment when the preview loads.
-        $paymentStatus = match ($invoice->state) {
-            'paid'     => 'paid',
-            'canceled' => 'refunded',
-            default    => 'pending',
+        // Payment status: prefer the amount_paid ledger (unpaid / partial /
+        // paid) so part-payments surface correctly. A canceled invoice is
+        // 'refunded'. Falls back to invoice.state for legacy rows where
+        // amount_paid was never written (defaults to 0).
+        $grandTotal  = (float) $invoice->grand_total;
+        $amountPaid  = (float) ($invoice->amount_paid ?? 0);
+        $outstanding = round(max(0, $grandTotal - $amountPaid), 2);
+
+        if ($invoice->state === 'canceled') {
+            $paymentStatus = 'refunded';
+        } elseif ($amountPaid <= 0.0001) {
+            // Legacy invoices created as 'paid' before amount_paid existed
+            // still report paid via state, so honour that.
+            $paymentStatus = $invoice->state === 'paid' ? 'paid' : 'unpaid';
+        } elseif ($amountPaid + 0.01 >= $grandTotal) {
+            $paymentStatus = 'paid';
+        } else {
+            $paymentStatus = 'partial';
+        }
+
+        // Document status from orders.status (draft → created → shipped).
+        $documentStatus = match ($order->status) {
+            'draft'                                  => 'draft',
+            'complete', 'completed'                  => 'shipped',
+            default                                  => 'created',
         };
+
+        // Payment ledger (most recent first) for the history panel.
+        $payments = DB::table('pos_invoice_payments')
+            ->where('invoice_id', $invoiceId)
+            ->orderByDesc('paid_at')
+            ->get()
+            ->map(fn ($p) => [
+                'id'       => (int) $p->id,
+                'amount'   => (float) $p->amount,
+                'method'   => $p->method,
+                'reference'=> $p->reference,
+                'note'     => $p->note,
+                'paidAt'   => (string) $p->paid_at,
+            ])->all();
 
         return [
             'id'                         => (int) $invoice->id,
@@ -113,7 +145,11 @@ class QualifiedInvoiceMapper
             'orderIncrementId'           => $order->increment_id ?? null,
             'state'                      => $invoice->state,
             'paymentStatus'              => $paymentStatus,
+            'documentStatus'             => $documentStatus,
             'shippingStatus'             => $shippingStatus,
+            'amountPaid'                 => round($amountPaid, 2),
+            'outstanding'                => $outstanding,
+            'payments'                   => $payments,
             'emailSent'                  => (bool) $invoice->email_sent,
             'createdAt'                  => (string) $invoice->created_at,
             'grandTotal'                 => (float) $invoice->grand_total,
