@@ -111,3 +111,27 @@ Route::middleware(['web', 'admin', 'auth:admin'])
         Route::post('{id}/mark-pickup', [\App\Http\Controllers\Admin\StorePickupController::class, 'markAsPickup'])
             ->name('mark_pickup');
     });
+
+// ── CENTRAL APEX GUARD ────────────────────────────────────────
+// snssale.com / www.snssale.com are the SaaS control (central) domains.
+// They have NO tenant DB, so the storefront cannot render there (the Shop
+// layout dereferences core()->getCurrentChannel()/getCurrentLocale(), which
+// are null on central → HTTP 500 fatals). Storefronts live ONLY on tenant
+// subdomains (kimono. / mmfood. / ttest. / a6. …snssale.com).
+//
+// This group is scoped to the apex hosts so it does NOT affect tenant
+// subdomains. App routes register before the Shop package's `/` route and
+// Route::fallback(), so these win on the apex without touching any package.
+foreach (['snssale.com', 'www.snssale.com'] as $centralHost) {
+    Route::domain($centralHost)->middleware('web')->group(function () {
+        // Bare apex → operational destination (SaaS control panel login).
+        Route::get('/', fn () => redirect('/superadmin/login'))
+            ->name('central.apex.home');
+
+        // Any other unmatched apex path (e.g. /postest) → branded standalone
+        // 404. Never attempts storefront rendering, so it cannot re-trigger
+        // the central-DB fatal.
+        Route::fallback(fn () => response()->view('errors.tenant-not-found', [], 404))
+            ->name('central.apex.fallback');
+    });
+}

@@ -8,7 +8,7 @@
 
 <html
     lang="{{ app()->getLocale() }}"
-    dir="{{ core()->getCurrentLocale()->direction }}"
+    dir="{{ core()->getCurrentLocale()?->direction ?? 'ltr' }}"
 >
     <head>
 
