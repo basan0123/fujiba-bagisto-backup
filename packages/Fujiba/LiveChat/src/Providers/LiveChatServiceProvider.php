@@ -22,6 +22,7 @@ class LiveChatServiceProvider extends ServiceProvider
                 \Fujiba\LiveChat\Console\Commands\SyncChatpionSubscribersCommand::class,
                 \Fujiba\LiveChat\Console\Commands\DispatchAutoFlowCommand::class,
                 \Fujiba\LiveChat\Console\Commands\DispatchAbandonedCartCommand::class,
+                \Fujiba\LiveChat\Console\Commands\SyncFlowsCommand::class,
             ]);
 
             $this->app->booted(function () {
@@ -40,6 +41,17 @@ class LiveChatServiceProvider extends ServiceProvider
                     ->withoutOverlapping(20)
                     ->runInBackground()
                     ->appendOutputTo(storage_path('logs/abandoned-cart-dispatch.log'));
+
+                // Daily refresh of the local chatpion_import flow-definition
+                // tables (messenger_bot + messenger_bot_postback) so the live
+                // chat flow picker's offline fallback isn't stale. Flow defs
+                // only — does NOT sync products/orders, so it can't re-trigger
+                // the phantom-reservation incident. Runs early morning JST.
+                $schedule->command('fujiba:sync-flows')
+                    ->dailyAt('04:30')
+                    ->withoutOverlapping(30)
+                    ->runInBackground()
+                    ->appendOutputTo(storage_path('logs/sync-flows.log'));
             });
         }
     }

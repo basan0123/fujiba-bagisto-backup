@@ -131,12 +131,20 @@ class CustomerDisplayController extends Controller
         // is no server-side cart row until checkout. Accept totals from the
         // client. Customer display matches whatever the cashier sees.
         $data = $request->validate([
-            'subtotal' => 'required|numeric',
-            'tax'      => 'required|numeric',
-            'total'    => 'required|numeric',
-            'items'    => 'required|integer|min:0',
-            'currency' => 'nullable|string|size:3',
-            'state'    => 'nullable|in:cart,paid',
+            'subtotal'      => 'required|numeric',
+            'tax'           => 'required|numeric',
+            'total'         => 'required|numeric',
+            'items'         => 'required|integer|min:0',
+            'currency'      => 'nullable|string|size:3',
+            'state'         => 'nullable|in:cart,paid',
+            // Optional line items for the itemized customer display. The count
+            // ('items') stays authoritative for the totals row; 'lines' is a
+            // display-only breakdown. Bounded so a runaway cart can't bloat the
+            // JSON column or the SSE frame.
+            'lines'         => 'nullable|array|max:50',
+            'lines.*.name'  => 'required_with:lines|string|max:120',
+            'lines.*.qty'   => 'required_with:lines|integer|min:0',
+            'lines.*.price' => 'required_with:lines|numeric',
         ]);
 
         $agent = auth('pos')->user();
@@ -147,11 +155,21 @@ class CustomerDisplayController extends Controller
             ->whereNull('revoked_at')
             ->firstOrFail();
 
+        $lines = collect($data['lines'] ?? [])
+            ->map(fn ($l) => [
+                'name'  => mb_substr((string) $l['name'], 0, 120),
+                'qty'   => (int) $l['qty'],
+                'price' => (float) $l['price'],
+            ])
+            ->values()
+            ->all();
+
         $payload = [
             'subtotal' => (float) $data['subtotal'],
             'tax'      => (float) $data['tax'],
             'total'    => (float) $data['total'],
             'items'    => (int) $data['items'],
+            'lines'    => $lines,
             'currency' => $data['currency'] ?? 'JPY',
             'state'    => $data['state'] ?? 'cart',
             'ts'       => now()->getTimestampMs(),

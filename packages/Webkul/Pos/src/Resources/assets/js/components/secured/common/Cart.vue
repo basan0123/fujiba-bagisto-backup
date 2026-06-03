@@ -1,7 +1,7 @@
 <template>
     <div
         v-if="layout === 'default'"
-        class="fixed flex h-[calc(100vh-68px)] w-[clamp(420px,_30vw,_600px)] flex-col border-l border-gray-200 bg-white dark:border-gray-700 dark:bg-gray-900 ltr:right-0 rtl:left-0"
+        class="fixed flex h-[calc(100vh-68px)] w-[clamp(300px,_38vw,_360px)] xl:w-[clamp(420px,_30vw,_600px)] flex-col border-l border-gray-200 bg-white dark:border-gray-700 dark:bg-gray-900 ltr:right-0 rtl:left-0"
     >
         <div class="flex-shrink-0 py-4 shadow-[0px_-1px_0px_0px_rgba(0,0,0,0.1)_inset] dark:shadow-[0px_-1px_0px_0px_rgba(255,255,255,0.05)_inset]">
             <CartTop

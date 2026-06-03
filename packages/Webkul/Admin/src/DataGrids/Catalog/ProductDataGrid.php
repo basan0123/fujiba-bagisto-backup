@@ -20,6 +20,20 @@ class ProductDataGrid extends DataGrid
     protected $primaryColumn = 'product_id';
 
     /**
+     * Default sort column: show most recently edited products first.
+     *
+     * @var string
+     */
+    protected $sortColumn = 'product_flat.updated_at';
+
+    /**
+     * Default sort order.
+     *
+     * @var string
+     */
+    protected $sortOrder = 'desc';
+
+    /**
      * Constructor for the class.
      *
      * @return void

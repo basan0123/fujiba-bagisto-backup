@@ -1,8 +1,16 @@
 #outlet\home\orders list related APIs
 extend type Query @guard(with: ["pos_user"]) {
+    # source ∈ pos | website | all (default pos — preserves the historical
+    # "register sale history" behaviour for callers that don't pass it).
+    # from / to: optional ISO-ish datetime strings (e.g. "2026-05-29 00:00:00")
+    # filtering on created_at of the underlying table (pos_order for source=pos,
+    # orders for website/all). Used by the OrderList today/week tabs.
     getOrders (
         first: Int,
-        page: Int
+        page: Int,
+        source: String,
+        from: String,
+        to: String
     ): [OutletOrder!] @paginate(
         type: "PAGINATOR",
         builder: "Webkul\\Pos\\Queries\\Order\\OrderQuery@getOrders",
@@ -12,6 +20,21 @@ extend type Query @guard(with: ["pos_user"]) {
     # Single order by sales order id (outlet-scoped). Powers OrderDetail.
     getOrder(id: Int!): OutletOrder
         @field(resolver: "Webkul\\Pos\\Queries\\Order\\OrderQuery@getOrder")
+
+    # Store-wide count of unfulfilled WEBSITE orders (all channels in the
+    # tenant), for the top-bar pending-order badge. Status ∈ pending,
+    # pending_payment, processing; register (pos_order) sales are excluded.
+    getPendingWebOrderCount: PendingWebOrderCount!
+        @field(resolver: "Webkul\\Pos\\Queries\\Order\\OrderQuery@pendingWebOrderCount")
+}
+
+# Badge payload for getPendingWebOrderCount. `total` is the sum the badge
+# shows; the per-status fields back a tooltip / future breakdown.
+type PendingWebOrderCount {
+    total: Int!
+    pending: Int!
+    pendingPayment: Int!
+    processing: Int!
 }
 
 extend type Mutation @guard(with: ["pos_user"]) {
@@ -22,10 +45,25 @@ extend type Mutation @guard(with: ["pos_user"]) {
 
 type OutletOrder {
     id: Int!
-    barcodeUrl: String @rename(attribute: "barcode_url")
-    outlet: Outlet @belongsTo(relation: "outlet")
-    customerCredit: CustomerCredit @belongsTo(relation: "customerCredit")
-    order: Order
+    # These four resolve through OrderQuery so a row can be either a pos_order
+    # (register sale) OR a core order (website sale, no pos_order row). The
+    # resolver branches on the root type; the pos_order path is unchanged.
+    barcodeUrl: String @field(resolver: "Webkul\\Pos\\Queries\\Order\\OrderQuery@resolveBarcodeUrl")
+    outlet: Outlet @field(resolver: "Webkul\\Pos\\Queries\\Order\\OrderQuery@resolveOutlet")
+    customerCredit: CustomerCredit @field(resolver: "Webkul\\Pos\\Queries\\Order\\OrderQuery@resolveCustomerCredit")
+    order: Order @field(resolver: "Webkul\\Pos\\Queries\\Order\\OrderQuery@resolveOrder")
+    # Per-order profit (revenue − cost of items). Manager/owner only —
+    # null for cashiers. Cost = Σ qty × product 'cost' attribute (attr 12),
+    # the same basis getInvoiceStats uses.
+    profitSummary: OrderProfitSummary
+        @field(resolver: "Webkul\\Pos\\Queries\\Order\\OrderQuery@profitSummary")
+}
+
+type OrderProfitSummary {
+    revenue: Float!
+    cost: Float!
+    profit: Float!
+    marginPct: Float!
 }
 
 type CustomerCredit {
@@ -47,4 +85,21 @@ type ReturnOrderResponse {
     success: Boolean
     message: String
     outletOrder: OutletOrder @rename(attribute: "outlet_order")
+}
+
+# Expose the EAV 'cost' attribute on the core Product type so OrderItem.product
+# can return it. Used by the POS order list to compute per-row profit
+# (Σ qty × cost). Product model's getAttribute() resolves 'cost' via EAV.
+extend type Product {
+    cost: Float
+}
+
+# Fulfillment state for the POS order-edit screen (web-order actions). These let
+# the UI reflect what's already done before showing the label / payment /
+# tracking controls. labelPrinted + paymentConfirmedAt read straight off the
+# orders row; trackingNumber resolves the latest shipment's track_number.
+extend type Order {
+    labelPrinted: Boolean @rename(attribute: "fujiba_label_printed")
+    paymentConfirmedAt: String @rename(attribute: "payment_confirmed_at")
+    trackingNumber: String @field(resolver: "Webkul\\Pos\\Queries\\Order\\OrderQuery@resolveTrackingNumber")
 }

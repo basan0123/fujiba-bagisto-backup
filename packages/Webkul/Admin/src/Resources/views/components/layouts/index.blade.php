@@ -144,6 +144,9 @@
         {!! view_render_event('bagisto.admin.layout.content.after') !!}
     </div>
 
+    {{-- Global hardware-barcode listener: scan on any admin page jumps to POS home --}}
+    @include('admin::components.layouts.barcode-global')
+
     {!! view_render_event('bagisto.admin.layout.body.after') !!}
 
     @stack('scripts')

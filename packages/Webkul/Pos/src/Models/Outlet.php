@@ -25,6 +25,8 @@ class Outlet extends Model implements OutletContract
      */
     protected $fillable = [
         'name',
+        'tagline',
+        'brand_color',
         'email',
         'phone',
         'website',

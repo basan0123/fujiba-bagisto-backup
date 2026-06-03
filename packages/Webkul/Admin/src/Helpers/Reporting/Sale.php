@@ -634,4 +634,325 @@ class Sale extends AbstractReporting
 
         return $stats ?? [];
     }
+
+    /* =====================================================================
+     |  Fujiba custom reporting queries (location, monthly, products, etc.)
+     |  All respect the active channel + date range + orders/payments mode.
+     * ==================================================================== */
+
+    /**
+     * Month-by-month sales table for the selected range.
+     * Returns rows of { ym, label, orders, sales, aov }.
+     */
+    public function getMonthlySalesTable(): array
+    {
+        $col = $this->dateColumn;
+
+        $rows = $this->orderRepository
+            ->resetModel()
+            ->select(
+                DB::raw("DATE_FORMAT($col, '%Y-%m') as ym"),
+                DB::raw('COUNT(*) as orders'),
+                DB::raw('SUM(base_grand_total - base_grand_total_refunded) as sales')
+            )
+            ->whereIn('channel_id', $this->channelIds)
+            ->whereBetween($col, [$this->startDate, $this->endDate])
+            ->groupBy('ym')
+            ->orderBy('ym')
+            ->get();
+
+        return $rows->map(function ($r) {
+            $orders = (int) $r->orders;
+            $sales = (float) $r->sales;
+
+            return [
+                'ym'             => $r->ym,
+                'label'          => $r->ym,
+                'orders'         => $orders,
+                'sales'          => $sales,
+                'formatted_sales'=> core()->formatBasePrice($sales),
+                'aov'            => $orders ? $sales / $orders : 0,
+                'formatted_aov'  => core()->formatBasePrice($orders ? $sales / $orders : 0),
+            ];
+        })->toArray();
+    }
+
+    /**
+     * Top selling products for the range, ranked by net revenue.
+     * Returns { product_id, name, sku, qty, revenue }.
+     */
+    public function getTopSellingProducts($limit = 10): array
+    {
+        $col = $this->dateColumn;
+
+        return $this->orderItemRepository
+            ->resetModel()
+            ->leftJoin('orders', 'order_items.order_id', '=', 'orders.id')
+            ->select(
+                'order_items.product_id',
+                DB::raw('MAX(order_items.name) as name'),
+                DB::raw('MAX(order_items.sku) as sku'),
+                DB::raw('SUM(order_items.qty_ordered - order_items.qty_refunded) as qty'),
+                DB::raw('SUM(order_items.base_total - order_items.base_amount_refunded) as revenue')
+            )
+            ->whereIn('orders.channel_id', $this->channelIds)
+            ->whereBetween('orders.'.$col, [$this->startDate, $this->endDate])
+            ->whereNull('order_items.parent_id')
+            ->groupBy('order_items.product_id')
+            ->orderByDesc('revenue')
+            ->limit($limit)
+            ->get()
+            ->map(fn ($r) => [
+                'product_id'        => $r->product_id,
+                'name'              => $r->name,
+                'sku'               => $r->sku,
+                'qty'               => (int) $r->qty,
+                'revenue'           => (float) $r->revenue,
+                'formatted_revenue' => core()->formatBasePrice((float) $r->revenue),
+            ])->toArray();
+    }
+
+    /**
+     * Customer location breakdown from order shipping addresses.
+     * Grouped by prefecture/state (most meaningful for a JP store), with the
+     * country attached. Returns { country, state, orders, sales }.
+     */
+    public function getCustomerLocations($limit = 15): array
+    {
+        $col = $this->dateColumn;
+
+        $rows = $this->orderRepository
+            ->resetModel()
+            ->leftJoin('addresses', function ($join) {
+                $join->on('addresses.order_id', '=', 'orders.id')
+                    ->where('addresses.address_type', '=', 'order_shipping');
+            })
+            ->select(
+                DB::raw("NULLIF(TRIM(addresses.state), '') as state"),
+                DB::raw("NULLIF(TRIM(addresses.country), '') as country"),
+                DB::raw('COUNT(DISTINCT orders.id) as orders'),
+                DB::raw('SUM(orders.base_grand_total - orders.base_grand_total_refunded) as sales')
+            )
+            ->whereIn('orders.channel_id', $this->channelIds)
+            ->whereBetween('orders.'.$col, [$this->startDate, $this->endDate])
+            ->groupBy('country', 'state')
+            ->orderByDesc('sales')
+            ->limit($limit)
+            ->get();
+
+        // Orders without a shipping address are in-store/POS or pickup; label
+        // them clearly instead of leaving a bare dash.
+        $unknown = trans('admin::app.reporting.sales.index.location-unknown');
+
+        return $rows->map(fn ($r) => [
+            'country'         => $r->country ?: '—',
+            'state'           => $r->state ?: $unknown,
+            'orders'          => (int) $r->orders,
+            'sales'           => (float) $r->sales,
+            'formatted_sales' => core()->formatBasePrice((float) $r->sales),
+        ])->toArray();
+    }
+
+    /**
+     * New vs returning customers in the range.
+     * A customer counts as "new" when their first-ever order falls inside the
+     * range; otherwise an order from them is "returning". Guests count as new.
+     * Returns { new_customers, returning_customers, new_orders, returning_orders }.
+     */
+    public function getNewVsReturningCustomers(): array
+    {
+        $col = $this->dateColumn;
+
+        $channelIn = implode(',', array_map('intval', $this->channelIds ?: [0]));
+        // Server-generated datetime → safe to quote into the CASE expressions.
+        $start = DB::getPdo()->quote($this->startDate->toDateTimeString());
+
+        // Per-customer first-ever order date (channel-scoped, all time).
+        $firstSub = "(SELECT customer_id, MIN($col) AS first_at
+                      FROM orders
+                      WHERE channel_id IN ($channelIn) AND customer_id IS NOT NULL
+                      GROUP BY customer_id) AS fo";
+
+        // An order is "returning" when the customer's first-ever order predates
+        // the range start; guests and first-timers are "new". Classify and
+        // aggregate entirely in SQL — no PHP loop over every order.
+        $ret = "(orders.is_guest = 0 AND fo.first_at < $start)";
+
+        $row = $this->orderRepository
+            ->resetModel()
+            ->leftJoin(DB::raw($firstSub), 'fo.customer_id', '=', 'orders.customer_id')
+            ->select(
+                DB::raw("SUM(CASE WHEN $ret THEN 1 ELSE 0 END) AS returning_orders"),
+                DB::raw("SUM(CASE WHEN NOT $ret THEN 1 ELSE 0 END) AS new_orders"),
+                DB::raw("COUNT(DISTINCT CASE WHEN $ret THEN orders.customer_id END) AS returning_customers"),
+                DB::raw("COUNT(DISTINCT CASE WHEN NOT $ret THEN orders.customer_id END) AS new_customers")
+            )
+            ->whereIn('orders.channel_id', $this->channelIds)
+            ->whereBetween('orders.'.$col, [$this->startDate, $this->endDate])
+            ->first();
+
+        return [
+            'new_customers'       => (int) ($row->new_customers ?? 0),
+            'returning_customers' => (int) ($row->returning_customers ?? 0),
+            'new_orders'          => (int) ($row->new_orders ?? 0),
+            'returning_orders'    => (int) ($row->returning_orders ?? 0),
+        ];
+    }
+
+    /**
+     * Sales heatmap by weekday (0=Sun..6=Sat) x hour (0..23).
+     * Returns a flat list of { dow, hour, orders, sales } for populated cells.
+     */
+    public function getSalesHeatmap(): array
+    {
+        $col = $this->dateColumn;
+
+        return $this->orderRepository
+            ->resetModel()
+            ->select(
+                DB::raw("(DAYOFWEEK($col) - 1) as dow"),
+                DB::raw("HOUR($col) as hour"),
+                DB::raw('COUNT(*) as orders'),
+                DB::raw('SUM(base_grand_total - base_grand_total_refunded) as sales')
+            )
+            ->whereIn('channel_id', $this->channelIds)
+            ->whereBetween($col, [$this->startDate, $this->endDate])
+            ->groupBy('dow', 'hour')
+            ->get()
+            ->map(fn ($r) => [
+                'dow'    => (int) $r->dow,
+                'hour'   => (int) $r->hour,
+                'orders' => (int) $r->orders,
+                'sales'  => (float) $r->sales,
+            ])->toArray();
+    }
+
+    /**
+     * Sales by channel/store for the range. Ignores the channel filter so all
+     * stores can be compared side by side. Returns { channel, orders, sales }.
+     */
+    public function getSalesByChannel(): array
+    {
+        $col = $this->dateColumn;
+
+        $names = core()->getAllChannels()->pluck('name', 'id');
+
+        $rows = $this->orderRepository
+            ->resetModel()
+            ->select(
+                'channel_id',
+                DB::raw('COUNT(*) as orders'),
+                DB::raw('SUM(base_grand_total - base_grand_total_refunded) as sales')
+            )
+            ->whereBetween($col, [$this->startDate, $this->endDate])
+            ->groupBy('channel_id')
+            ->orderByDesc('sales')
+            ->get();
+
+        return $rows->map(fn ($r) => [
+            'channel'         => $names[$r->channel_id] ?? ('#'.$r->channel_id),
+            'orders'          => (int) $r->orders,
+            'sales'           => (float) $r->sales,
+            'formatted_sales' => core()->formatBasePrice((float) $r->sales),
+        ])->toArray();
+    }
+
+    /**
+     * Per-product revenue/qty for the active range, as a base subquery.
+     * Aggregating once per product first keeps the later attribute joins tiny
+     * (distinct products, not every order_item row) — the key to fast
+     * category/brand breakdowns.
+     */
+    protected function productRevenueSub()
+    {
+        $col = $this->dateColumn;
+
+        return DB::table('order_items')
+            ->join('orders', 'order_items.order_id', '=', 'orders.id')
+            ->select(
+                'order_items.product_id',
+                DB::raw('SUM(order_items.base_total - order_items.base_amount_refunded) as revenue'),
+                DB::raw('SUM(order_items.qty_ordered - order_items.qty_refunded) as qty')
+            )
+            ->whereIn('orders.channel_id', $this->channelIds)
+            ->whereBetween('orders.'.$col, [$this->startDate, $this->endDate])
+            ->whereNull('order_items.parent_id')
+            ->whereNotNull('order_items.product_id')
+            ->groupBy('order_items.product_id');
+    }
+
+    /**
+     * Sales split by product category for the range, ranked by revenue.
+     * Pre-aggregates per product, then maps products → categories.
+     */
+    public function getSalesByCategory($limit = 10): array
+    {
+        $locale = app()->getLocale();
+
+        $rows = DB::query()
+            ->fromSub($this->productRevenueSub(), 'pr')
+            ->leftJoin('product_categories', 'pr.product_id', '=', 'product_categories.product_id')
+            ->leftJoin('category_translations', function ($join) use ($locale) {
+                $join->on('product_categories.category_id', '=', 'category_translations.category_id')
+                    ->where('category_translations.locale', '=', $locale);
+            })
+            ->select(
+                DB::raw("COALESCE(NULLIF(category_translations.name, ''), '—') as label"),
+                DB::raw('SUM(pr.revenue) as revenue'),
+                DB::raw('SUM(pr.qty) as qty')
+            )
+            ->groupBy('label')
+            ->orderByDesc('revenue')
+            ->limit($limit)
+            ->get();
+
+        return $rows->map(fn ($r) => [
+            'label'             => $r->label,
+            'qty'               => (int) $r->qty,
+            'revenue'           => (float) $r->revenue,
+            'formatted_revenue' => core()->formatBasePrice((float) $r->revenue),
+        ])->toArray();
+    }
+
+    /**
+     * Sales split by brand attribute for the range, ranked by revenue.
+     * Brand is a select attribute: option id in product_attribute_values.integer_value.
+     */
+    public function getSalesByBrand($limit = 10): array
+    {
+        $locale = app()->getLocale();
+
+        $brandAttrId = DB::table('attributes')->where('code', 'brand')->value('id');
+
+        if (! $brandAttrId) {
+            return [];
+        }
+
+        $rows = DB::query()
+            ->fromSub($this->productRevenueSub(), 'pr')
+            ->leftJoin('product_attribute_values as brand_attr', function ($join) use ($brandAttrId) {
+                $join->on('pr.product_id', '=', 'brand_attr.product_id')
+                    ->where('brand_attr.attribute_id', '=', $brandAttrId);
+            })
+            ->leftJoin('attribute_option_translations as brand_trans', function ($join) use ($locale) {
+                $join->on('brand_trans.attribute_option_id', '=', 'brand_attr.integer_value')
+                    ->where('brand_trans.locale', '=', $locale);
+            })
+            ->select(
+                DB::raw("COALESCE(NULLIF(brand_trans.label, ''), NULLIF(brand_attr.text_value, ''), '—') as label"),
+                DB::raw('SUM(pr.revenue) as revenue'),
+                DB::raw('SUM(pr.qty) as qty')
+            )
+            ->groupBy('label')
+            ->orderByDesc('revenue')
+            ->limit($limit)
+            ->get();
+
+        return $rows->map(fn ($r) => [
+            'label'             => $r->label,
+            'qty'               => (int) $r->qty,
+            'revenue'           => (float) $r->revenue,
+            'formatted_revenue' => core()->formatBasePrice((float) $r->revenue),
+        ])->toArray();
+    }
 }

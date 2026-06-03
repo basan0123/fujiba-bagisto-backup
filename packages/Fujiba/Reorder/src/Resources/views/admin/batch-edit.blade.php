@@ -26,6 +26,8 @@
         <div class="flex gap-2">
             <a href="{{ route('admin.inventory.reorder.history') }}"
                class="px-3 py-2 text-sm bg-gray-100 rounded">Back</a>
+            <a href="{{ route('admin.inventory.reorder.batches.export-csv', $batch->id) }}"
+               class="px-3 py-2 text-sm bg-gray-100 rounded">CSV</a>
             @if (in_array($batch->status, ['draft', 'pending']))
                 <button id="be-save"
                     class="px-3 py-2 text-sm bg-blue-600 text-white rounded">Save</button>

@@ -71,7 +71,7 @@
                                 type="file"
                                 class="hidden"
                                 :id="$.uid + '_imageInput'"
-                                accept="image/*"
+                                accept="image/*,.heic,.heif,.avif"
                                 :multiple="allowMultiple"
                                 :ref="$.uid + '_imageInput'"
                                 @change="add"
@@ -377,7 +377,7 @@
                         type="file"
                         :name="name + '[]'"
                         class="hidden"
-                        accept="image/*"
+                        accept="image/*,.heic,.heif,.avif"
                         :id="$.uid + '_imageInput_' + index"
                         :ref="$.uid + '_imageInput_' + index"
                         @change="edit"
@@ -492,7 +492,7 @@
                         return;
                     }
 
-                    const validFiles = Array.from(imageInput.files).every(file => file.type.includes('image/'));
+                    const validFiles = Array.from(imageInput.files).every(file => this.isAcceptedImage(file));
 
                     if (! validFiles) {
                         this.$emitter.emit('add-flash', {
@@ -566,6 +566,20 @@
                     return new File([u8arr], filename, {type:mime});
                 },
 
+                isAcceptedImage(file) {
+                    /**
+                     * Accept anything the browser tags as an image, but also files
+                     * with an empty MIME type (iPhone HEIC/HEIF often report no
+                     * type) or a known image extension. The backend converts every
+                     * accepted upload to WebP, so we can afford to be permissive here.
+                     */
+                    if (file.type && file.type.startsWith('image/')) {
+                        return true;
+                    }
+
+                    return /\.(jpe?g|png|gif|bmp|webp|svg|svgz|ico|tiff?|heic|heif|avif)$/i.test(file.name || '');
+                },
+
                 resetAIModal() {
                     this.ai = {
                         enabled: Boolean("{{ core()->getConfigData('general.magic_ai.settings.enabled') && core()->getConfigData('general.magic_ai.image_generation.enabled') }}"),
@@ -607,7 +621,7 @@
                         return;
                     }
 
-                    const validFiles = Array.from(imageInput.files).every(file => file.type.includes('image/'));
+                    const validFiles = Array.from(imageInput.files).every(file => this.isAcceptedImage(file));
 
                     if (! validFiles) {
                         this.$emitter.emit('add-flash', {
@@ -621,6 +635,19 @@
                     this.setFile(imageInput.files[0]);
 
                     this.readFile(imageInput.files[0]);
+                },
+
+                isAcceptedImage(file) {
+                    /**
+                     * Accept anything tagged as an image, plus empty-MIME files
+                     * (iPhone HEIC/HEIF) and known image extensions. Backend
+                     * converts every accepted upload to WebP.
+                     */
+                    if (file.type && file.type.startsWith('image/')) {
+                        return true;
+                    }
+
+                    return /\.(jpe?g|png|gif|bmp|webp|svg|svgz|ico|tiff?|heic|heif|avif)$/i.test(file.name || '');
                 },
 
                 remove() {

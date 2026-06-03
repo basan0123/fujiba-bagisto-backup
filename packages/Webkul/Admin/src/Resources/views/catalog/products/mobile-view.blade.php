@@ -191,6 +191,18 @@
 .dark .mobile-mode-tab{background:#1f2937;border-color:#9ca3af;color:#fff;}
 .dark .mobile-mode-tab.is-active{background:#1d4ed8;border-color:#1e40af;color:#fff;}
 
+/* ═══ CALCULATOR TABS ═══ */
+.calc-mode-tab{
+    border:1.5px solid #d97706;background:#fff;color:#92400e;
+    transition:all .15s;
+}
+.calc-mode-tab:hover{background:#fef3c7;}
+.calc-mode-tab.is-active{background:#d97706;color:#fff;border-color:#b45309;}
+.dark .calc-mode-tab{background:#1f2937;border-color:#f59e0b;color:#fbbf24;}
+.dark .calc-mode-tab.is-active{background:#b45309;border-color:#92400e;color:#fff;}
+.calc-tax-btn.is-active{background:#d97706;color:#fff;border-color:#b45309;}
+.dark .calc-tax-btn.is-active{background:#b45309;border-color:#92400e;color:#fff;}
+
 /* ═══ SAVE RING ═══ */
 @keyframes pos-ring-fade {
     0%   { box-shadow: 0 0 0 2px #4ade80; }
@@ -258,6 +270,15 @@
       <input type="number" id="mobile-stock-lt" min="0" placeholder="Stock <"
              class="w-28 rounded-md border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-800 px-3 py-2 text-sm text-gray-800 dark:text-white outline-none focus:ring-2 focus:ring-blue-400"
              oninput="mobileFilterList()">
+      <select id="mobile-price-filter"
+              class="custom-select rounded-md border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-800 px-3 py-2 pr-8 text-sm text-gray-800 dark:text-white outline-none focus:ring-2 focus:ring-blue-400"
+              onchange="mobileFilterList()">
+        <option value="all">Price: all</option>
+        <option value="no-sell">No sell price</option>
+        <option value="no-buy">No buy price</option>
+        <option value="no-either">No buy or sell</option>
+        <option value="no-both">Missing both</option>
+      </select>
     </div>
 
     <div class="px-4 pb-3 flex gap-2 sm:gap-3">
@@ -290,17 +311,17 @@
 
 {{-- ═══ BOTTOM SHEET ═══ --}}
 <div id="mobile-sheet"
-     class="fixed bottom-0 left-0 right-0 z-40 bg-white dark:bg-gray-900 rounded-t-3xl shadow-2xl transition-transform duration-300 transform translate-y-full max-h-[90vh] overflow-y-auto"
+     class="fixed bottom-0 left-0 right-0 z-40 bg-white dark:bg-gray-900 rounded-t-2xl shadow-2xl transition-transform duration-300 transform translate-y-full max-h-[85vh] sm:max-h-[80vh] sm:max-w-md sm:mx-auto sm:rounded-2xl sm:bottom-4 overflow-y-auto"
      style="padding-bottom: env(safe-area-inset-bottom)">
 
-  <div class="sticky top-0 bg-white dark:bg-gray-900 rounded-t-3xl pt-4 pb-3 border-b border-gray-200 dark:border-gray-800 touch-none flex justify-center">
-    <div class="w-12 h-1.5 bg-gray-300 dark:bg-gray-600 rounded-full"></div>
+  <div class="sticky top-0 bg-white dark:bg-gray-900 rounded-t-3xl pt-2 pb-2 border-b border-gray-200 dark:border-gray-800 touch-none flex justify-center z-10">
+    <div class="w-10 h-1 bg-gray-300 dark:bg-gray-600 rounded-full"></div>
   </div>
 
-  <div class="px-4 sm:px-6 py-4">
-    <div class="mb-6">
-      <h2 class="text-lg sm:text-xl font-bold text-gray-800 dark:text-white mb-1" id="mobile-sheet-title">@lang('admin::app.catalog.products.views.edit-stock')</h2>
-      <p class="text-sm text-gray-600 dark:text-gray-400" id="mobile-sheet-product"></p>
+  <div class="px-3 sm:px-4 py-3">
+    <div class="mb-2">
+      <h2 class="text-base font-bold text-gray-800 dark:text-white mb-0.5" id="mobile-sheet-title">@lang('admin::app.catalog.products.views.edit-stock')</h2>
+      <p class="text-xs text-gray-600 dark:text-gray-400 truncate" id="mobile-sheet-product"></p>
     </div>
 
     {{-- STOCK --}}
@@ -330,15 +351,134 @@
 
     {{-- PRICE --}}
     <div data-mode-body="price" class="hidden">
-      <div class="bg-gradient-to-br from-green-50 to-green-100 dark:from-green-900/30 dark:to-green-900/50 rounded-2xl p-6 sm:p-8 mb-6 text-center border border-green-200 dark:border-green-800">
-        <label class="text-xs sm:text-sm font-semibold text-green-600 dark:text-green-400 block mb-4 uppercase tracking-wide">@lang('admin::app.catalog.products.views.sale-price')</label>
+      {{-- BUY PRICE (cost) --}}
+      <div class="bg-gradient-to-br from-amber-50 to-amber-100 dark:from-amber-900/30 dark:to-amber-900/50 rounded-xl p-3 sm:p-4 mb-2 text-center border border-amber-200 dark:border-amber-800">
+        <label class="text-[11px] font-semibold text-amber-700 dark:text-amber-400 block mb-2 uppercase tracking-wide">仕入価格</label>
         <div class="flex items-center justify-center gap-2">
-          <span class="text-3xl sm:text-4xl font-black text-green-700 dark:text-green-400">¥</span>
-          <input type="number" id="mobile-price-input" value="0"
-                 class="flex-1 max-w-[280px] h-16 sm:h-20 text-center text-3xl sm:text-4xl font-black bg-white dark:bg-gray-800 border-2 border-green-400 dark:border-green-500 rounded-2xl text-green-700 dark:text-green-400 outline-none focus:ring-2 focus:ring-green-500 shadow-md"
-                 inputmode="numeric" autocomplete="off" min="0" step="1">
+          <span class="text-2xl font-black text-amber-700 dark:text-amber-400">¥</span>
+          <input type="number" id="mobile-cost-input" value="0"
+                 class="flex-1 max-w-[200px] h-12 text-center text-2xl font-black bg-white dark:bg-gray-800 border-2 border-amber-400 dark:border-amber-500 rounded-lg text-amber-700 dark:text-amber-400 outline-none focus:ring-2 focus:ring-amber-500 shadow-sm"
+                 inputmode="numeric" autocomplete="off" min="0" step="1"
+                 oninput="if(typeof mobileCalcRun==='function')mobileCalcRun()">
+          <button type="button" id="mobile-calc-toggle" onclick="mobileToggleCalc()"
+                  class="flex-shrink-0 w-10 h-10 rounded-full bg-white dark:bg-gray-800 border-2 border-amber-400 dark:border-amber-500 text-amber-700 dark:text-amber-400 shadow-sm hover:bg-amber-50 dark:hover:bg-amber-900/20 active:scale-95 transition-all flex items-center justify-center"
+                  title="計算機" aria-label="計算機" aria-expanded="false">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <rect x="4" y="2" width="16" height="20" rx="2"/>
+              <line x1="8" y1="6" x2="16" y2="6"/>
+              <line x1="8" y1="10" x2="8" y2="10"/>
+              <line x1="12" y1="10" x2="12" y2="10"/>
+              <line x1="16" y1="10" x2="16" y2="10"/>
+              <line x1="8" y1="14" x2="8" y2="14"/>
+              <line x1="12" y1="14" x2="12" y2="14"/>
+              <line x1="16" y1="14" x2="16" y2="14"/>
+              <line x1="8" y1="18" x2="12" y2="18"/>
+              <line x1="16" y1="18" x2="16" y2="18"/>
+            </svg>
+          </button>
         </div>
-        <div class="text-xs sm:text-sm text-green-700 dark:text-green-300 font-medium mt-4">@lang('admin::app.catalog.products.views.sale-price-info')</div>
+
+        {{-- CALCULATOR PANEL (hidden by default) --}}
+        <div id="mobile-calc-panel" class="hidden mt-3 text-left">
+          <div class="flex gap-1 mb-2 overflow-x-auto">
+            <button type="button" class="calc-mode-tab flex-shrink-0 px-2 py-1 rounded text-[11px] font-semibold whitespace-nowrap" data-calc-mode="kimono" onclick="mobileCalcSetMode('kimono')">着物+税</button>
+            <button type="button" class="calc-mode-tab flex-shrink-0 px-2 py-1 rounded text-[11px] font-semibold whitespace-nowrap" data-calc-mode="jpfood" onclick="mobileCalcSetMode('jpfood')">日本食品 −割引</button>
+            <button type="button" class="calc-mode-tab flex-shrink-0 px-2 py-1 rounded text-[11px] font-semibold whitespace-nowrap" data-calc-mode="mmk" onclick="mobileCalcSetMode('mmk')">MMK→JPY</button>
+            <button type="button" class="calc-mode-tab flex-shrink-0 px-2 py-1 rounded text-[11px] font-semibold whitespace-nowrap" data-calc-mode="profit" onclick="mobileCalcSetMode('profit')">利益確認</button>
+          </div>
+
+          {{-- KIMONO: buy + tax --}}
+          <div data-calc-body="kimono" class="hidden space-y-1.5">
+            <div>
+              <label class="text-[11px] font-semibold text-amber-700 dark:text-amber-400 block mb-1">仕入額 (税抜)</label>
+              <input type="number" id="calc-kimono-buy" value="0" min="0" step="1" inputmode="numeric"
+                     class="w-full rounded border border-amber-300 dark:border-amber-700 bg-white dark:bg-gray-800 px-2 py-1.5 text-sm text-gray-800 dark:text-white outline-none focus:ring-2 focus:ring-amber-400"
+                     oninput="mobileCalcRun()">
+            </div>
+            <div>
+              <label class="text-[11px] font-semibold text-amber-700 dark:text-amber-400 block mb-1">消費税</label>
+              <div class="flex gap-1.5">
+                <button type="button" class="calc-tax-btn flex-1 px-2 py-1.5 rounded text-xs font-semibold border border-amber-300 dark:border-amber-700 bg-white dark:bg-gray-800 text-amber-700 dark:text-amber-300" data-tax="8" onclick="mobileCalcSetTax(8)">8%</button>
+                <button type="button" class="calc-tax-btn flex-1 px-2 py-1.5 rounded text-xs font-semibold border border-amber-300 dark:border-amber-700 bg-white dark:bg-gray-800 text-amber-700 dark:text-amber-300" data-tax="10" onclick="mobileCalcSetTax(10)">10%</button>
+              </div>
+            </div>
+          </div>
+
+          {{-- JP FOOD: base − discount% --}}
+          <div data-calc-body="jpfood" class="hidden space-y-1.5">
+            <div>
+              <label class="text-[11px] font-semibold text-amber-700 dark:text-amber-400 block mb-1">仕入額 (税込)</label>
+              <input type="number" id="calc-jp-base" value="0" min="0" step="1" inputmode="numeric"
+                     class="w-full rounded border border-amber-300 dark:border-amber-700 bg-white dark:bg-gray-800 px-2 py-1.5 text-sm text-gray-800 dark:text-white outline-none focus:ring-2 focus:ring-amber-400"
+                     oninput="mobileCalcRun()">
+            </div>
+            <div>
+              <label class="text-[11px] font-semibold text-amber-700 dark:text-amber-400 block mb-1">割引率 %</label>
+              <input type="number" id="calc-jp-discount" value="12" min="0" max="100" step="0.1" inputmode="decimal"
+                     class="w-full rounded border border-amber-300 dark:border-amber-700 bg-white dark:bg-gray-800 px-2 py-1.5 text-sm text-gray-800 dark:text-white outline-none focus:ring-2 focus:ring-amber-400"
+                     oninput="mobileCalcRun()">
+            </div>
+          </div>
+
+          {{-- MMK: per-kilo × weight × rate --}}
+          <div data-calc-body="mmk" class="hidden space-y-1.5">
+            <div>
+              <label class="text-[11px] font-semibold text-amber-700 dark:text-amber-400 block mb-1">MMK 単価 (1kg)</label>
+              <input type="number" id="calc-mmk-unit" value="0" min="0" step="1" inputmode="numeric"
+                     class="w-full rounded border border-amber-300 dark:border-amber-700 bg-white dark:bg-gray-800 px-2 py-1.5 text-sm text-gray-800 dark:text-white outline-none focus:ring-2 focus:ring-amber-400"
+                     oninput="mobileCalcRun()">
+            </div>
+            <div class="flex gap-2">
+              <div class="flex-1">
+                <label class="text-[11px] font-semibold text-amber-700 dark:text-amber-400 block mb-1">重量 (kg)</label>
+                <input type="number" id="calc-mmk-weight" value="1" min="0" step="0.01" inputmode="decimal"
+                       class="w-full rounded-md border border-amber-300 dark:border-amber-700 bg-white dark:bg-gray-800 px-3 py-2 text-sm text-gray-800 dark:text-white outline-none focus:ring-2 focus:ring-amber-400"
+                       oninput="mobileCalcRun()">
+              </div>
+              <div class="flex-1">
+                <label class="text-[11px] font-semibold text-amber-700 dark:text-amber-400 block mb-1">MMK→JPY レート</label>
+                <input type="number" id="calc-mmk-rate" value="0.05" min="0" step="0.0001" inputmode="decimal"
+                       class="w-full rounded-md border border-amber-300 dark:border-amber-700 bg-white dark:bg-gray-800 px-3 py-2 text-sm text-gray-800 dark:text-white outline-none focus:ring-2 focus:ring-amber-400"
+                       oninput="mobileCalcRun()">
+              </div>
+            </div>
+          </div>
+
+          {{-- PROFIT: ref only (uses sell-price input) --}}
+          <div data-calc-body="profit" class="hidden">
+            <p class="text-[11px] text-amber-700 dark:text-amber-400 mb-2">現在の仕入価格と販売価格から利益を表示します。</p>
+          </div>
+
+          {{-- RESULT --}}
+          <div class="mt-2 p-2 rounded bg-white dark:bg-gray-800 border-2 border-dashed border-amber-400 dark:border-amber-500">
+            <div class="flex items-baseline justify-between gap-2 mb-1">
+              <span class="text-[10px] font-semibold text-amber-700 dark:text-amber-400 uppercase tracking-wide">計算結果 (参考)</span>
+              <span id="calc-result" class="text-xl font-black text-amber-700 dark:text-amber-400">¥0</span>
+            </div>
+            <div id="calc-formula" class="text-[10px] text-gray-500 dark:text-gray-400 mb-1.5 font-mono"></div>
+            <div id="calc-profit-row" class="hidden text-[11px] text-gray-600 dark:text-gray-300 mb-1.5 flex justify-between gap-2">
+              <span>利益: <strong id="calc-profit" class="text-green-600 dark:text-green-400">¥0</strong></span>
+              <span>利益率: <strong id="calc-margin" class="text-green-600 dark:text-green-400">0%</strong></span>
+            </div>
+            <button type="button" id="calc-apply" onclick="mobileCalcApply()"
+                    class="w-full py-1.5 rounded bg-amber-600 hover:bg-amber-700 active:scale-95 text-white text-xs font-semibold transition-all disabled:opacity-50 disabled:cursor-not-allowed">
+              仕入価格に反映
+            </button>
+          </div>
+        </div>
+      </div>
+
+      {{-- SELL PRICE --}}
+      <div class="bg-gradient-to-br from-green-50 to-green-100 dark:from-green-900/30 dark:to-green-900/50 rounded-xl p-3 sm:p-4 mb-3 text-center border border-green-200 dark:border-green-800">
+        <label class="text-[11px] font-semibold text-green-600 dark:text-green-400 block mb-2 uppercase tracking-wide">@lang('admin::app.catalog.products.views.sale-price')</label>
+        <div class="flex items-center justify-center gap-2">
+          <span class="text-2xl font-black text-green-700 dark:text-green-400">¥</span>
+          <input type="number" id="mobile-price-input" value="0"
+                 class="flex-1 max-w-[240px] h-12 text-center text-2xl font-black bg-white dark:bg-gray-800 border-2 border-green-400 dark:border-green-500 rounded-lg text-green-700 dark:text-green-400 outline-none focus:ring-2 focus:ring-green-500 shadow-sm"
+                 inputmode="numeric" autocomplete="off" min="0" step="1"
+                 oninput="if(typeof mobileCalcRun==='function')mobileCalcRun()">
+        </div>
+        <div class="text-[10px] text-green-700 dark:text-green-300 font-medium mt-2">@lang('admin::app.catalog.products.views.sale-price-info')</div>
       </div>
     </div>
 
@@ -357,17 +497,17 @@
     </div>
 
     {{-- FOOTER --}}
-    <div class="flex gap-2 sm:gap-3 w-full fixed bottom-0 left-0 right-0 p-4 sm:p-6 bg-white dark:bg-gray-900 border-t border-gray-200 dark:border-gray-800 sm:static sm:border-t-0 sm:bg-transparent sm:p-0"
-         style="padding-bottom: max(1rem, env(safe-area-inset-bottom))">
+    <div class="flex gap-2 w-full fixed bottom-0 left-0 right-0 px-3 py-2 bg-white dark:bg-gray-900 border-t border-gray-200 dark:border-gray-800 sm:static sm:border-t-0 sm:bg-transparent sm:px-0 sm:py-0 sm:mt-3"
+         style="padding-bottom: max(0.5rem, env(safe-area-inset-bottom))">
       <button type="button" id="mobile-sheet-cancel"
-              class="transparent-button flex-1 hover:bg-gray-100 dark:text-white dark:hover:bg-gray-950 min-h-[44px]"
+              class="transparent-button flex-1 hover:bg-gray-100 dark:text-white dark:hover:bg-gray-950 min-h-[40px] text-sm"
               onclick="mobileCloseSheet()">@lang('admin::app.catalog.products.views.cancel')</button>
       <button type="button" id="mobile-sheet-save"
-              class="primary-button flex-1 min-h-[44px]"
+              class="primary-button flex-1 min-h-[40px] text-sm"
               onclick="mobileSaveSheet()">@lang('admin::app.catalog.products.views.save')</button>
     </div>
 
-    <div class="h-20 sm:h-0"></div>
+    <div class="h-14 sm:h-0"></div>
   </div>
 </div>
 
@@ -467,11 +607,21 @@
     const ltRaw    = ltEl ? ltEl.value : '';
     const ltNum    = ltRaw === '' ? null : parseInt(ltRaw, 10);
     const ltActive = ltNum !== null && !isNaN(ltNum);
+    const priceEl  = document.getElementById('mobile-price-filter');
+    const priceF   = priceEl ? priceEl.value : 'all';
     return function(p) {
       if (q && !((p.name||'').toLowerCase().includes(q) || (p.sku||'').toLowerCase().includes(q))) return false;
       if (status === 'active'   && String(p.status) !== '1') return false;
       if (status === 'inactive' && String(p.status) === '1') return false;
       if (ltActive && (parseFloat(p.stock)||0) >= ltNum) return false;
+      if (priceF !== 'all') {
+        const sell = parseFloat(p.price) || 0;
+        const buy  = parseFloat(p.jpy_cost != null ? p.jpy_cost : p.cost) || 0;
+        if (priceF === 'no-sell'   && sell > 0) return false;
+        if (priceF === 'no-buy'    && buy  > 0) return false;
+        if (priceF === 'no-either' && sell > 0 && buy > 0) return false;
+        if (priceF === 'no-both'   && (sell > 0 || buy > 0)) return false;
+      }
       return true;
     };
   }
@@ -616,6 +766,16 @@
       document.getElementById('mobile-stock-input').value = parseInt(p.stock||0, 10);
     } else if (sheet.mode === 'price') {
       document.getElementById('mobile-price-input').value = parseFloat(p.price||0);
+      const buy = parseFloat(p.jpy_cost != null ? p.jpy_cost : p.cost) || 0;
+      document.getElementById('mobile-cost-input').value = buy;
+      // Seed calculator inputs from the current buy so opening the panel is useful immediately.
+      const kb = document.getElementById('calc-kimono-buy'); if (kb) kb.value = buy;
+      const jb = document.getElementById('calc-jp-base');    if (jb) jb.value = buy;
+      // Collapse calculator panel from any prior product
+      const panel = document.getElementById('mobile-calc-panel');
+      const cbtn  = document.getElementById('mobile-calc-toggle');
+      if (panel) panel.classList.add('hidden');
+      if (cbtn)  cbtn.setAttribute('aria-expanded', 'false');
     } else if (sheet.mode === 'category') {
       const pre = Array.isArray(p.category_ids) ? p.category_ids
         : String(p.category_ids||'').split(',').filter(Boolean);
@@ -689,6 +849,7 @@
     const p = allProducts[idx];
     if ('stock'      in payload) p.stock = payload.stock;
     if ('price'      in payload) p.price = payload.price;
+    if ('jpy_cost'   in payload) { p.jpy_cost = payload.jpy_cost; p.cost = payload.jpy_cost; }
     if ('categories' in payload) {
       const ids = (payload.categories||[]).map(String).filter(Boolean);
       p.category_ids   = ids;
@@ -715,8 +876,10 @@
       payload.stock = parseInt(document.getElementById('mobile-stock-input').value||0, 10);
     } else if (sheet.mode === 'price') {
       const v = parseFloat(document.getElementById('mobile-price-input').value);
-      if (isNaN(v)||v<0) { mobileShowToast(I18N.invalid,'bg-red-600'); btn.disabled=false; btn.textContent=I18N.save; return; }
-      payload.price = v;
+      const c = parseFloat(document.getElementById('mobile-cost-input').value);
+      if (isNaN(v)||v<0||isNaN(c)||c<0) { mobileShowToast(I18N.invalid,'bg-red-600'); btn.disabled=false; btn.textContent=I18N.save; return; }
+      payload.price    = v;
+      payload.jpy_cost = c;
     } else if (sheet.mode === 'category') {
       const ids = [...sheet.catChecked].map(Number).filter(Boolean);
       payload.categories = ids.length ? ids : [''];
@@ -753,6 +916,137 @@
     document.getElementById('mobile-total-stock').textContent = stock.toLocaleString();
     document.getElementById('mobile-total-value').textContent = '¥'+Math.round(value).toLocaleString();
   }
+
+  /* ════════════════════════════════════════════════════════════════════
+     BUY-PRICE CALCULATOR — reference-only, never auto-saves.
+     User taps "仕入価格に反映" to copy the result into #mobile-cost-input;
+     real DB write happens via the existing save button.
+     ════════════════════════════════════════════════════════════════════ */
+  const CALC_LS_MODE = 'mobile-pos-calc-mode';
+  const CALC_LS_TAX  = 'mobile-pos-calc-tax';
+  const CALC_LS_RATE = 'mobile-pos-calc-mmk-rate';
+  let calcMode = 'kimono';
+  let calcTax  = 10;
+  let calcResult = 0;
+
+  function calcShowBody(mode) {
+    document.querySelectorAll('[data-calc-body]').forEach(el =>
+      el.classList.toggle('hidden', el.dataset.calcBody !== mode));
+    document.querySelectorAll('.calc-mode-tab').forEach(tab =>
+      tab.classList.toggle('is-active', tab.dataset.calcMode === mode));
+  }
+
+  function calcInitFromStorage() {
+    try {
+      const m = localStorage.getItem(CALC_LS_MODE);
+      if (m && ['kimono','jpfood','mmk','profit'].includes(m)) calcMode = m;
+      const t = parseInt(localStorage.getItem(CALC_LS_TAX)||'',10);
+      if (t === 8 || t === 10) calcTax = t;
+      const r = parseFloat(localStorage.getItem(CALC_LS_RATE)||'');
+      if (!isNaN(r) && r > 0) {
+        const el = document.getElementById('calc-mmk-rate');
+        if (el) el.value = r;
+      }
+    } catch(_) {}
+  }
+
+  window.mobileToggleCalc = function() {
+    const panel = document.getElementById('mobile-calc-panel');
+    const btn   = document.getElementById('mobile-calc-toggle');
+    if (!panel) return;
+    const hidden = panel.classList.toggle('hidden');
+    btn.setAttribute('aria-expanded', hidden ? 'false' : 'true');
+    if (!hidden) {
+      calcInitFromStorage();
+      calcShowBody(calcMode);
+      document.querySelectorAll('.calc-tax-btn').forEach(b =>
+        b.classList.toggle('is-active', parseInt(b.dataset.tax,10) === calcTax));
+      mobileCalcRun();
+    }
+  };
+
+  window.mobileCalcSetMode = function(mode) {
+    calcMode = mode;
+    try { localStorage.setItem(CALC_LS_MODE, mode); } catch(_) {}
+    calcShowBody(mode);
+    mobileCalcRun();
+  };
+
+  window.mobileCalcSetTax = function(t) {
+    calcTax = t;
+    try { localStorage.setItem(CALC_LS_TAX, String(t)); } catch(_) {}
+    document.querySelectorAll('.calc-tax-btn').forEach(b =>
+      b.classList.toggle('is-active', parseInt(b.dataset.tax,10) === t));
+    mobileCalcRun();
+  };
+
+  function num(id) { const el = document.getElementById(id); return el ? (parseFloat(el.value)||0) : 0; }
+  function fmt(n) { return '¥' + Math.round(n).toLocaleString(); }
+
+  window.mobileCalcRun = function() {
+    let result = 0, formula = '';
+    const sell = num('mobile-price-input');
+
+    if (calcMode === 'kimono') {
+      const buy = num('calc-kimono-buy');
+      result    = buy * (1 + calcTax/100);
+      formula   = `${buy.toLocaleString()} × (1 + ${calcTax}%) = ${fmt(result)}`;
+    } else if (calcMode === 'jpfood') {
+      const base = num('calc-jp-base');
+      const disc = num('calc-jp-discount');
+      result     = base * (1 - disc/100);
+      formula    = `${base.toLocaleString()} × (1 − ${disc}%) = ${fmt(result)}`;
+    } else if (calcMode === 'mmk') {
+      const unit   = num('calc-mmk-unit');
+      const weight = num('calc-mmk-weight');
+      const rate   = num('calc-mmk-rate');
+      result       = unit * weight * rate;
+      formula      = `${unit.toLocaleString()} MMK × ${weight}kg × ${rate} = ${fmt(result)}`;
+      if (rate > 0) { try { localStorage.setItem(CALC_LS_RATE, String(rate)); } catch(_) {} }
+    } else if (calcMode === 'profit') {
+      const buy = num('mobile-cost-input');
+      result    = buy; // "result" mirrors current buy so Apply is a no-op
+      formula   = `現在の仕入: ${fmt(buy)} / 販売: ${fmt(sell)}`;
+    }
+
+    calcResult = result;
+    const resEl = document.getElementById('calc-result');
+    const fEl   = document.getElementById('calc-formula');
+    if (resEl) resEl.textContent = fmt(result);
+    if (fEl)   fEl.textContent   = formula;
+
+    // Profit row: shown whenever we have a candidate buy (result) AND a sell.
+    const buyForProfit = calcMode === 'profit' ? num('mobile-cost-input') : result;
+    const profitRow = document.getElementById('calc-profit-row');
+    if (profitRow) {
+      const showProfit = buyForProfit > 0 && sell > 0;
+      profitRow.classList.toggle('hidden', !showProfit);
+      if (showProfit) {
+        const profit = sell - buyForProfit;
+        const margin = sell > 0 ? (profit / sell) * 100 : 0;
+        const pEl = document.getElementById('calc-profit');
+        const mEl = document.getElementById('calc-margin');
+        const color = profit >= 0 ? 'text-green-600 dark:text-green-400' : 'text-red-600 dark:text-red-400';
+        if (pEl) { pEl.textContent = fmt(profit); pEl.className = 'text-green-600 dark:text-green-400'.replace(/text-\S+ dark:text-\S+/, color); }
+        if (mEl) { mEl.textContent = margin.toFixed(1) + '%'; mEl.className = pEl ? pEl.className : ''; }
+      }
+    }
+
+    // In profit-only mode, Apply makes no sense — disable it.
+    const applyBtn = document.getElementById('calc-apply');
+    if (applyBtn) applyBtn.disabled = (calcMode === 'profit') || result <= 0;
+  };
+
+  window.mobileCalcApply = function() {
+    if (calcResult <= 0) return;
+    const target = document.getElementById('mobile-cost-input');
+    if (!target) return;
+    target.value = Math.round(calcResult);
+    target.classList.add('pos-saved');
+    setTimeout(() => target.classList.remove('pos-saved'), 800);
+    mobileShowToast('仕入価格に反映しました', 'bg-amber-600');
+    mobileCalcRun(); // refresh profit row against new buy
+  };
 
   /* ── BARCODE SCAN: pin search to SKU, scroll to card, flash it ── */
   window.addEventListener('pos:barcode-resolved', function(ev){

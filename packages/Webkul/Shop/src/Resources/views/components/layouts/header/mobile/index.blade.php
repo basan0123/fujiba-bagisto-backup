@@ -505,24 +505,46 @@
 
             methods: {
                 initCategories() {
-                    try {
-                        const stored = localStorage.getItem('categories');
+                    // Versioned + TTL'd cache. Must stay in sync with the desktop header
+                    // (components/layouts/header/desktop/bottom.blade.php) — both share the
+                    // 'categories_v' localStorage key and CATEGORY_CACHE_VERSION constant.
+                    const CATEGORY_CACHE_VERSION = 2; // bumped 2026-05-24 for ￥ price rename
+                    const CATEGORY_CACHE_TTL = 60 * 60 * 1000; // 1 hour
 
-                        if (stored) {
-                            this.categories = JSON.parse(stored);
-                            this.isLoading = false;
-                            return;
+                    try {
+                        const raw = localStorage.getItem('categories_v');
+
+                        if (raw) {
+                            const cache = JSON.parse(raw);
+
+                            if (
+                                cache
+                                && cache.v === CATEGORY_CACHE_VERSION
+                                && Array.isArray(cache.data)
+                                && (Date.now() - (cache.t || 0)) < CATEGORY_CACHE_TTL
+                            ) {
+                                this.categories = cache.data;
+                                this.isLoading = false;
+                                return;
+                            }
                         }
 
+                        localStorage.removeItem('categories');
                     } catch (e) {}
 
-                    this.getCategories();
+                    this.getCategories(CATEGORY_CACHE_VERSION);
                 },
-                getCategories() {
+                getCategories(version) {
                     this.$axios.get("{{ route('shop.api.categories.tree') }}")
                         .then(response => {
                             this.categories = response.data.data;
-                            localStorage.setItem('categories', JSON.stringify(this.categories));
+                            try {
+                                localStorage.setItem('categories_v', JSON.stringify({
+                                    v: version,
+                                    t: Date.now(),
+                                    data: this.categories,
+                                }));
+                            } catch (e) {}
                         })
                         .catch(error => {
                             console.log(error);

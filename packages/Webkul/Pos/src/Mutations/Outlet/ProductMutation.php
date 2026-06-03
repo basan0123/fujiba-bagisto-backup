@@ -295,11 +295,17 @@ class ProductMutation extends Controller
         }
 
         $validator = Validator::make($args, [
-            'name'     => 'required',
-            'sku'      => ['nullable', 'unique:products,sku', new Slug],
-            'price'    => 'required|numeric|min:0',
-            'quantity' => 'required|integer|min:0',
-            'weight'   => 'nullable|numeric|min:0',
+            'name'             => 'required',
+            'sku'              => ['nullable', 'unique:products,sku', new Slug],
+            'price'            => 'required|numeric|min:0',
+            'cost'             => 'nullable|numeric|min:0',
+            'quantity'         => 'required|integer|min:0',
+            'weight'           => 'nullable|numeric|min:0',
+            'categoryIds'      => 'nullable|array',
+            'categoryIds.*'    => 'integer',
+            'images'           => 'nullable|array',
+            'images.*.base64'  => 'required_with:images|string',
+            'images.*.name'    => 'nullable|string|max:190',
         ]);
 
         if ($validator->fails()) {
@@ -363,13 +369,20 @@ class ProductMutation extends Controller
             ? (core()->getAllChannels()->firstWhere('id', $outletChannelId) ?? core()->getDefaultChannel())
             : core()->getDefaultChannel();
 
-        // Optional category from the POS quick-create form. Only attach when
-        // the category actually exists (and isn't the root) to avoid FK errors.
-        $categoryId = isset($args['categoryId']) ? (int) $args['categoryId'] : 0;
-        $categoryIds = [];
-        if ($categoryId > 0 && DB::table('categories')->where('id', $categoryId)->exists()) {
-            $categoryIds = [$categoryId];
+        // Optional category from the POS quick-create form. Accept either
+        // the legacy `categoryId` (single) or the new `categoryIds` (multi);
+        // both shapes are merged and FK-validated so missing rows don't blow up.
+        $rawIds = [];
+        if (! empty($args['categoryIds']) && is_array($args['categoryIds'])) {
+            $rawIds = array_map('intval', $args['categoryIds']);
         }
+        if (isset($args['categoryId']) && (int) $args['categoryId'] > 0) {
+            $rawIds[] = (int) $args['categoryId'];
+        }
+        $rawIds = array_values(array_unique(array_filter($rawIds, fn ($v) => $v > 0)));
+        $categoryIds = $rawIds
+            ? DB::table('categories')->whereIn('id', $rawIds)->pluck('id')->all()
+            : [];
 
         $data = array_merge($args, [
             'channel'           => $channel->code,
@@ -388,15 +401,30 @@ class ProductMutation extends Controller
             'categories'        => $categoryIds,
         ]);
 
+        // `cost` is a normal Bagisto product attribute (code=cost). Mirror
+        // updateProduct: passing it in $data lets the repository persist it.
+        if (array_key_exists('cost', $args) && $args['cost'] !== null) {
+            $data['cost'] = $args['cost'];
+        }
+
         Event::dispatch('catalog.product.update.before', $product->id);
 
         $product = $this->productRepository->update($data, $product->id);
 
         Event::dispatch('catalog.product.update.after', $product);
 
-        // Optional image — base64-encoded payload from the POS quick-create form.
+        // Optional images — accept either the legacy single base64 field or
+        // the new multi-image list. Failures inside storeBase64Image() are
+        // already swallowed so a bad upload never blocks product creation.
         if ($imageBase64) {
             $this->storeBase64Image($product, $imageBase64, $imageName);
+        }
+        if (! empty($args['images']) && is_array($args['images'])) {
+            foreach ($args['images'] as $img) {
+                if (! empty($img['base64'])) {
+                    $this->storeBase64Image($product, $img['base64'], $img['name'] ?? null);
+                }
+            }
         }
 
         // Optional barcode — link the scanned code to the freshly created product.
@@ -716,6 +744,7 @@ class ProductMutation extends Controller
             'quantity'       => 'sometimes|required|integer|min:0',
             'weight'         => 'sometimes|nullable|numeric|min:0',
             'taxCategoryId'  => 'sometimes|nullable|integer',
+            'categoryId'     => 'sometimes|nullable|integer',
             'description'    => 'sometimes|nullable|string|max:5000',
             'shortDescription' => 'sometimes|nullable|string|max:1000',
             'status'         => 'sometimes|boolean',
@@ -766,6 +795,16 @@ class ProductMutation extends Controller
 
         if (array_key_exists('taxCategoryId', $args)) {
             $data['tax_category_id'] = $args['taxCategoryId'];
+        }
+
+        // Optional category reassignment. Mirror createProduct's FK-safety:
+        // only set when the category exists. Passing 'categories' to the
+        // repository update replaces the product's category links.
+        if (array_key_exists('categoryId', $args)) {
+            $categoryId = (int) $args['categoryId'];
+            $data['categories'] = ($categoryId > 0 && DB::table('categories')->where('id', $categoryId)->exists())
+                ? [$categoryId]
+                : [];
         }
 
         if (array_key_exists('quantity', $args)) {

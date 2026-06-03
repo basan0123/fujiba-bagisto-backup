@@ -114,4 +114,8 @@ return [
             ],
         ],
     ],
+    // FUJIBA 2026-05-30: removed the 'pos.settings.chat_widget' config group.
+    // It configured the now-deleted storefront vanilla-JS chat widget. POS chat
+    // is Messenger-only and inherits its configuration from the existing
+    // Fujiba\LiveChat package (livechat_settings: page token, bot id, etc.).
 ];

@@ -1,0 +1,134 @@
+# outlet/orders/manage-edit.graphql — POS order EDITING (the GraphQL face of
+# the admin "advanced order" screen). Address / payment-method / fulfillment /
+# status / note. Line-item editing lives in manage-edit-items.graphql.
+#
+# Every resolver delegates to the shared Fujiba\OrdersAdmin\Services\* classes
+# the admin REST controllers use, so the rules can't drift. Cashier+ (mirrors
+# the admin sales.orders.edit permission); scoped to the agent's outlet channel.
+
+extend type Mutation @guard(with: ["pos_user"]) {
+    updateOrderShippingAddress(
+        input: updateOrderAddressInput! @spread
+    ): orderEditResult @field(resolver: "Webkul\\Pos\\Mutations\\Outlet\\OrderEditMutation@updateAddress")
+
+    updateOrderPaymentMethod(
+        input: updateOrderPaymentMethodInput! @spread
+    ): orderPaymentEditResult @field(resolver: "Webkul\\Pos\\Mutations\\Outlet\\OrderEditMutation@updatePaymentMethod")
+
+    updateOrderFulfillment(
+        input: updateOrderFulfillmentInput! @spread
+    ): orderEditResult @field(resolver: "Webkul\\Pos\\Mutations\\Outlet\\OrderEditMutation@updateFulfillment")
+
+    updateOrderStatus(
+        input: updateOrderStatusInput! @spread
+    ): orderEditResult @field(resolver: "Webkul\\Pos\\Mutations\\Outlet\\OrderEditMutation@updateStatus")
+
+    updateOrderNote(
+        input: updateOrderNoteInput! @spread
+    ): orderEditResult @field(resolver: "Webkul\\Pos\\Mutations\\Outlet\\OrderEditMutation@updateNote")
+
+    # Web-order fulfillment actions (parity with the admin advanced screen).
+    # markOrderLabelPrinted: auto-ships the unshipped portion (decrements stock)
+    # and, for COD orders, confirms payment + flips the invoice to paid.
+    markOrderLabelPrinted(
+        input: markLabelPrintedInput! @spread
+    ): orderEditResult @field(resolver: "Webkul\\Pos\\Mutations\\Outlet\\OrderEditMutation@markLabelPrinted")
+
+    confirmOrderPayment(
+        input: confirmOrderPaymentInput! @spread
+    ): orderPaymentConfirmResult @field(resolver: "Webkul\\Pos\\Mutations\\Outlet\\OrderEditMutation@confirmPayment")
+
+    # Sets the tracking number on the latest shipment. Fails (success:false) when
+    # the order has no shipment yet — mark the label printed (or ship) first.
+    updateOrderTracking(
+        input: updateOrderTrackingInput! @spread
+    ): orderEditResult @field(resolver: "Webkul\\Pos\\Mutations\\Outlet\\OrderEditMutation@updateTracking")
+}
+
+extend type Query @guard(with: ["pos_user"]) {
+    # Non-persisting fee preview for a fulfillment-type switch (renders the
+    # before/after totals in the picker before the user confirms).
+    previewOrderFulfillment(
+        orderId: Int!
+        type: String!
+    ): fulfillmentPreview @field(resolver: "Webkul\\Pos\\Mutations\\Outlet\\OrderEditMutation@previewFulfillment")
+}
+
+input updateOrderAddressInput {
+    orderId: Int!
+    name: String!
+    address1: String!
+    address2: String
+    city: String!
+    state: String
+    postcode: String!
+    country: String!     # ISO-2 country code
+    phone: String
+}
+
+input updateOrderPaymentMethodInput {
+    orderId: Int!
+    method: String!      # cashondelivery | moneytransfer | cash | kpay
+}
+
+input updateOrderFulfillmentInput {
+    orderId: Int!
+    type: String!        # delivery | pickup | cod | bank_transfer
+}
+
+input updateOrderStatusInput {
+    orderId: Int!
+    status: String!      # pending | pending_payment | processing | completed | canceled | closed | fraud
+    customerMessage: String
+}
+
+input updateOrderNoteInput {
+    orderId: Int!
+    note: String!
+}
+
+input markLabelPrintedInput {
+    orderId: Int!
+}
+
+input confirmOrderPaymentInput {
+    orderId: Int!
+    confirmed: Boolean!
+    note: String
+}
+
+input updateOrderTrackingInput {
+    orderId: Int!
+    trackingNumber: String!
+}
+
+# Generic success/message payload for the edit mutations.
+type orderEditResult {
+    success: Boolean!
+    message: String
+}
+
+# Payment-method edit also returns the recomputed COD fee + grand total.
+type orderPaymentEditResult {
+    success: Boolean!
+    message: String
+    codFeeApplied: Float
+    newGrandTotal: Float
+}
+
+# Payment-confirm returns the new confirmed-at timestamp (null when un-confirmed).
+type orderPaymentConfirmResult {
+    success: Boolean!
+    message: String
+    paymentConfirmedAt: String
+}
+
+# Fulfillment fee preview (no DB write).
+type fulfillmentPreview {
+    type: String!
+    shippingAmount: Float!
+    codFee: Float!
+    coolSurcharge: Float!
+    grandTotal: Float!
+    needsCool: Boolean!
+}

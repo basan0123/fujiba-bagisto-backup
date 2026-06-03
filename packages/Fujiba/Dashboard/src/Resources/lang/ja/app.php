@@ -5,13 +5,40 @@ return [
 
         // ───────────── range_presets (quick-range bar above filters) ─────────────
         'range_presets' => [
-            'today'      => '今日',
-            'yesterday'  => '昨日',
-            'this_month' => '今月',
-            'last_month' => '先月',
-            'last_3m'    => '直近3ヶ月',
-            'this_year'  => '今年',
-            'all'        => '全期間',
+            'today'                => '今日',
+            'yesterday'            => '昨日',
+            'day_before_yesterday' => '一昨日',
+            'this_month'           => '今月',
+            'last_month'           => '先月',
+            'last_3m'              => '直近3ヶ月',
+            'this_fiscal_year'     => '今期',
+            'last_fiscal_year'     => '前期',
+            'this_year'            => '今年',
+            'all'                  => '全期間',
+            'all_stores'           => '全店',
+        ],
+
+        // ───────────── fiscal_year (会計年度 system config) ─────────────
+        'fiscal_year' => [
+            'section_title'    => '会計年度',
+            'section_info'     => '自社の決算期に合わせて会計年度の開始月を設定します。ダッシュボードの「今期」「前期」の集計期間に反映されます。',
+            'settings_title'   => '会計年度の設定',
+            'start_month'      => '会計年度の開始月',
+            'start_month_info' => '日本企業の多くは4月（4月〜翌3月）です。会社ごとに変更できます。',
+            'months' => [
+                '1'  => '1月',
+                '2'  => '2月',
+                '3'  => '3月',
+                '4'  => '4月',
+                '5'  => '5月',
+                '6'  => '6月',
+                '7'  => '7月',
+                '8'  => '8月',
+                '9'  => '9月',
+                '10' => '10月',
+                '11' => '11月',
+                '12' => '12月',
+            ],
         ],
 
         // ───────────── common ─────────────

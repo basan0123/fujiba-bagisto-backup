@@ -899,7 +899,7 @@
                         {{-- Add product (3-card grid) --}}
                         <div class="mb-3 border-t pt-3">
                             <label class="text-xs text-gray-500">@{{ t('add_item') }}</label>
-                            <input v-model="modal.editItems.search" @input="searchEditProducts"
+                            <input v-model="modal.editItems.search" @input="searchEditProducts()"
                                 class="ov-input mt-1" :placeholder="t('search_product')" />
                             <div v-if="modal.editItems.searchBusy" class="text-center text-xs text-gray-500 py-2">
                                 @{{ t('chat_loading') }}
@@ -907,23 +907,23 @@
                             <div v-if="modal.editItems.searchResults.length"
                                 ref="editItemsGrid"
                                 @scroll="onEditGridScroll"
-                                class="mt-2 grid grid-cols-2 sm:grid-cols-3 gap-2 overflow-y-auto p-1"
-                                style="max-height: 420px;">
+                                class="mt-2 grid grid-cols-3 sm:grid-cols-4 md:grid-cols-5 gap-1.5 overflow-y-auto p-1"
+                                style="max-height: 360px;">
                                 <div v-for="p in modal.editItems.searchResults" :key="p.id"
                                     class="border rounded overflow-hidden hover:border-blue-500 transition-colors flex flex-col">
                                     <div class="aspect-square bg-gray-100 dark:bg-gray-800 flex items-center justify-center overflow-hidden">
                                         <img v-if="p.image" :src="p.image" alt="" class="w-full h-full object-cover" />
-                                        <span v-else class="text-gray-400 text-xs">No image</span>
+                                        <span v-else class="text-gray-400 text-[10px]">No img</span>
                                     </div>
-                                    <div class="p-2 flex-1 flex flex-col gap-1">
-                                        <div class="text-xs font-medium leading-tight line-clamp-2" :title="p.name">@{{ p.name }}</div>
-                                        <div class="text-[10px] text-gray-500">@{{ p.sku }}</div>
-                                        <div class="text-xs">¥@{{ formatYen(p.price) }}</div>
-                                        <div class="text-[10px]" :class="p.qty_in_stock > 0 ? 'text-green-600' : 'text-red-600'">
-                                            @{{ t('in_stock') }}: @{{ p.qty_in_stock }}
+                                    <div class="p-1 flex-1 flex flex-col gap-0.5">
+                                        <div class="text-[11px] font-medium leading-tight line-clamp-2" :title="p.name">@{{ p.name }}</div>
+                                        <div class="text-[9px] text-gray-500 truncate" :title="p.sku">@{{ p.sku }}</div>
+                                        <div class="flex items-center justify-between gap-1">
+                                            <span class="text-[11px] font-semibold">¥@{{ formatYen(p.price) }}</span>
+                                            <span class="text-[9px]" :class="p.qty_in_stock > 0 ? 'text-green-600' : 'text-red-600'">@{{ p.qty_in_stock }}</span>
                                         </div>
                                         <button class="ov-btn ov-btn-primary mt-auto"
-                                            style="font-size: 11px; padding: 4px 8px;"
+                                            style="font-size: 10px; padding: 2px 6px;"
                                             :disabled="p.qty_in_stock < 1"
                                             @click="addEditItem(p)">
                                             @{{ t('add') }}
@@ -931,7 +931,7 @@
                                     </div>
                                 </div>
                                 <div v-if="modal.editItems.searchBusy && modal.editItems.searchPage > 1"
-                                    class="col-span-2 sm:col-span-3 text-center text-xs text-gray-500 py-2">
+                                    class="col-span-3 sm:col-span-4 md:col-span-5 text-center text-xs text-gray-500 py-2">
                                     @{{ t('chat_loading') }}
                                 </div>
                             </div>
@@ -2506,25 +2506,39 @@
                     m.searchHasMore = false;
                 }
 
+                // Block further scroll-fired loads immediately — otherwise rapid
+                // scrolls fire multiple page fetches before the first one returns
+                // and produce duplicate cards.
+                m.searchBusy = true;
+
+                // Track which request is the latest; stale responses (a previous
+                // query whose result arrives after the user typed again) are
+                // discarded so they don't overwrite the new results.
+                m.searchSeq = (m.searchSeq || 0) + 1;
+                const seq = m.searchSeq;
+
                 if (m.searchTimer) clearTimeout(m.searchTimer);
                 m.searchTimer = setTimeout(() => {
-                    m.searchBusy = true;
                     this.$axios.get('{{ url(config('app.admin_url')) }}/api/orders/' + m.order.id + '/edit-items/search', {
                         params: { q, page: m.searchPage, per_page: 30 },
                     })
                         .then(r => {
+                            if (seq !== m.searchSeq) return; // stale
                             const existing = new Set(m.items.map(i => i.product_id));
-                            const newRows = (r.data.data || []).filter(p => !existing.has(p.id));
+                            const seen     = new Set(m.searchResults.map(p => p.id));
+                            const newRows  = (r.data.data || []).filter(p => !existing.has(p.id) && !seen.has(p.id));
                             if (loadMore) {
                                 m.searchResults = m.searchResults.concat(newRows);
                             } else {
                                 m.searchResults = newRows;
                             }
-                            m.searchTotal = Number(r.data.total || 0);
+                            m.searchTotal   = Number(r.data.total || 0);
                             m.searchHasMore = !!r.data.has_more;
-                            m.searchBusy = false;
+                            m.searchBusy    = false;
                         })
-                        .catch(() => { m.searchBusy = false; });
+                        .catch(() => {
+                            if (seq === m.searchSeq) m.searchBusy = false;
+                        });
                 }, loadMore ? 0 : 250);
             },
             /**

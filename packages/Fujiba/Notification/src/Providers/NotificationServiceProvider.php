@@ -56,6 +56,7 @@ class NotificationServiceProvider extends ServiceProvider
             $this->commands([
                 \Fujiba\Notification\Console\Commands\BackfillMessengerTokens::class,
                 \Fujiba\Notification\Console\Commands\BackfillTokensFromCustomers::class,
+                \Fujiba\Notification\Console\Commands\SweepPendingNotifications::class,
             ]);
         }
 

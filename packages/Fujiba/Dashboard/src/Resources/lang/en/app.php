@@ -5,13 +5,40 @@ return [
 
         // ───────────── range_presets (quick-range bar above filters) ─────────────
         'range_presets' => [
-            'today'      => 'Today',
-            'yesterday'  => 'Yesterday',
-            'this_month' => 'This month',
-            'last_month' => 'Last month',
-            'last_3m'    => 'Last 3 months',
-            'this_year'  => 'This year',
-            'all'        => 'All time',
+            'today'                => 'Today',
+            'yesterday'            => 'Yesterday',
+            'day_before_yesterday' => 'Day before yesterday',
+            'this_month'           => 'This month',
+            'last_month'           => 'Last month',
+            'last_3m'              => 'Last 3 months',
+            'this_fiscal_year'     => 'This fiscal year',
+            'last_fiscal_year'     => 'Last fiscal year',
+            'this_year'            => 'This year',
+            'all'                  => 'All time',
+            'all_stores'           => 'All stores',
+        ],
+
+        // ───────────── fiscal_year (system config) ─────────────
+        'fiscal_year' => [
+            'section_title'    => 'Fiscal Year',
+            'section_info'     => 'Set the month your company\'s fiscal (business) year begins. Drives the dashboard "This fiscal year" / "Last fiscal year" quick-range presets.',
+            'settings_title'   => 'Fiscal Year Settings',
+            'start_month'      => 'Fiscal year start month',
+            'start_month_info' => 'Most Japanese companies start in April (Apr–Mar). Configurable per company.',
+            'months' => [
+                '1'  => 'January',
+                '2'  => 'February',
+                '3'  => 'March',
+                '4'  => 'April',
+                '5'  => 'May',
+                '6'  => 'June',
+                '7'  => 'July',
+                '8'  => 'August',
+                '9'  => 'September',
+                '10' => 'October',
+                '11' => 'November',
+                '12' => 'December',
+            ],
         ],
 
         // ───────────── common ─────────────

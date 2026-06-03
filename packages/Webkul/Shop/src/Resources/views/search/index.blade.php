@@ -171,6 +171,21 @@
                     </div>
                 </div>
 
+                <!-- Matching Categories (e.g. searching "yen" / "YEN" / "Yenn" surfaces the Yen price categories) -->
+                <div v-if="categories.length" class="container px-[60px] max-lg:px-8 max-md:px-4 mt-6">
+                    <h3 class="text-lg font-medium text-zinc-800 mb-3">@lang('shop::app.components.layouts.header.desktop.bottom.categories')</h3>
+                    <div class="flex flex-wrap gap-2">
+                        <a
+                            v-for="category in categories"
+                            :key="category.id"
+                            :href="`{{ route('shop.product_or_category.index', '') }}/${category.slug}`"
+                            class="inline-flex items-center rounded-full border border-zinc-200 bg-white px-4 py-2 text-sm font-medium text-zinc-700 transition-colors hover:border-navyBlue hover:text-navyBlue"
+                        >
+                            @{{ category.name }}
+                        </a>
+                    </div>
+                </div>
+
                 <!-- Filter Popup Modal -->
                 <teleport to="body">
                     <transition name="lc-fade">
@@ -330,6 +345,7 @@
                             filter: {},
                         },
                         products: [],
+                        categories: [],
                         links: {},
                         loader: false,
                         // drag state
@@ -372,6 +388,7 @@
                 mounted() {
                     this.initScrollBehavior();
                     this.initInfiniteScroll();
+                    this.getCategories();
                 },
 
                 methods: {
@@ -470,6 +487,52 @@
                                 }
                             });
                         }).catch(error => { console.log(error); });
+                    },
+
+                    getCategories() {
+                        // Surface categories whose NAME or SLUG matches the search term.
+                        //
+                        // Name search is via the category API (case-insensitive on the
+                        // server, utf8mb4_unicode_ci) so digits like "1595" or the symbol
+                        // "￥" match the price categories (named ￥1595, ￥1795, ...).
+                        //
+                        // The price categories no longer contain the word "yen" in their
+                        // NAME, but their SLUG still does (1595yen, 1795yen, ...). So we
+                        // also fetch the visible category tree and match the query against
+                        // name OR slug client-side, then merge + dedupe by id. The tree
+                        // endpoint only returns enabled categories, so the disabled
+                        // 1295Yen category is automatically excluded.
+                        const params = new URLSearchParams(window.location.search);
+                        const query = (params.get('query') || '').trim();
+
+                        if (!query) return;
+
+                        const q = query.toLowerCase();
+
+                        const byName = this.$axios.get("{{ route('shop.api.categories.index') }}", {
+                            params: { name: query, limit: 24 }
+                        }).then(r => r.data.data || []).catch(() => []);
+
+                        const flatten = (nodes, acc = []) => {
+                            (nodes || []).forEach(n => {
+                                acc.push(n);
+                                if (n.children && n.children.length) flatten(n.children, acc);
+                            });
+                            return acc;
+                        };
+
+                        const bySlug = this.$axios.get("{{ route('shop.api.categories.tree') }}")
+                            .then(r => flatten(r.data.data).filter(c =>
+                                (c.name && c.name.toLowerCase().includes(q)) ||
+                                (c.slug && c.slug.toLowerCase().includes(q))
+                            ))
+                            .catch(() => []);
+
+                        Promise.all([byName, bySlug]).then(([a, b]) => {
+                            const merged = {};
+                            [...a, ...b].forEach(c => { if (c && c.id != null) merged[c.id] = c; });
+                            this.categories = Object.values(merged);
+                        });
                     },
 
                     loadMoreProducts() {

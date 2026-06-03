@@ -5,6 +5,21 @@ return [
         'estimate' => '見積もり / 放棄カート',
     ],
 
+    'tracking' => [
+        'no-shipment' => '更新する出荷がありません。先にラベル印刷（または出荷）を行ってください。',
+        'updated'     => '追跡番号を更新しました。',
+    ],
+
+    'payment-confirm' => [
+        'confirmed'   => '入金を確認しました。',
+        'unconfirmed' => '入金確認を取り消しました。',
+    ],
+
+    'label-printed' => [
+        'flipped' => 'ラベルを印刷済みにしました。',
+        'already' => 'ラベルはすでに印刷済みです。',
+    ],
+
     'estimate' => [
         'page_title'        => '放棄カート / 見積もり利益',
         'subtitle'          => '注文未完了のカートと、確定した場合の予想利益を表示します。',

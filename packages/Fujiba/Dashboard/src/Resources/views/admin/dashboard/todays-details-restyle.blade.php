@@ -152,6 +152,12 @@
         display: flex;
         flex-direction: column;
     }
+    /* When the grid holds an odd number of cards (Cart Activity moved to the
+       top left 3: PaymentMethods | SalesByState / OrdersByRegion alone), let
+       that lone last card span both columns so there's no empty gap. */
+    .fujiba-todays-grid > [id^="fujiba-"][id$="-card"]:last-child:nth-child(odd) {
+        grid-column: 1 / -1;
+    }
     .fujiba-todays-grid > [id^="fujiba-"][id$="-card"] > .fujiba-pie-card,
     .fujiba-todays-grid > [id^="fujiba-"][id$="-card"] > .fujiba-sbs-card,
     .fujiba-todays-grid > [id^="fujiba-"][id$="-card"] > [id$="-template"] {

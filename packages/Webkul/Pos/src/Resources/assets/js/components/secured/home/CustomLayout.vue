@@ -43,6 +43,7 @@
 
         <!-- Product grid -->
         <div
+            ref="gridEl"
             class="grid gap-3 [grid-template-columns:repeat(auto-fill,_minmax(160px,_1fr))]"
             @dragover.prevent
             @drop.prevent="onDropToEnd"
@@ -50,10 +51,12 @@
             <div
                 v-for="(product, idx) in arrangedProducts"
                 :key="`tile-${product.id}`"
+                :data-tile-id="product.id"
                 class="group relative box-shadow flex cursor-pointer flex-col gap-1.5 rounded-lg bg-white dark:bg-gray-900 p-2 transition-transform"
                 :class="{
-                    'cursor-grab': editing,
+                    'cursor-grab touch-none select-none': editing,
                     'ring-2 ring-[#00B8D9]': editing && draggingId === product.id,
+                    'opacity-40': editing && draggingId === product.id,
                     'ring-1 ring-dashed ring-[#00B8D9]/60': editing && dragOverId === product.id && draggingId !== product.id,
                 }"
                 :draggable="editing"
@@ -63,6 +66,7 @@
                 @dragover.prevent="onDragOver($event, product)"
                 @dragleave="onDragLeave(product)"
                 @drop.stop.prevent="onDrop($event, product, idx)"
+                @pointerdown="onPointerDown($event, product)"
             >
                 <!-- Remove button (edit mode only) -->
                 <button
@@ -131,6 +135,31 @@
                 </template>
             </div>
         </div>
+
+        <!-- Touch drag ghost (follows finger) -->
+        <Teleport to="body">
+            <div
+                v-if="ghost.visible"
+                class="pointer-events-none fixed z-[70] w-[140px] rounded-lg bg-white dark:bg-gray-900 p-2 opacity-90 shadow-2xl ring-2 ring-[#00B8D9]"
+                :style="{ left: ghost.x + 'px', top: ghost.y + 'px', transform: 'translate(-50%, -50%)' }"
+            >
+                <img
+                    v-if="ghost.product?.images?.length"
+                    :src="ghost.product.images[0].url"
+                    class="aspect-square rounded object-cover"
+                    alt=""
+                />
+                <img
+                    v-else
+                    src="@images/product-placeholder.webp"
+                    class="aspect-square rounded object-cover opacity-30"
+                    alt=""
+                />
+                <p class="truncate-text-2 text-center text-[12px] font-medium leading-4 text-gray-900 dark:text-gray-100">
+                    {{ ghost.product?.name || ghost.product?.sku }}
+                </p>
+            </div>
+        </Teleport>
 
         <!-- Product picker overlay -->
         <Teleport to="body">
@@ -206,7 +235,7 @@
 </template>
 
 <script setup>
-    import { ref, computed, watch } from 'vue';
+    import { ref, computed, watch, onBeforeUnmount } from 'vue';
     import { useIndexedDB } from '@src/composable/indexed-db';
 
     const props = defineProps({
@@ -243,6 +272,20 @@
     const pickerSearch = ref('');
     const draggingId   = ref(null);
     const dragOverId   = ref(null);
+
+    /**
+     * Touch drag (iPad / phone). HTML5 drag events don't fire on touch, so we
+     * drive reordering with Pointer events: a long-press starts the drag, a
+     * floating ghost follows the finger, and the tile under the finger becomes
+     * the drop target.
+     */
+    const gridEl = ref(null);
+    const ghost  = ref({ visible: false, x: 0, y: 0, product: null });
+
+    let touchState = null; // { pointerId, product, longPressTimer, started }
+    let lastDragEndedAt = 0;
+    const LONG_PRESS_MS = 220;
+    const MOVE_CANCEL_PX = 12; // finger movement before long-press fires = scroll, not drag
 
     /**
      * Build a stable per-cashier-per-outlet-per-category storage key.
@@ -369,6 +412,7 @@
 
     const onTileClick = (product) => {
         if (editing.value) return; // Don't add-to-cart in edit mode
+        if (Date.now() - lastDragEndedAt < 350) return; // swallow click synthesized after a touch drag
         emit('add-to-cart', product);
     };
 
@@ -450,21 +494,10 @@
             return;
         }
 
-        ensureExplicitOrder();
-
-        const next = [...orderedIds.value];
-        const fromIdx = next.indexOf(fromId);
-        const toIdx = next.indexOf(toId);
-        if (fromIdx === -1 || toIdx === -1) return;
-
-        next.splice(fromIdx, 1);
-        next.splice(toIdx, 0, fromId);
-        orderedIds.value = next;
+        await moveTile(fromId, toId);
 
         draggingId.value = null;
         dragOverId.value = null;
-
-        await saveLayout();
     };
 
     const onDropToEnd = async (event) => {
@@ -484,9 +517,126 @@
     };
 
     /**
+     * Touch / pointer drag (iPad & phone)
+     */
+    const tileIdFromPoint = (x, y) => {
+        const el = document.elementFromPoint(x, y);
+        const tile = el?.closest?.('[data-tile-id]');
+        if (! tile) return null;
+        const id = tile.getAttribute('data-tile-id');
+        // ids may be number or string — match against the live list
+        const match = arrangedProducts.value.find(p => String(p.id) === String(id));
+        return match ? match.id : null;
+    };
+
+    const onPointerDown = (event, product) => {
+        // Mouse keeps using native HTML5 drag; only hijack touch/pen.
+        if (! editing.value || event.pointerType === 'mouse') return;
+
+        const startX = event.clientX;
+        const startY = event.clientY;
+
+        touchState = {
+            pointerId: event.pointerId,
+            product,
+            startX,
+            startY,
+            started: false,
+            longPressTimer: setTimeout(() => {
+                // Begin drag: lock the tile, show ghost, capture the pointer.
+                if (! touchState) return;
+                touchState.started = true;
+                draggingId.value = product.id;
+                ensureExplicitOrder();
+                ghost.value = { visible: true, x: startX, y: startY, product };
+                try { event.target.setPointerCapture?.(event.pointerId); } catch (e) { /* noop */ }
+                if (navigator.vibrate) navigator.vibrate(10);
+            }, LONG_PRESS_MS),
+        };
+
+        window.addEventListener('pointermove', onPointerMove, { passive: false });
+        window.addEventListener('pointerup', onPointerUp);
+        window.addEventListener('pointercancel', onPointerUp);
+    };
+
+    const onPointerMove = (event) => {
+        if (! touchState || event.pointerId !== touchState.pointerId) return;
+
+        const dx = Math.abs(event.clientX - touchState.startX);
+        const dy = Math.abs(event.clientY - touchState.startY);
+
+        if (! touchState.started) {
+            // Moved before the long-press fired → treat as a scroll, abort drag.
+            if (dx > MOVE_CANCEL_PX || dy > MOVE_CANCEL_PX) {
+                clearTimeout(touchState.longPressTimer);
+                teardownPointer();
+            }
+            return;
+        }
+
+        // Dragging: prevent the page from scrolling and move the ghost.
+        event.preventDefault();
+        ghost.value.x = event.clientX;
+        ghost.value.y = event.clientY;
+
+        const overId = tileIdFromPoint(event.clientX, event.clientY);
+        dragOverId.value = (overId !== null && overId !== draggingId.value) ? overId : null;
+    };
+
+    const onPointerUp = async (event) => {
+        if (! touchState || event.pointerId !== touchState.pointerId) return;
+
+        const started = touchState.started;
+        clearTimeout(touchState.longPressTimer);
+
+        if (started) {
+            const overId = tileIdFromPoint(event.clientX, event.clientY);
+            if (overId !== null && overId !== draggingId.value) {
+                await moveTile(draggingId.value, overId);
+            }
+            ghost.value = { visible: false, x: 0, y: 0, product: null };
+            draggingId.value = null;
+            dragOverId.value = null;
+            lastDragEndedAt = Date.now();
+        }
+        // If not started, it was a tap — let the native @click add-to-cart fire.
+
+        teardownPointer();
+    };
+
+    const teardownPointer = () => {
+        window.removeEventListener('pointermove', onPointerMove);
+        window.removeEventListener('pointerup', onPointerUp);
+        window.removeEventListener('pointercancel', onPointerUp);
+        touchState = null;
+    };
+
+    /**
+     * Move `fromId` to sit just before `toId` in the explicit order, and persist.
+     * Shared by HTML5 drop and touch drop.
+     */
+    const moveTile = async (fromId, toId) => {
+        ensureExplicitOrder();
+        const next = [...orderedIds.value];
+        const fromIdx = next.indexOf(fromId);
+        const toIdx = next.indexOf(toId);
+        if (fromIdx === -1 || toIdx === -1) return;
+
+        next.splice(fromIdx, 1);
+        next.splice(next.indexOf(toId), 0, fromId);
+        orderedIds.value = next;
+        await saveLayout();
+    };
+
+    /**
      * Reload layout when category changes.
      */
     watch(() => props.activeCategoryId, async () => {
         await loadLayout();
     }, { immediate: true });
+
+    onBeforeUnmount(() => {
+        if (touchState) clearTimeout(touchState.longPressTimer);
+        teardownPointer();
+    });
 </script>

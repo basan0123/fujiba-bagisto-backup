@@ -1,12 +1,18 @@
 #outlet\agent\customers Related APIs
 extend type Query @guard(with: ["pos_user"]) {
+    # Skip rows with NULL email — they exist in some Fujiba tenants from
+    # legacy imports and explode Lighthouse pagination because Customer.email
+    # is declared as String! in the shared admin schema. A single null-email
+    # row in the page would crash the entire response, so the list never
+    # loaded in the native POS. They are also unusable for POS sales
+    # (the create/update validator requires an email anyway).
     getCustomers(
         first: Int,
         page: Int
     ): [Customer!] @paginate(
         type: "PAGINATOR",
         defaultCount: 10,
-        model: "Webkul\\Customer\\Models\\Customer"
+        builder: "Webkul\\Pos\\Queries\\Outlet\\CustomerQuery@listForPos"
     )
 
     # Single customer by id. Powers CustomerDetail — replaces the old

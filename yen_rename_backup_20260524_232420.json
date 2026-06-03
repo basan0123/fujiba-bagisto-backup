@@ -1,0 +1,438 @@
+{
+    "category_translations": [
+        {
+            "id": 50,
+            "category_id": 18,
+            "name": "1295Yen",
+            "slug": "1295yen",
+            "url_path": "",
+            "description": "<p>1295Yen<\/p>",
+            "meta_title": "Kimono Fabric ¥1,295 – Pre-Cut Wagara Panels | Fujiba",
+            "meta_description": "Pre-cut kimono fabric panels at ¥1,295. Affordable wagara textiles for half-obi, pouches and beginner handmade kimono crafts.",
+            "meta_keywords": "kimono fabric 1295 yen, cheap kimono fabric, pre-cut wagara",
+            "locale_id": 1,
+            "locale": "en"
+        },
+        {
+            "id": 51,
+            "category_id": 18,
+            "name": "1295Yen",
+            "slug": "1295yen",
+            "url_path": "",
+            "description": "<p>1295Yen<\/p>",
+            "meta_title": "着物生地 1,295円｜カット済み 和柄ハンドメイド用 | Fujiba",
+            "meta_description": "1,295円のカット済み着物生地。半幅帯・ポーチ・小物制作向けの手頃な和柄生地を取り揃えました。",
+            "meta_keywords": "着物 生地 1295円, 和柄 生地 安い, カット済み",
+            "locale_id": 2,
+            "locale": "ja"
+        },
+        {
+            "id": 52,
+            "category_id": 18,
+            "name": "1295Yen",
+            "slug": "1295yen",
+            "url_path": "",
+            "description": "<p>1295Yen<\/p>",
+            "meta_title": "ကီမိုနို အထည် ¥၁,၂၉၅ – ကြိုတင်ဖြတ်ထား Wagara | Fujiba",
+            "meta_description": "¥၁,၂၉၅ ဖြင့် ကြိုတင်ဖြတ်ထား ကီမိုနို အထည် panel များ။ Half-obi, ပန်းကန်အိတ်နှင့် လက်လုပ်လုပ်ငန်းအတွက်။",
+            "meta_keywords": "ကီမိုနို အထည် ၁၂၉၅, စျေးသက်သာ",
+            "locale_id": 3,
+            "locale": "my"
+        },
+        {
+            "id": 53,
+            "category_id": 19,
+            "name": "1395Yen",
+            "slug": "1395yen",
+            "url_path": "",
+            "description": "<p>1395Yen Collection<\/p>",
+            "meta_title": "Kimono Fabric ¥1,395 – Pre-Cut Wagara Panels | Fujiba",
+            "meta_description": "Pre-cut kimono fabric panels at ¥1,395. Sakura, asanoha and other traditional Japanese patterns sized for handmade crafts.",
+            "meta_keywords": "kimono fabric 1395 yen, wagara, pre-cut Japanese fabric",
+            "locale_id": 1,
+            "locale": "en"
+        },
+        {
+            "id": 54,
+            "category_id": 19,
+            "name": "1395Yen",
+            "slug": "1395yen",
+            "url_path": "",
+            "description": "<p>1395Yen Collection<\/p>",
+            "meta_title": "着物生地 1,395円｜カット済み 和柄ハンドメイド用 | Fujiba",
+            "meta_description": "1,395円のカット済み着物生地。桜・麻の葉などの和柄を、ハンドメイド向けの使いやすいサイズで。",
+            "meta_keywords": "着物 生地 1395円, 和柄 生地, カット済み",
+            "locale_id": 2,
+            "locale": "ja"
+        },
+        {
+            "id": 55,
+            "category_id": 19,
+            "name": "1395Yen",
+            "slug": "1395yen",
+            "url_path": "",
+            "description": "<p>1395Yen Collection<\/p>",
+            "meta_title": "ကီမိုနို အထည် ¥၁,၃၉၅ – Wagara ပုံစံများ | Fujiba",
+            "meta_description": "¥၁,၃၉၅ ဖြင့် ကြိုတင်ဖြတ်ထား ကီမိုနို အထည် — ဆာကူရာ၊ asanoha နှင့် အခြား wagara ပုံစံများ။",
+            "meta_keywords": "ကီမိုနို အထည် ၁၃၉၅",
+            "locale_id": 3,
+            "locale": "my"
+        },
+        {
+            "id": 56,
+            "category_id": 20,
+            "name": "1595Yen",
+            "slug": "1595yen",
+            "url_path": "",
+            "description": "<p>1595Yen Collection<\/p>",
+            "meta_title": "Kimono Fabric ¥1,595 – Pre-Cut Wagara | Fujiba",
+            "meta_description": "Pre-cut kimono fabric at ¥1,595. Mid-range wagara panels in cotton and polyester for obi, accessories and home decor projects.",
+            "meta_keywords": "kimono fabric 1595 yen, mid-range kimono fabric",
+            "locale_id": 1,
+            "locale": "en"
+        },
+        {
+            "id": 57,
+            "category_id": 20,
+            "name": "1595Yen",
+            "slug": "1595yen",
+            "url_path": "",
+            "description": "<p>1595Yen Collection<\/p>",
+            "meta_title": "着物生地 1,595円｜カット済み 和柄 | Fujiba",
+            "meta_description": "1,595円のカット済み着物生地。綿・ポリエステルの中価格帯の和柄を、帯・小物・インテリア制作向けに。",
+            "meta_keywords": "着物 生地 1595円, 和柄 生地",
+            "locale_id": 2,
+            "locale": "ja"
+        },
+        {
+            "id": 58,
+            "category_id": 20,
+            "name": "1595Yen",
+            "slug": "1595yen",
+            "url_path": "",
+            "description": "<p>1595Yen Collection<\/p>",
+            "meta_title": "ကီမိုနို အထည် ¥၁,၅၉၅ – Wagara | Fujiba",
+            "meta_description": "¥၁,၅၉၅ ဖြင့် ကြိုတင်ဖြတ်ထား ကီမိုနို အထည်။ Obi, ဆက်စပ်ပစ္စည်းနှင့် အလှပြင်ပစ္စည်းအတွက်။",
+            "meta_keywords": "ကီမိုနို အထည် ၁၅၉၅",
+            "locale_id": 3,
+            "locale": "my"
+        },
+        {
+            "id": 59,
+            "category_id": 21,
+            "name": "2300Yen",
+            "slug": "2300yen",
+            "url_path": "",
+            "description": "<p>2300Yen Collection<\/p>",
+            "meta_title": "Kimono Fabric ¥2,300 – Premium Pre-Cut Wagara | Fujiba",
+            "meta_description": "Pre-cut kimono fabric at ¥2,300. Premium wagara including kinran (gold brocade) and silk panels for ceremonial and statement pieces.",
+            "meta_keywords": "kimono fabric 2300 yen, premium kimono fabric, kinran",
+            "locale_id": 1,
+            "locale": "en"
+        },
+        {
+            "id": 60,
+            "category_id": 21,
+            "name": "2300Yen",
+            "slug": "2300yen",
+            "url_path": "",
+            "description": "<p>2300Yen Collection<\/p>",
+            "meta_title": "着物生地 2,300円｜上質カット済み 金襴・正絹 | Fujiba",
+            "meta_description": "2,300円のカット済み着物生地。金襴・正絹を含む上質和柄を、式典用・ハンドメイドのこだわり制作向けに。",
+            "meta_keywords": "着物 生地 2300円, 金襴 生地, 正絹 生地",
+            "locale_id": 2,
+            "locale": "ja"
+        },
+        {
+            "id": 61,
+            "category_id": 21,
+            "name": "2300Yen",
+            "slug": "2300yen",
+            "url_path": "",
+            "description": "<p>2300Yen Collection<\/p>",
+            "meta_title": "ကီမိုနို အထည် ¥၂,၃၀၀ – Premium Wagara | Fujiba",
+            "meta_description": "¥၂,၃၀၀ ဖြင့် Premium ကီမိုနို အထည် — kinran ရွှေပန်းပု နှင့် ပိုးအထည် အပါအဝင်။",
+            "meta_keywords": "ကီမိုနို အထည် ၂၃၀၀, kinran",
+            "locale_id": 3,
+            "locale": "my"
+        },
+        {
+            "id": 62,
+            "category_id": 22,
+            "name": "1700Yenn",
+            "slug": "1700yenn",
+            "url_path": "",
+            "description": "<p>1700Yenn Collection<\/p>",
+            "meta_title": "Kimono Fabric ¥1,700 – Pre-Cut Wagara | Fujiba",
+            "meta_description": "Pre-cut kimono fabric at ¥1,700. Higher-grade wagara panels for haori, obi face and statement craft pieces.",
+            "meta_keywords": "kimono fabric 1700 yen, premium wagara",
+            "locale_id": 1,
+            "locale": "en"
+        },
+        {
+            "id": 63,
+            "category_id": 22,
+            "name": "1700Yenn",
+            "slug": "1700yenn",
+            "url_path": "",
+            "description": "<p>1700Yenn Collection<\/p>",
+            "meta_title": "着物生地 1,700円｜カット済み 和柄 | Fujiba",
+            "meta_description": "1,700円のカット済み着物生地。羽織・帯・リメイクの主役素材になるグレードの和柄を取り揃えています。",
+            "meta_keywords": "着物 生地 1700円, 和柄 生地 羽織",
+            "locale_id": 2,
+            "locale": "ja"
+        },
+        {
+            "id": 64,
+            "category_id": 22,
+            "name": "1700Yenn",
+            "slug": "1700yenn",
+            "url_path": "",
+            "description": "<p>1700Yenn Collection<\/p>",
+            "meta_title": "ကီမိုနို အထည် ¥၁,၇၀၀ – Wagara | Fujiba",
+            "meta_description": "¥၁,၇၀၀ ဖြင့် ကြိုတင်ဖြတ်ထား ကီမိုနို အထည်။ Haori, obi နှင့် အထူးပြုလုပ်ငန်းများအတွက်။",
+            "meta_keywords": "ကီမိုနို အထည် ၁၇၀၀",
+            "locale_id": 3,
+            "locale": "my"
+        },
+        {
+            "id": 74,
+            "category_id": 26,
+            "name": "1800YEN",
+            "slug": "1800yen",
+            "url_path": "",
+            "description": "<p>1800Yen<\/p>",
+            "meta_title": "Kimono Fabric ¥1,800 – Pre-Cut Wagara | Fujiba",
+            "meta_description": "Pre-cut kimono fabric at ¥1,800. Quality wagara textiles for serious handmade kimono and obi projects.",
+            "meta_keywords": "kimono fabric 1800 yen, quality wagara",
+            "locale_id": 1,
+            "locale": "en"
+        },
+        {
+            "id": 75,
+            "category_id": 26,
+            "name": "1800YEN",
+            "slug": "1800yen",
+            "url_path": "",
+            "description": "<p>1800Yen<\/p>",
+            "meta_title": "着物生地 1,800円｜カット済み 和柄 | Fujiba",
+            "meta_description": "1,800円のカット済み着物生地。本格的なハンドメイド着物・帯制作向けの上質な和柄を揃えました。",
+            "meta_keywords": "着物 生地 1800円, 上質 和柄",
+            "locale_id": 2,
+            "locale": "ja"
+        },
+        {
+            "id": 76,
+            "category_id": 26,
+            "name": "1800YEN",
+            "slug": "1800yen",
+            "url_path": "",
+            "description": "<p>1800Yen<\/p>",
+            "meta_title": "ကီမိုနို အထည် ¥၁,၈၀၀ – Wagara | Fujiba",
+            "meta_description": "¥၁,၈၀၀ ဖြင့် ကြိုတင်ဖြတ်ထား ကီမိုနို အထည်။ ပိုကောင်းသော wagara ပုံစံများ။",
+            "meta_keywords": "ကီမိုနို အထည် ၁၈၀၀",
+            "locale_id": 3,
+            "locale": "my"
+        }
+    ],
+    "categories": [
+        {
+            "id": 18,
+            "status": 1
+        },
+        {
+            "id": 19,
+            "status": 1
+        },
+        {
+            "id": 20,
+            "status": 1
+        },
+        {
+            "id": 21,
+            "status": 1
+        },
+        {
+            "id": 22,
+            "status": 1
+        },
+        {
+            "id": 26,
+            "status": 1
+        }
+    ],
+    "product_categories_18": [
+        {
+            "product_id": 1893,
+            "category_id": 18
+        },
+        {
+            "product_id": 1898,
+            "category_id": 18
+        },
+        {
+            "product_id": 1901,
+            "category_id": 18
+        },
+        {
+            "product_id": 1903,
+            "category_id": 18
+        },
+        {
+            "product_id": 1906,
+            "category_id": 18
+        },
+        {
+            "product_id": 1914,
+            "category_id": 18
+        },
+        {
+            "product_id": 1917,
+            "category_id": 18
+        },
+        {
+            "product_id": 1921,
+            "category_id": 18
+        },
+        {
+            "product_id": 1933,
+            "category_id": 18
+        },
+        {
+            "product_id": 1946,
+            "category_id": 18
+        },
+        {
+            "product_id": 1959,
+            "category_id": 18
+        },
+        {
+            "product_id": 1961,
+            "category_id": 18
+        },
+        {
+            "product_id": 1969,
+            "category_id": 18
+        },
+        {
+            "product_id": 1971,
+            "category_id": 18
+        },
+        {
+            "product_id": 1977,
+            "category_id": 18
+        },
+        {
+            "product_id": 1997,
+            "category_id": 18
+        },
+        {
+            "product_id": 1998,
+            "category_id": 18
+        },
+        {
+            "product_id": 2001,
+            "category_id": 18
+        },
+        {
+            "product_id": 2002,
+            "category_id": 18
+        },
+        {
+            "product_id": 2004,
+            "category_id": 18
+        },
+        {
+            "product_id": 2005,
+            "category_id": 18
+        },
+        {
+            "product_id": 2011,
+            "category_id": 18
+        },
+        {
+            "product_id": 2018,
+            "category_id": 18
+        },
+        {
+            "product_id": 2019,
+            "category_id": 18
+        },
+        {
+            "product_id": 2029,
+            "category_id": 18
+        },
+        {
+            "product_id": 2032,
+            "category_id": 18
+        },
+        {
+            "product_id": 2049,
+            "category_id": 18
+        },
+        {
+            "product_id": 2051,
+            "category_id": 18
+        },
+        {
+            "product_id": 2055,
+            "category_id": 18
+        },
+        {
+            "product_id": 2056,
+            "category_id": 18
+        },
+        {
+            "product_id": 2058,
+            "category_id": 18
+        },
+        {
+            "product_id": 2061,
+            "category_id": 18
+        },
+        {
+            "product_id": 2066,
+            "category_id": 18
+        },
+        {
+            "product_id": 2069,
+            "category_id": 18
+        },
+        {
+            "product_id": 2071,
+            "category_id": 18
+        },
+        {
+            "product_id": 2073,
+            "category_id": 18
+        },
+        {
+            "product_id": 2084,
+            "category_id": 18
+        },
+        {
+            "product_id": 2086,
+            "category_id": 18
+        },
+        {
+            "product_id": 2091,
+            "category_id": 18
+        },
+        {
+            "product_id": 2092,
+            "category_id": 18
+        },
+        {
+            "product_id": 2096,
+            "category_id": 18
+        },
+        {
+            "product_id": 2101,
+            "category_id": 18
+        },
+        {
+            "product_id": 2199,
+            "category_id": 18
+        }
+    ]
+}

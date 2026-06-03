@@ -135,6 +135,18 @@ class ProductController extends Controller
                   });
             })
 
+            // ── JOIN MASTER PRICE ATTRIBUTE (source of truth) ──
+            // product_flat.price can drift out of sync with the master
+            // attribute_values.float_value when inline writes skip the observer.
+            // Reading master here means the UI always shows the price an admin
+            // actually set (seen in prod: flat=1395 while master=1595).
+            ->leftJoin('product_attribute_values as price_attr', function($q) {
+                $q->on('products.id', '=', 'price_attr.product_id')
+                  ->where('price_attr.attribute_id', function($sub) {
+                      $sub->select('id')->from('attributes')->where('code', 'price')->limit(1);
+                  });
+            })
+
             // ── JOIN ORIGINAL PRODUCT NAME (text) ──
             ->leftJoin('product_attribute_values as opn_attr', function($q) {
                 $q->on('products.id', '=', 'opn_attr.product_id')
@@ -206,6 +218,11 @@ class ProductController extends Controller
                 // Cost attribute from Bagisto's attribute system
                 'cost_attr.float_value as cost',
                 'cost_attr.text_value as cost_text',
+
+                // Master price (source of truth) — overrides product_flat.price
+                // in the row map below when present.
+                'price_attr.float_value as master_price',
+                'price_attr.text_value as master_price_text',
 
                 // Custom attributes: original_product_name (text), source_name (multiselect)
                 'opn_attr.text_value as original_product_name',
@@ -288,6 +305,16 @@ class ProductController extends Controller
                              $p->cost = $p->cost !== null ? floatval($p->cost) : (
                                  $p->cost_text !== null ? floatval($p->cost_text) : 0
                              );
+
+                             // ✅ PRICE: prefer master attribute_values over stale product_flat.
+                             // Falls back to product_flat.price when no master row exists.
+                             $masterPrice = $p->master_price !== null
+                                 ? floatval($p->master_price)
+                                 : ($p->master_price_text !== null ? floatval($p->master_price_text) : null);
+                             if ($masterPrice !== null) {
+                                 $p->price = $masterPrice;
+                             }
+                             unset($p->master_price, $p->master_price_text);
 
                              // `jpy_cost` is the canonical final cost for this row (Bagisto `cost` attr
                              // in JPY). Fallback to pos_product_meta.buy_price so legacy rows still show.

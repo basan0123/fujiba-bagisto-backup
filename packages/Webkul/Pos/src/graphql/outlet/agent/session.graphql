@@ -17,6 +17,8 @@ extend type Mutation {
 
 input UpdateOutletProfileInput {
     name: String
+    tagline: String
+    brandColor: String
     phone: String
     email: String
     address: String
@@ -72,6 +74,8 @@ type Agent {
 type Outlet {
     id: Int!
     name: String!
+    tagline: String
+    brandColor: String @rename(attribute: "brand_color")
     email: String
     phone: String
     website: String

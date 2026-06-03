@@ -166,7 +166,11 @@ class Core
      */
     public function getCurrentChannelCode(): string
     {
-        return $this->getCurrentChannel()?->code;
+        // The declared `: string` return type means a null channel (e.g. on the
+        // central/tenant-less connection, whose `channels` table is empty) would
+        // raise a TypeError and crash artisan/queue/scheduler. Coalesce to '' so
+        // a missing channel degrades gracefully instead of fataling.
+        return $this->getCurrentChannel()?->code ?? '';
     }
 
     /**
@@ -202,7 +206,9 @@ class Core
      */
     public function getDefaultChannelCode(): string
     {
-        return $this->getDefaultChannel()?->code;
+        // Coalesce to '' so a missing default channel (empty central DB) does
+        // not raise a TypeError against the declared `: string` return type.
+        return $this->getDefaultChannel()?->code ?? '';
     }
 
     /**

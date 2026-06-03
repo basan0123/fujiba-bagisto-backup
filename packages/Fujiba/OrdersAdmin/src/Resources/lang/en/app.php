@@ -5,6 +5,21 @@ return [
         'estimate' => 'Estimate / Abandoned Carts',
     ],
 
+    'tracking' => [
+        'no-shipment' => 'No shipment to update. Mark the label as printed (or ship the order) first.',
+        'updated'     => 'Tracking number updated.',
+    ],
+
+    'payment-confirm' => [
+        'confirmed'   => 'Payment confirmed.',
+        'unconfirmed' => 'Payment unconfirmed.',
+    ],
+
+    'label-printed' => [
+        'flipped' => 'Label marked as printed.',
+        'already' => 'Label already marked as printed.',
+    ],
+
     'estimate' => [
         'page_title'        => 'Abandoned Carts / Estimated Profit',
         'subtitle'          => 'Carts that did not convert to an order, with estimated profit if they had.',

@@ -322,14 +322,22 @@ class ReorderController
     {
         $batch = ReorderBatch::with('items.product')->findOrFail($id);
 
-        $itemPayload = $batch->items->map(function (ReorderItem $it) use ($batch) {
+        $originalNames = $this->originalProductNames(
+            $batch->items->pluck('product_id')->all()
+        );
+
+        $itemPayload = $batch->items->map(function (ReorderItem $it) use ($batch, $originalNames) {
             $stock = $this->stockResolver->forChannel((int) $batch->channel_id, [(int) $it->product_id]);
             $img   = optional($it->product?->images?->first())->path;
+
+            $original = $originalNames[$it->product_id] ?? null;
 
             return [
                 'id'             => $it->id,
                 'product_id'     => $it->product_id,
-                'name'           => $it->name_snapshot ?: optional($it->product)->name,
+                // Show the original product name (custom attribute) when present,
+                // falling back to the snapshot/flat name (which is the short code).
+                'name'           => $original ?: ($it->name_snapshot ?: optional($it->product)->name),
                 'sku'            => optional($it->product)->sku,
                 'image'          => $img ? Storage::url($img) : null,
                 'qty'            => (int) $it->qty,
@@ -702,5 +710,79 @@ class ReorderController
         }
 
         return $cache[$code];
+    }
+
+    /**
+     * Resolve the custom `original_product_name` attribute for a set of products
+     * in a single query. Returns [product_id => original_name]; empty values are
+     * dropped so callers can cleanly fall back.
+     *
+     * @param  array<int>  $productIds
+     * @return array<int, string>
+     */
+    private function originalProductNames(array $productIds): array
+    {
+        $productIds = array_values(array_unique(array_filter($productIds)));
+
+        if (empty($productIds)) {
+            return [];
+        }
+
+        $attrId = $this->attributeId('original_product_name');
+
+        if (! $attrId) {
+            return [];
+        }
+
+        return DB::table('product_attribute_values')
+            ->where('attribute_id', $attrId)
+            ->whereIn('product_id', $productIds)
+            ->whereNotNull('text_value')
+            ->where('text_value', '!=', '')
+            ->pluck('text_value', 'product_id')
+            ->map(fn ($v) => trim((string) $v))
+            ->filter()
+            ->all();
+    }
+
+    /**
+     * Download the batch's items as a CSV file.
+     */
+    public function exportBatchCsv(int $id): \Symfony\Component\HttpFoundation\StreamedResponse
+    {
+        $batch = ReorderBatch::with('items.product')->findOrFail($id);
+
+        $originalNames = $this->originalProductNames(
+            $batch->items->pluck('product_id')->all()
+        );
+
+        $filename = 'reorder-batch-'.$batch->id.'.csv';
+
+        return response()->streamDownload(function () use ($batch, $originalNames) {
+            $out = fopen('php://output', 'w');
+
+            // UTF-8 BOM so Excel renders Japanese correctly.
+            fwrite($out, "\xEF\xBB\xBF");
+
+            fputcsv($out, ['Product ID', 'Name', 'SKU', 'Current Stock', 'Qty', 'Cost']);
+
+            foreach ($batch->items as $it) {
+                $original = $originalNames[$it->product_id] ?? null;
+                $stock    = $this->stockResolver->forChannel((int) $batch->channel_id, [(int) $it->product_id]);
+
+                fputcsv($out, [
+                    $it->product_id,
+                    $original ?: ($it->name_snapshot ?: optional($it->product)->name),
+                    optional($it->product)->sku,
+                    (int) ($stock[$it->product_id] ?? 0),
+                    (int) $it->qty,
+                    (float) $it->cost,
+                ]);
+            }
+
+            fclose($out);
+        }, $filename, [
+            'Content-Type' => 'text/csv; charset=UTF-8',
+        ]);
     }
 }

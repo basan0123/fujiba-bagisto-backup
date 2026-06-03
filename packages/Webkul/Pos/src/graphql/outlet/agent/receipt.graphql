@@ -1,0 +1,24 @@
+#outlet\agent\receipt — receipt-template editor for the POS settings screen.
+
+extend type Mutation @guard(with: ["pos_user"]) {
+    updateReceipt(
+        input: UpdateReceiptInput! @spread
+    ): UpdateReceiptResult @field(resolver: "Webkul\\Pos\\Mutations\\Outlet\\ReceiptMutation@update")
+}
+
+input UpdateReceiptInput {
+    title: String
+    headerContent: String
+    footerContent: String
+    logo: String
+    displayLogo: Boolean
+    displayOutletName: Boolean
+    displayOutletAddress: Boolean
+    displayCashierName: Boolean
+}
+
+type UpdateReceiptResult {
+    success: Boolean!
+    message: String
+    receipt: Receipt
+}

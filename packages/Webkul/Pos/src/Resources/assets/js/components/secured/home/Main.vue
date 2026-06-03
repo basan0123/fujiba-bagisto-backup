@@ -1,11 +1,11 @@
 <template>
     <!-- ═══════════════════════════════════════════════════════
-         MOBILE — Air Regi 4×4 horizontal paged tile grid
-         lg:hidden so it disappears on tablet/desktop (≥1024px,
-         which includes the 11" iPad at 1194px)
+         MOBILE (phones only) — Air Regi 4×4 horizontal paged tile grid
+         md:hidden so it disappears on every iPad (≥768px, incl.
+         iPad mini & all iPads in portrait). Only ≤767px phones see it.
          ═══════════════════════════════════════════════════════ -->
     <div
-        class="lg:hidden flex flex-col"
+        class="md:hidden flex flex-col"
         style="height: calc(100vh - 44px - 49px - env(safe-area-inset-bottom, 0px));"
     >
         <!-- Category filter bar -->
@@ -152,10 +152,13 @@
     </div>
 
     <!-- ═══════════════════════════════════════════════════════
-         PC / iPad — Original Bagisto product grid + cart sidebar
-         hidden on phones, lg:flex on ≥1024px (includes 11" iPad)
+         PC / iPad — Original Bagisto product grid + cart
+         hidden on phones, md:flex on every iPad (≥768px). The cart
+         is a drawer below 1024px and a fixed sidebar at ≥1024px
+         (see isMobileOrTab ≤1024), so narrow iPad portrait gets the
+         full-width grid + slide-up cart.
          ═══════════════════════════════════════════════════════ -->
-    <div class="hidden lg:flex h-full gap-4 overflow-hidden">
+    <div class="hidden md:flex h-full gap-4 overflow-hidden">
         <div class="padding-right flex-1 overflow-hidden py-4">
             <div class="flex flex-col gap-4">
                 <category

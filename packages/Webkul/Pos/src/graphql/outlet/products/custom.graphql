@@ -38,12 +38,20 @@ input createOutletProductInput {
     name: String!
     sku: String!
     price: Float!
+    cost: Float
     quantity: Int!
     weight: Float
     barcode: String
     categoryId: Int
+    categoryIds: [Int!]
     imageBase64: String
     imageName: String
+    images: [outletProductImageUploadInput!]
+}
+
+input outletProductImageUploadInput {
+    base64: String!
+    name: String
 }
 
 type createOutletProductResult {

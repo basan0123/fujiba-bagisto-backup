@@ -170,7 +170,7 @@
                             @if($tempType === 'frozen')<span class="icon" title="冷凍便">⚠️❄️</span>@endif
                             {{ $item->name }}
                         </div>
-                        <div class="sku">SKU: {{ $item->getTypeInstance()->getOrderedItem($item)->sku }}</div>
+                        <div class="sku">SKU: {{ $item->product ? $item->getTypeInstance()->getOrderedItem($item)->sku : $item->sku }}</div>
                         <div class="price">{{ core()->formatPrice($unit, $currency) }}</div>
                     </div>
 

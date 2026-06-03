@@ -229,9 +229,19 @@ class OrderListController extends Controller
             return response()->json(['message' => 'Forbidden.'], 403);
         }
 
+        // Exclude label-printed rows: in this admin a printed label means the
+        // order is treated as "shipped" (virtual status) and is no longer an
+        // open order. Without this guard a processing+label_printed order is
+        // counted in the pill but unreachable by the pending/processing filter
+        // (which excludes label-printed rows), so the count never matches what
+        // the filter can surface. See index()'s status-filter logic.
         $rows = \Illuminate\Support\Facades\DB::table('orders')
             ->select('channel_id', 'status', \Illuminate\Support\Facades\DB::raw('COUNT(*) as cnt'))
             ->whereIn('status', ['pending', 'processing'])
+            ->where(function ($q) {
+                $q->whereNull('fujiba_label_printed')
+                    ->orWhere('fujiba_label_printed', 0);
+            })
             ->groupBy('channel_id', 'status')
             ->get();
 

@@ -223,6 +223,38 @@ class DrillDownQuery
         })->all();
     }
 
+    /* ----------------- §E6 per-hour series ----------------- */
+    public function byHour($root, array $args, GraphQLContext $context): array
+    {
+        $self = $context->user();
+        $outletId = (int) $self->outlet_id;
+        [$from, $to] = $this->range($args);
+
+        $rows = DB::table('orders as o')
+            ->join('pos_order as po', 'po.order_id', '=', 'o.id')
+            ->where('po.outlet_id', $outletId)
+            ->whereIn('o.status', self::COMPLETED_STATUSES)
+            ->whereBetween('o.created_at', [$from, $to])
+            ->select(
+                DB::raw('HOUR(o.created_at) as h'),
+                DB::raw('COUNT(o.id) as order_count'),
+                DB::raw('SUM(o.grand_total - COALESCE(o.grand_total_refunded,0)) as revenue'),
+            )
+            ->groupBy('h')
+            ->get()
+            ->keyBy(fn ($r) => (int) $r->h);
+
+        // Zero-fill all 24 hours so the chart has a fixed 0..23 x-axis.
+        return array_map(function ($hour) use ($rows) {
+            $r = $rows->get($hour);
+            return [
+                'hour'       => $hour,
+                'orderCount' => (int) ($r->order_count ?? 0),
+                'revenue'    => (float) ($r->revenue ?? 0),
+            ];
+        }, range(0, 23));
+    }
+
     /** Default to last 30 days when no explicit range supplied. */
     private function range(array $args, bool $requireExplicit = false): array
     {

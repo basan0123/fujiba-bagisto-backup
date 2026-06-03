@@ -17,9 +17,19 @@ class InitializeTenancyForSubdomains
         $host = $request->getHost();
         $centralDomains = config('tenancy.central_domains', []);
 
-        // Skip if on a central domain
+        // Skip tenant init if on a central domain (snssale.com / www. / etc.).
+        //
+        // Central domains have NO tenant DB, so the central connection is used
+        // — and that DB has no `channels`/`currencies` rows. Any request that
+        // reaches the Shop storefront there dereferences core()->getCurrentChannel()
+        // (null) and fatals with HTTP 500 ("Attempt to read property base_currency
+        // on null", Core.php:413). The apex-guard *route* in routes/web.php cannot
+        // prevent this because the Shop package's `GET /` route registers first
+        // and wins route matching. So we guard here, in global middleware, which
+        // runs BEFORE any controller is dispatched and is therefore immune to
+        // route registration order.
         if (in_array($host, $centralDomains)) {
-            return $next($request);
+            return $this->guardCentralDomain($request, $next);
         }
 
         // Find the tenant by domain lookup (works for ANY domain pattern,
@@ -89,5 +99,57 @@ class InitializeTenancyForSubdomains
         Config::set('cache.prefix', 'tenant_' . substr($tenantId, 0, 8));
 
         return $next($request);
+    }
+
+    /**
+     * Handle a request on a central (non-tenant) domain.
+     *
+     * The central DB has no storefront data, so we never let the request fall
+     * through to the Shop storefront. Control-plane paths (super-admin panel,
+     * tenant-aware storage, impersonation, language/messenger/chatpion helpers,
+     * and framework internals) are allowed through; the bare apex redirects to
+     * the super-admin login; everything else gets a branded standalone 404.
+     */
+    protected function guardCentralDomain(Request $request, Closure $next)
+    {
+        $path = trim($request->path(), '/'); // '' for the bare apex "/"
+
+        // Bare apex → operational destination (SaaS control panel login).
+        if ($path === '') {
+            return redirect('/superadmin/login');
+        }
+
+        // Path prefixes that legitimately exist on the central domain. Any
+        // request matching one of these is dispatched normally.
+        $allowedPrefixes = [
+            'superadmin',
+            'storage',
+            'language',
+            'messenger',
+            'customer/messenger',
+            'chatpion',
+            'admin',                  // impersonation accept/stop + admin url
+            config('app.admin_url'),  // configured admin slug (may differ from "admin")
+            // Framework / tooling internals that must never be 404'd:
+            'livewire',
+            '_debugbar',
+            'telescope',
+            'horizon',
+            'sanctum',
+            'broadcasting',
+            'up',                     // Laravel health check
+        ];
+
+        foreach ($allowedPrefixes as $prefix) {
+            $prefix = trim((string) $prefix, '/');
+
+            if ($prefix !== '' && ($path === $prefix || str_starts_with($path, $prefix . '/'))) {
+                return $next($request);
+            }
+        }
+
+        // Anything else would try to render the storefront (which fatals on the
+        // empty central DB). Serve a branded 404 instead.
+        return response()->view('errors.tenant-not-found', [], 404);
     }
 }

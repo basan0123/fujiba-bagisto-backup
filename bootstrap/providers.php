@@ -67,6 +67,7 @@ return [
     Fujiba\MessengerBridge\Providers\MessengerBridgeServiceProvider::class,
     Fujiba\Accounting\Providers\AccountingServiceProvider::class,
     Fujiba\AuthGateway\Providers\AuthGatewayServiceProvider::class,
+    Fujiba\CustomerRanks\Providers\CustomerRanksServiceProvider::class,
     Webkul\Waste\Providers\WasteServiceProvider::class,
 
 ];

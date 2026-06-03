@@ -2,6 +2,7 @@
 
 namespace Webkul\Admin\Http\Controllers\Reporting;
 
+use Illuminate\Support\Facades\Cache;
 use Maatwebsite\Excel\Facades\Excel;
 use Webkul\Admin\Exports\ReportingExport;
 use Webkul\Admin\Helpers\Reporting as ReportingHelper;
@@ -17,6 +18,13 @@ class Controller extends BaseController
     protected $typeFunctions = [];
 
     /**
+     * How long (seconds) to cache a computed stats payload. Short enough that
+     * a new order shows up within a minute, long enough that switching widgets
+     * / re-tapping a preset is instant. Set to 0 to disable.
+     */
+    protected int $cacheTtl = 60;
+
+    /**
      * Create a controller instance.
      *
      * @return void
@@ -30,12 +38,40 @@ class Controller extends BaseController
      */
     public function stats()
     {
-        $stats = $this->reportingHelper->{$this->resolveTypeFunction()}();
+        $fn = $this->resolveTypeFunction();
 
-        return response()->json([
-            'statistics' => $stats,
-            'date_range' => $this->reportingHelper->getDateRange(),
-        ]);
+        $payload = $this->remember(function () use ($fn) {
+            return [
+                'statistics' => $this->reportingHelper->{$fn}(),
+                'date_range' => $this->reportingHelper->getDateRange(),
+            ];
+        });
+
+        return response()->json($payload);
+    }
+
+    /**
+     * Cache a stats payload for `$cacheTtl` seconds, keyed on the tenant, the
+     * reporting controller, the requested type and every filter param.
+     *
+     * The cache store is shared across tenants in this install (no
+     * CacheTenancyBootstrapper), so the tenant id MUST be part of the key to
+     * prevent one store's figures leaking into another's report.
+     */
+    protected function remember(\Closure $callback): array
+    {
+        if ($this->cacheTtl <= 0) {
+            return $callback();
+        }
+
+        $tenantId = function_exists('tenant') && tenant() ? tenant()->getTenantKey() : 'central';
+
+        $params = request()->only(['type', 'start', 'end', 'channel', 'mode', 'period']);
+        ksort($params);
+
+        $key = 'reporting:'.$tenantId.':'.static::class.':'.md5(json_encode($params));
+
+        return Cache::remember($key, $this->cacheTtl, $callback);
     }
 
     /**

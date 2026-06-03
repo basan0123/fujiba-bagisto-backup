@@ -154,6 +154,17 @@ class AuthController extends Controller
 
         $this->limiter->recordSignup($email, $ip, $ua, true);
 
+        // Bake the freshly-provisioned outlet's channel + inventory source into
+        // the JWT and response, exactly as login() does. Without channel_id the
+        // tenant-side ValidatePosJwtTenant falls back to host/subdomain channel
+        // resolution (defaults to channel 1) — fine for a single-channel fresh
+        // tenant by luck, but the client (pinSessionFromGateway) would store
+        // channelId=null and the catalog/image paths would be unscoped until
+        // fetchCurrentAgent ran. Carry them so signup matches login. See
+        // [pos-jwt-channel-resolution].
+        $channelId         = (int) ($result['channel_id'] ?? 0) ?: null;
+        $inventorySourceId = (int) ($result['inventory_source_id'] ?? 0) ?: null;
+
         $token = $this->issueToken(
             posUserId: (int) $result['pos_user_id'],
             gatewayUserId: $userId,
@@ -161,17 +172,21 @@ class AuthController extends Controller
             name: $req->input('name'),
             tenantId: $result['tenant_id'],
             subdomain: $result['subdomain'],
-            role: 'owner'
+            role: 'owner',
+            channelId: $channelId,
+            inventorySourceId: $inventorySourceId,
         );
 
         return response()->json([
-            'jwt'              => $token['jwt'],
-            'expires_at'       => $token['exp'],
-            'tenant_subdomain' => $result['subdomain'],
-            'tenant_id'        => $result['tenant_id'],
-            'store_name'       => $storeName,
-            'role'             => 'owner',
-            'tenant_url'       => "https://{$result['subdomain']}." . config('auth-gateway.tenant_subdomain_suffix'),
+            'jwt'                 => $token['jwt'],
+            'expires_at'          => $token['exp'],
+            'tenant_subdomain'    => $result['subdomain'],
+            'tenant_id'           => $result['tenant_id'],
+            'store_name'          => $storeName,
+            'role'                => 'owner',
+            'channel_id'          => $channelId,
+            'inventory_source_id' => $inventorySourceId,
+            'tenant_url'          => "https://{$result['subdomain']}." . config('auth-gateway.tenant_subdomain_suffix'),
         ], 201);
     }
 

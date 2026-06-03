@@ -248,7 +248,16 @@ class CashierQuery extends Controller
         return $this->orderRepository->getModel()
             ->join('orders', 'orders.id', 'pos_order.order_id')
             ->where('user_id', $user->id)
-            ->where('status', Order::STATUS_COMPLETED)
+            // A till takes the money the moment a sale is rung up, but a POS
+            // order only reaches `completed` after invoice + shipment. Counting
+            // `completed` alone left freshly-rung `processing` sales out of the
+            // drawer totals, so the expected amount undercounted real cash.
+            // Count every active sale state and exclude only the ones that
+            // never took money (canceled / closed / fraud / pending payment).
+            ->whereIn('status', [
+                Order::STATUS_PROCESSING,
+                Order::STATUS_COMPLETED,
+            ])
             ->whereDate('orders.created_at', today())
             ->select(
                 DB::raw('SUM(cash_total) as cash_payment_sale'),

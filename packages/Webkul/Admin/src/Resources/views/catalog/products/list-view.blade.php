@@ -554,7 +554,10 @@ function calcCostJPY(r) {
 }
 function calcNetCost(r) { return calcCostJPY(r) + (parseFloat(r.weight_kg) || 0) * getCargoRate(); }
 function calcProfit(r)  {
-    const sell = parseFloat(r.special_price || r.price) || 0;
+    // special_price arrives as "0.0000" (truthy string) when unset, so
+    // `special_price || price` wrongly yields 0 — use it only when > 0.
+    const sp   = parseFloat(r.special_price) || 0;
+    const sell = sp > 0 ? sp : (parseFloat(r.price) || 0);
     const net  = calcNetCost(r);
     return sell > 0 ? (sell - net) / sell * 100 : null;
 }

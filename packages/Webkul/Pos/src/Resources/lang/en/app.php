@@ -99,6 +99,14 @@ return [
             'bad-reason'     => 'Unknown reason :reason.',
             'amount-required' => 'Refund amount must be positive.',
             'manager-required-large' => 'Refunds over ¥3,000 require manager approval.',
+            'address-updated'     => 'Address updated.',
+            'payment-updated'     => 'Payment method updated.',
+            'fulfillment-updated' => 'Fulfillment updated.',
+            'status-updated'      => 'Status updated.',
+            'note-saved'          => 'Note saved.',
+            'items-updated'       => 'Order updated.',
+            'not-editable'        => 'Order cannot be edited in its current status.',
+            'stock-check-failed'  => 'Stock check failed.',
         ],
 
         'shift' => [

@@ -74,6 +74,61 @@
             font-size: 12px;
         }
     }
+
+    /* ─── Channel button rail (全店 / kimono / mmfood …) ───
+       Replaces the core channel dropdown. Same pill shape as the range
+       presets but a distinct active colour (slate) so a store selection
+       reads differently from a date selection. */
+    .fujiba-channel-rail {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 4px;
+        margin-bottom: 6px;
+    }
+    .fujiba-channel-rail button {
+        appearance: none;
+        cursor: pointer;
+        border: 1px solid rgba(15,23,42,0.12);
+        background: #fff;
+        color: #374151;
+        font-size: 12px;
+        line-height: 1.15;
+        padding: 3px 11px;
+        border-radius: 999px;
+        min-height: 0;
+        font-weight: 600;
+        transition: background 160ms ease, color 160ms ease, border-color 160ms ease;
+    }
+    .fujiba-channel-rail button:hover {
+        background: #f3f4f6;
+        border-color: rgba(15,23,42,0.22);
+    }
+    .fujiba-channel-rail button.is-active {
+        background: #0f172a;
+        color: #fff;
+        border-color: #0f172a;
+    }
+    .dark .fujiba-channel-rail button {
+        background: rgb(17,24,39);
+        color: rgb(209,213,219);
+        border-color: rgba(255,255,255,0.10);
+    }
+    .dark .fujiba-channel-rail button:hover {
+        background: rgb(31,41,55);
+    }
+    .dark .fujiba-channel-rail button.is-active {
+        background: #e5e7eb;
+        color: #0f172a;
+        border-color: #e5e7eb;
+    }
+
+    /* Hide the core channel dropdown once our rail is mounted. The marker
+       class is added to the filter row by the mount script. */
+    .fujiba-filter-row.fujiba-channel-rail-active .fj-dash-filter-channel,
+    .fujiba-filter-row.fujiba-channel-rail-active x-admin-dropdown:has(.fj-dash-filter-channel),
+    .fujiba-filter-row.fujiba-channel-rail-active > div:has(> .fj-dash-filter-channel) {
+        display: none !important;
+    }
 </style>
 
 <script>
@@ -146,35 +201,61 @@
     function addMonths(d, n)   { return new Date(d.getFullYear(), d.getMonth() + n, d.getDate()); }
     function startOfYear(d)    { return new Date(d.getFullYear(), 0, 1); }
 
+    // Company fiscal-year start month (1-12), set per-company under
+    // Configure → General → 会計年度. Falls back to April (Japanese default).
+    var FY_START_MONTH = parseInt(@json($fiscalYearStartMonth ?? 4), 10) || 4;
+
+    // Start of the fiscal year that contains date `d`. If the calendar month is
+    // before the FY start month, the FY began in the previous calendar year.
+    function startOfFiscalYear(d, startMonth) {
+        var m0 = startMonth - 1; // JS month index
+        var y = (d.getMonth() < m0) ? d.getFullYear() - 1 : d.getFullYear();
+        return new Date(y, m0, 1);
+    }
+
     var LABELS = {
-        today:      @json(trans('fujiba::app.dashboard.range_presets.today')),
-        yesterday:  @json(trans('fujiba::app.dashboard.range_presets.yesterday')),
-        this_month: @json(trans('fujiba::app.dashboard.range_presets.this_month')),
-        last_month: @json(trans('fujiba::app.dashboard.range_presets.last_month')),
-        last_3m:    @json(trans('fujiba::app.dashboard.range_presets.last_3m')),
-        this_year:  @json(trans('fujiba::app.dashboard.range_presets.this_year')),
-        all:        @json(trans('fujiba::app.dashboard.range_presets.all')),
+        today:        @json(trans('fujiba::app.dashboard.range_presets.today')),
+        yesterday:    @json(trans('fujiba::app.dashboard.range_presets.yesterday')),
+        day_before:   @json(trans('fujiba::app.dashboard.range_presets.day_before_yesterday')),
+        this_month:   @json(trans('fujiba::app.dashboard.range_presets.this_month')),
+        last_month:   @json(trans('fujiba::app.dashboard.range_presets.last_month')),
+        last_3m:      @json(trans('fujiba::app.dashboard.range_presets.last_3m')),
+        this_fiscal:  @json(trans('fujiba::app.dashboard.range_presets.this_fiscal_year')),
+        last_fiscal:  @json(trans('fujiba::app.dashboard.range_presets.last_fiscal_year')),
+        this_year:    @json(trans('fujiba::app.dashboard.range_presets.this_year')),
+        all:          @json(trans('fujiba::app.dashboard.range_presets.all')),
     };
 
     function presets() {
         var today = new Date();
-        var yesterday = new Date(today.getFullYear(), today.getMonth(), today.getDate() - 1);
+        var yesterday    = new Date(today.getFullYear(), today.getMonth(), today.getDate() - 1);
+        var dayBefore    = new Date(today.getFullYear(), today.getMonth(), today.getDate() - 2);
         var thisMonthStart = startOfMonth(today);
         var lastMonthStart = startOfMonth(addMonths(today, -1));
         var lastMonthEnd   = endOfMonth(addMonths(today, -1));
         var threeMonthsAgo = startOfMonth(addMonths(today, -2)); // last 3 months including current
         var yearStart      = startOfYear(today);
+
+        // Fiscal year (期): 今期 runs from this FY start month → today;
+        // 前期 is the full prior fiscal year (start → day before this FY start).
+        var thisFyStart    = startOfFiscalYear(today, FY_START_MONTH);
+        var lastFyStart    = new Date(thisFyStart.getFullYear() - 1, thisFyStart.getMonth(), 1);
+        var lastFyEnd      = new Date(thisFyStart.getFullYear(), thisFyStart.getMonth(), 0); // day before thisFyStart
+
         // "All time": cap at 5 years back to keep widget queries bounded.
         var allStart       = new Date(today.getFullYear() - 5, 0, 1);
 
         return [
-            { key: 'today',      label: LABELS.today,      start: fmt(today),          end: fmt(today) },
-            { key: 'yesterday',  label: LABELS.yesterday,  start: fmt(yesterday),      end: fmt(yesterday) },
-            { key: 'this_month', label: LABELS.this_month, start: fmt(thisMonthStart), end: fmt(today) },
-            { key: 'last_month', label: LABELS.last_month, start: fmt(lastMonthStart), end: fmt(lastMonthEnd) },
-            { key: 'last_3m',    label: LABELS.last_3m,    start: fmt(threeMonthsAgo), end: fmt(today) },
-            { key: 'this_year',  label: LABELS.this_year,  start: fmt(yearStart),      end: fmt(today) },
-            { key: 'all',        label: LABELS.all,        start: fmt(allStart),       end: fmt(today) },
+            { key: 'today',       label: LABELS.today,       start: fmt(today),          end: fmt(today) },
+            { key: 'yesterday',   label: LABELS.yesterday,   start: fmt(yesterday),      end: fmt(yesterday) },
+            { key: 'day_before',  label: LABELS.day_before,  start: fmt(dayBefore),      end: fmt(dayBefore) },
+            { key: 'this_month',  label: LABELS.this_month,  start: fmt(thisMonthStart), end: fmt(today) },
+            { key: 'last_month',  label: LABELS.last_month,  start: fmt(lastMonthStart), end: fmt(lastMonthEnd) },
+            { key: 'last_3m',     label: LABELS.last_3m,     start: fmt(threeMonthsAgo), end: fmt(today) },
+            { key: 'this_fiscal', label: LABELS.this_fiscal, start: fmt(thisFyStart),    end: fmt(today) },
+            { key: 'last_fiscal', label: LABELS.last_fiscal, start: fmt(lastFyStart),    end: fmt(lastFyEnd) },
+            { key: 'this_year',   label: LABELS.this_year,   start: fmt(yearStart),      end: fmt(today) },
+            { key: 'all',         label: LABELS.all,         start: fmt(allStart),       end: fmt(today) },
         ];
     }
 
@@ -245,6 +326,87 @@
         return null;
     }
 
+    // ─── Channel rail ───────────────────────────────────────────────────
+    // Channel list comes from the server (core()->getAllChannels()), same
+    // source as the core dropdown — no hardcoded store codes. Index 0 is the
+    // synthetic 全店 (all, code ''); the rest mirror the core dropdown order.
+    var CHANNELS = @json($channelOptions ?? []);
+    var ALL_LABEL = @json(trans('fujiba::app.dashboard.range_presets.all_stores'));
+
+    // Locate the core channel dropdown + its (v-show-hidden) menu items. The
+    // toggle button carries .fj-dash-filter-channel; menu <li>s sit in the
+    // same dropdown wrapper and keep the core @click="filters.channel=..."
+    // handler even while hidden, so clicking one drives the Vue state natively.
+    function findChannelDropdown(row) {
+        var toggle = row.querySelector('.fj-dash-filter-channel');
+        if (!toggle) return null;
+        // Walk up to the dropdown root that also contains the menu list.
+        var wrap = toggle.closest('[v-slot\\:toggle]') || toggle.parentElement;
+        var root = toggle;
+        for (var i = 0; i < 6 && root.parentElement; i++) {
+            root = root.parentElement;
+            var items = root.querySelectorAll('li, [class*="dropdown"] a, .dropdown-menu-item, ul > li');
+            if (items.length >= CHANNELS.length) {
+                return { toggle: toggle, items: collectMenuItems(root) };
+            }
+        }
+        return { toggle: toggle, items: collectMenuItems(row) };
+    }
+
+    function collectMenuItems(scope) {
+        // The core menu renders one item per channel via v-for. Grab the <li>s
+        // inside the menu <ul>; fall back to anchors. Order matches CHANNELS.
+        var lis = scope.querySelectorAll('ul li');
+        if (lis.length >= CHANNELS.length) return Array.prototype.slice.call(lis, 0, CHANNELS.length);
+        var any = scope.querySelectorAll('li');
+        return Array.prototype.slice.call(any, 0, CHANNELS.length);
+    }
+
+    function currentChannel() {
+        try {
+            var KEY = 'fujiba_global_filters:' + window.location.host;
+            var s = JSON.parse(localStorage.getItem(KEY) || '{}') || {};
+            return ('channel' in s) ? (s.channel || '') : '';
+        } catch (e) { return ''; }
+    }
+
+    function selectChannel(dd, code, index) {
+        // Optimistically persist the selection now so paint reads the right
+        // value immediately (the core watcher will write the same value a tick
+        // later — idempotent). Then drive the actual filter.
+        try {
+            var KEY = 'fujiba_global_filters:' + window.location.host;
+            var prev = JSON.parse(localStorage.getItem(KEY) || '{}') || {};
+            prev.channel = code;
+            localStorage.setItem(KEY, JSON.stringify(prev));
+        } catch (e) {}
+
+        // Preferred path: click the matching (hidden) core menu item so the Vue
+        // component updates filters.channel itself and re-emits full state.
+        var clicked = false;
+        if (dd && dd.items && dd.items[index]) {
+            try { dd.items[index].click(); clicked = true; } catch (e) {}
+        }
+
+        // Fallback (single channel / dropdown absent): emit directly so widgets
+        // re-fetch. Mirrors applyPreset's persist + broadcast.
+        if (! clicked && window.emitter && typeof window.emitter.emit === 'function') {
+            try {
+                var KEY2 = 'fujiba_global_filters:' + window.location.host;
+                var merged = JSON.parse(localStorage.getItem(KEY2) || '{}') || {};
+                if (!merged.mode) merged.mode = 'orders';
+                window.emitter.emit('reporting-filter-updated', merged);
+            } catch (e) {}
+        }
+    }
+
+    function paintChannels(rail) {
+        var cur = currentChannel();
+        Array.prototype.forEach.call(rail.children, function (b) {
+            b.classList.toggle('is-active', (b.dataset.fjChannelCode || '') === cur);
+        });
+    }
+
     function paint(bar, all, host) {
         var k = activeKey(host, all);
         Array.prototype.forEach.call(bar.children, function (b) {
@@ -281,6 +443,43 @@
             host.startInput.addEventListener(ev, function () { paint(bar, all, host); });
             host.endInput.addEventListener(ev,   function () { paint(bar, all, host); });
         });
+
+        // ─── Channel rail ───
+        // Only worth showing when there's more than one real channel (the core
+        // dropdown itself hides for a single channel via channels.length > 2).
+        if (CHANNELS.length > 1) {
+            var rail = document.createElement('div');
+            rail.className = 'fujiba-channel-rail';
+
+            var dd = findChannelDropdown(host.row);
+
+            // [0] 全店 (all) + one button per real channel, in core order.
+            var entries = [{ code: '', name: ALL_LABEL }].concat(CHANNELS);
+            entries.forEach(function (ch, idx) {
+                var b = document.createElement('button');
+                b.type = 'button';
+                b.textContent = ch.name;
+                b.dataset.fjChannelCode = ch.code || '';
+                b.addEventListener('click', function () {
+                    selectChannel(dd, ch.code || '', idx);
+                    // Re-read after Vue processes the click, then repaint.
+                    setTimeout(function () { paintChannels(rail); }, 0);
+                });
+                rail.appendChild(b);
+            });
+
+            host.row.classList.add('fujiba-channel-rail-active');
+            host.row.parentElement.insertBefore(rail, bar);
+            paintChannels(rail);
+
+            // Keep the rail in sync if the channel changes via any other path.
+            if (window.emitter && typeof window.emitter.on === 'function') {
+                window.emitter.on('reporting-filter-updated', function () {
+                    setTimeout(function () { paintChannels(rail); }, 0);
+                });
+            }
+        }
+
         return true;
     }
 

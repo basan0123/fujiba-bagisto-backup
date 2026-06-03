@@ -29,6 +29,8 @@ class OutletProfileMutation extends Controller
 
         $validator = Validator::make($args, [
             'name'          => 'sometimes|required|string|max:255',
+            'tagline'       => 'nullable|string|max:255',
+            'brandColor'    => 'nullable|string|max:32',
             'phone'         => 'nullable|string|max:50',
             'email'         => 'nullable|email|max:255',
             'address'       => 'nullable|string|max:500',
@@ -60,7 +62,8 @@ class OutletProfileMutation extends Controller
 
         // Map camelCase args → snake_case columns; only set keys the caller sent.
         $map = [
-            'name' => 'name', 'phone' => 'phone', 'email' => 'email',
+            'name' => 'name', 'tagline' => 'tagline', 'brandColor' => 'brand_color',
+            'phone' => 'phone', 'email' => 'email',
             'address' => 'address', 'city' => 'city', 'state' => 'state',
             'country' => 'country', 'postcode' => 'postcode',
             'gstNumber' => 'gst_number', 'businessHours' => 'business_hours',

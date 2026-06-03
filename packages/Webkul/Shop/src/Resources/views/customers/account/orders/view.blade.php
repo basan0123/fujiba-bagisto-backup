@@ -1219,7 +1219,7 @@
                                                             </span>
 
                                                             <span>
-                                                                {{ $item->getTypeInstance()->getOrderedItem($item)->sku }}
+                                                                {{ optional($item->order_item)->sku ?? $item->sku }}
                                                             </span>
                                                         </div>
 
@@ -1479,7 +1479,7 @@
                                                 @foreach ($invoice->items as $item)
                                                     <tr class="border-b bg-white text-black [&>*]:font-medium [&>*]:px-6 [&>*]:py-4">
                                                         <td data-value="@lang('shop::app.customers.account.orders.view.invoices.sku')">
-                                                            {{ $item->getTypeInstance()->getOrderedItem($item)->sku }}
+                                                            {{ optional($item->order_item)->sku ?? $item->sku }}
                                                         </td>
 
                                                         <td data-value="@lang('shop::app.customers.account.orders.view.invoices.product-name')">

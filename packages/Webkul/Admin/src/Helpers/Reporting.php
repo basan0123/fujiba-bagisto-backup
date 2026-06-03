@@ -983,6 +983,74 @@ class Reporting
         return $this->productReporting->getTopSearchTerms(5);
     }
 
+    /* =====================================================================
+     |  Fujiba custom report stat wrappers (called by SaleController types)
+     * ==================================================================== */
+
+    /**
+     * Month-by-month sales table.
+     */
+    public function getMonthlySalesStats($type = 'graph'): array
+    {
+        return ['rows' => $this->saleReporting->getMonthlySalesTable()];
+    }
+
+    /**
+     * Top selling products for the range.
+     */
+    public function getTopSellingProductsStats($type = 'graph'): array
+    {
+        return ['products' => $this->saleReporting->getTopSellingProducts($type === 'table' ? 50 : 10)];
+    }
+
+    /**
+     * Customer location breakdown (by prefecture/state).
+     */
+    public function getCustomerLocationStats($type = 'graph'): array
+    {
+        return ['locations' => $this->saleReporting->getCustomerLocations($type === 'table' ? 100 : 15)];
+    }
+
+    /**
+     * New vs returning customers.
+     */
+    public function getNewVsReturningStats($type = 'graph'): array
+    {
+        return $this->saleReporting->getNewVsReturningCustomers();
+    }
+
+    /**
+     * Weekday x hour sales heatmap.
+     */
+    public function getSalesHeatmapStats($type = 'graph'): array
+    {
+        return ['cells' => $this->saleReporting->getSalesHeatmap()];
+    }
+
+    /**
+     * Sales by channel/store.
+     */
+    public function getSalesByChannelStats($type = 'graph'): array
+    {
+        return ['channels' => $this->saleReporting->getSalesByChannel()];
+    }
+
+    /**
+     * Sales by category.
+     */
+    public function getSalesByCategoryStats($type = 'graph'): array
+    {
+        return ['categories' => $this->saleReporting->getSalesByCategory($type === 'table' ? 50 : 10)];
+    }
+
+    /**
+     * Sales by brand.
+     */
+    public function getSalesByBrandStats($type = 'graph'): array
+    {
+        return ['brands' => $this->saleReporting->getSalesByBrand($type === 'table' ? 50 : 10)];
+    }
+
     /**
      * Returns date range
      */

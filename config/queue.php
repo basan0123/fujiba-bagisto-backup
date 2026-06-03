@@ -69,7 +69,15 @@ return [
             'queue' => env('REDIS_QUEUE', 'default'),
             'retry_after' => (int) env('REDIS_QUEUE_RETRY_AFTER', 90),
             'block_for' => null,
-            'after_commit' => false,
+            // Hold dispatched jobs until the surrounding DB transaction commits.
+            // checkout.order.save.after fires INSIDE OrderRepository's transaction
+            // (Webkul\Sales\Repositories\OrderRepository::createOrderIfNotThenRetry),
+            // so notification jobs queued from that event used to reach the worker
+            // before the notification_log row was committed → NotificationLog::find()
+            // returned null → the job silently no-op'd and the alert was lost
+            // (~24% of order.placed messenger notifications stuck 'pending').
+            // after_commit defers the push until commit, closing that race.
+            'after_commit' => true,
         ],
 
     ],

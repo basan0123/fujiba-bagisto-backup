@@ -4,6 +4,7 @@ namespace Webkul\Pos\Providers;
 
 use Illuminate\Support\Facades\Event;
 use Illuminate\Support\ServiceProvider;
+use Webkul\Pos\Listeners\AutoAssignOutletProduct;
 use Webkul\Pos\Listeners\AutoRegisterProductBarcode;
 use Webkul\Pos\Listeners\RevokeCustomerDisplaysOnLogout;
 
@@ -39,6 +40,13 @@ class EventServiceProvider extends ServiceProvider
             $e->addTemplate('pos::admin.sales.order.view');
         });
 
+        // FUJIBA 2026-05-30: the storefront vanilla-JS chat widget that used to
+        // be injected here ('bagisto.shop.layout.body.after' → pos::shop.chat-widget)
+        // has been removed. POS chat is Messenger-only now: it surfaces the
+        // existing Fujiba\LiveChat / Chatpion Facebook conversations through the
+        // POS GraphQL chat resolvers. There is intentionally no storefront widget
+        // and no separate POS chat database.
+
         // FUJIBA 2026-05-06: customer-display URL must persist across logout.
         // The cashier signing out (or any other cashier signing in on the same
         // terminal) keeps the same /pos/display/{token} URL, so the customer
@@ -51,5 +59,14 @@ class EventServiceProvider extends ServiceProvider
         // lazily on first print.
         Event::listen('catalog.product.create.after', [AutoRegisterProductBarcode::class, 'handle']);
         Event::listen('catalog.product.update.after', [AutoRegisterProductBarcode::class, 'handle']);
+
+        // Auto-link every newly created product to the outlet so it appears in
+        // the POS catalog (getOutletProducts joins through pos_outlet_product).
+        // SINGLE-OUTLET tenants only — the listener no-ops on multi-outlet
+        // tenants, which curate per-store assignment. Fixes products created
+        // via admin/import never showing in the POS (2026-05-24). create.after
+        // only: an update shouldn't re-link a product an admin intentionally
+        // unassigned via the POS visibility toggle.
+        Event::listen('catalog.product.create.after', [AutoAssignOutletProduct::class, 'handle']);
     }
 }

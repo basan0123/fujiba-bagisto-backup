@@ -33,6 +33,14 @@ class OrderEventListener
         'sales.refund.save.after'   => 'order.refunded',
     ];
 
+    /**
+     * Order statuses that qualify for the 'order.placed' notification. A web
+     * order is "new / unfulfilled" only in these three states; placement in any
+     * other status (completed, canceled, fraud, closed, …) sends nothing. Other
+     * lifecycle events (invoiced / shipped / …) are not gated on this.
+     */
+    public const PLACED_NOTIFY_STATUSES = ['pending', 'pending_payment', 'processing'];
+
     public function __construct(
         protected TemplateRenderer $renderer,
         protected ChannelManager $channels,
@@ -78,6 +86,26 @@ class OrderEventListener
                 && (app()->bound('fujiba.suppress_order_placed') || $order->status === 'draft')
             ) {
                 return;
+            }
+
+            // 'order.placed' is a WEB-only, early-status notification. Two gates,
+            // both scoped to order.placed so later lifecycle events (invoiced /
+            // shipped / cancelled / refunded) still fire normally for any order:
+            //   1. Web-only — POS counter sales never trigger an order-placed
+            //      alert (customer mail/Messenger AND admin Messenger). The admin
+            //      path keeps its own isPosOrder() guard as defence-in-depth.
+            //   2. Status gate — only the open/unfulfilled web statuses
+            //      (pending / processing / pending_payment) qualify. Anything
+            //      else at placement time (e.g. completed, canceled, fraud) sends
+            //      nothing.
+            if ($eventKey === 'order.placed') {
+                if ($this->isPosOrder($order)) {
+                    return;
+                }
+
+                if (! in_array($order->status, self::PLACED_NOTIFY_STATUSES, true)) {
+                    return;
+                }
             }
 
             $vars     = $this->buildVars($order, $payload);
@@ -345,6 +373,17 @@ class OrderEventListener
         }
 
         return config('fujiba-notification.fallback_language', config('app.locale', 'en'));
+    }
+
+    /**
+     * Public entry point for rebuilding template vars outside the event flow.
+     * Used by the fujiba:notifications:sweep command to re-render stuck
+     * notifications with byte-identical variables. Keeps buildVars() protected
+     * as the internal contract while exposing a stable name for the sweeper.
+     */
+    public function buildVarsFor(Order $order, mixed $payload): array
+    {
+        return $this->buildVars($order, $payload);
     }
 
     /**

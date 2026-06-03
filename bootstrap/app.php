@@ -58,6 +58,10 @@ return Application::configure(basePath: dirname(__DIR__))
             // (the pairing_token IS the secret). No session, so no CSRF.
             'pos/api/customer-display/*',
             'pos/display/*/ping',
+
+            // Storefront live-chat: public, the visitor_token IS the credential
+            // (same model as the display token). No CSRF on the widget's POSTs.
+            'pos/chat/*',
         ]);
 
         // Stop unauthenticated API calls from crashing on `route('login')`.
@@ -144,6 +148,40 @@ return Application::configure(basePath: dirname(__DIR__))
                 });
             });
         })->hourly()->name('reindex-inventory')->onOneServer()->withoutOverlapping();
+
+        // Messenger notification safety net (defense layer 3). notification_log
+        // lives in tenant DBs, so sweep per tenant. Re-dispatches any messenger
+        // notification stuck 'pending' past the 2-min grace window — the catch-all
+        // that guarantees order alerts (customer + admin) are never silently lost,
+        // even on a worker crash or future regression. Idempotent: the job
+        // short-circuits on already-sent rows. See
+        // Fujiba\Notification\Console\Commands\SweepPendingNotifications.
+        //
+        // CRITICAL: catch PER TENANT. Not every tenant has the Fujiba Notification
+        // package migrated (template/legacy tenants lack notification_log). An
+        // uncaught throw here would abort chunkById mid-loop and skip every tenant
+        // sorted after the broken one — i.e. the safety net would silently stop
+        // covering stores. One tenant's failure must never stop the others.
+        $schedule->call(function () {
+            \App\Models\Tenant::query()->chunkById(50, function ($tenants) {
+                $tenants->each(function ($tenant) {
+                    tenancy()->initialize($tenant);
+                    try {
+                        if (! \Illuminate\Support\Facades\Schema::connection('tenant')->hasTable('notification_log')) {
+                            return; // package not installed on this tenant — nothing to sweep
+                        }
+                        \Illuminate\Support\Facades\Artisan::call('fujiba:notifications:sweep');
+                    } catch (\Throwable $e) {
+                        \Illuminate\Support\Facades\Log::error('[FujibaNotification] sweep failed for tenant', [
+                            'tenant' => (string) $tenant->id,
+                            'error'  => $e->getMessage(),
+                        ]);
+                    } finally {
+                        tenancy()->end();
+                    }
+                });
+            });
+        })->everyMinute()->name('sweep-pending-notifications')->onOneServer()->withoutOverlapping();
     })
     ->withExceptions(function (Exceptions $exceptions) {
         // Super-admin AuthenticationException routing is handled by

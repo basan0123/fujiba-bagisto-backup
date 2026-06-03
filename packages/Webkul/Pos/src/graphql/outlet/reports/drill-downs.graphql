@@ -30,6 +30,34 @@ extend type Query @guard(with: ["pos_user"]) {
         dateFrom: String!,
         dateTo: String!
     ): [ReportByDayRow!]! @field(resolver: "Webkul\\Pos\\Queries\\Reports\\DrillDownQuery@byDay")
+
+    # Hourly sales buckets (0..23) for the 時間帯別 chart. Always returns 24
+    # rows (missing hours zero-filled) so the client can render a fixed-width
+    # bar chart without gaps. Scoped to the current outlet; default last 30 days.
+    getHourlyReport(
+        dateFrom: String,
+        dateTo: String
+    ): [ReportByHourRow!]! @field(resolver: "Webkul\\Pos\\Queries\\Reports\\DrillDownQuery@byHour")
+
+    # Headline totals for the 集計 tab + Today dashboard. source ∈ pos|website|all
+    # (default all). cost/profit/stockValue are null for cashiers. stockValue is
+    # a current snapshot and ignores the date range.
+    getSalesTotals(
+        dateFrom: String,
+        dateTo: String,
+        source: String
+    ): SalesTotals! @field(resolver: "Webkul\\Pos\\Queries\\Reports\\SalesTotalsQuery")
+}
+
+type SalesTotals {
+    source: String!
+    orderCount: Int!
+    itemCount: Int!
+    revenue: Float!
+    cost: Float
+    profit: Float
+    stockValue: Float
+    canSeeProfit: Boolean!
 }
 
 type ReportByProductResponse {
@@ -73,4 +101,10 @@ type ReportByDayRow {
     revenue: Float!
     cashAmount: Float!
     otherAmount: Float!
+}
+
+type ReportByHourRow {
+    hour: Int!
+    orderCount: Int!
+    revenue: Float!
 }

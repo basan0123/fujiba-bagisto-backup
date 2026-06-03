@@ -2,6 +2,7 @@
 #import outlet/audit/*.graphql
 #import outlet/cashier/*.graphql
 #import outlet/categories/*.graphql
+#import outlet/chat/*.graphql
 #import outlet/common/*.graphql
 #import outlet/customers/*.graphql
 #import outlet/home/*.graphql

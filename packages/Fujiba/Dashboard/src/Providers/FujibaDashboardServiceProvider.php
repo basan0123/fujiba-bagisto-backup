@@ -38,6 +38,11 @@ class FujibaDashboardServiceProvider extends ServiceProvider
         });
 
         $this->app->singleton(ShortPrice::class, fn ($app) => new ShortPrice($app));
+
+        // Per-company fiscal-year (会計年度) start-month setting, surfaced under
+        // Configure → General. Stored per-tenant in core_config and consumed by
+        // the dashboard 今期 / 前期 quick-range presets.
+        $this->mergeConfigFrom(__DIR__.'/../Config/system.php', 'core');
     }
 
     public function boot(): void
@@ -84,13 +89,13 @@ class FujibaDashboardServiceProvider extends ServiceProvider
             [BusinessOverviewListener::class, 'handle']
         );
 
-        // Shipping Performance: collected vs carrier-billed shipping (margin)
-        // + free-shipping subsidy count. Reads `order_shipping_costs` (manual /
-        // CSV) and `shipping_rule_logs`. Renders directly below the Business
-        // Overview block.
+        // Cart Activity — live cart feed. Moved to the TOP (directly below the
+        // Business Overview block, full width) per request. Registered right
+        // after BusinessOverview so it's the first widget under 全体の概要; it
+        // renders outside the 2-col Today's Details grid as its own row.
         Event::listen(
             'bagisto.admin.dashboard.overall_details.before',
-            [ShippingPerformanceListener::class, 'handle']
+            [CartActivityListener::class, 'handle']
         );
 
         // Order matters: Inventory Value renders before
@@ -118,11 +123,14 @@ class FujibaDashboardServiceProvider extends ServiceProvider
             [TodaysDetailsRestyleListener::class, 'handle']
         );
 
-        // The four widgets below render inside a 2-column grid wrapper opened
-        // by TodaysGridOpenListener and closed by TodaysGridCloseListener.
+        // The widgets below render inside a 2-column grid wrapper opened by
+        // TodaysGridOpenListener and closed by TodaysGridCloseListener.
         // Registration order = render order = grid cell order:
         //   row 1: [PaymentMethods | SalesByState]
-        //   row 2: [OrdersByRegion | CartActivity]
+        //   row 2: [OrdersByRegion (spans full width — see grid CSS)]
+        // Cart Activity used to be the row-2 right cell but was moved to the
+        // top (overall_details.before). With 3 cards the lone last one spans
+        // both columns via .fujiba-todays-grid > ...:last-child:nth-child(odd).
         // CartFunnelListener is currently a no-op; kept registered so existing
         // wiring is not deleted, placed inside the wrapper so it does not break
         // the row count if it ever begins emitting markup.
@@ -145,18 +153,11 @@ class FujibaDashboardServiceProvider extends ServiceProvider
             [SalesByStateListener::class, 'handle']
         );
 
-        // Orders by Region (Japan choropleth) — renders below Cart Activity,
-        // alongside the Today's Details block. Phase E W3.
+        // Orders by Region (Japan choropleth) — the 3rd (last) grid card; with
+        // Cart Activity moved out it spans both columns. Phase E W3.
         Event::listen(
             'bagisto.admin.dashboard.todays_details.after',
             [OrdersByRegionListener::class, 'handle']
-        );
-
-        // Cart Activity — live cart feed. Previously rendered first in this
-        // slot; moved into the 2-col grid as the row-2 right cell.
-        Event::listen(
-            'bagisto.admin.dashboard.todays_details.after',
-            [CartActivityListener::class, 'handle']
         );
 
         Event::listen(
@@ -167,6 +168,16 @@ class FujibaDashboardServiceProvider extends ServiceProvider
         Event::listen(
             'bagisto.admin.dashboard.todays_details.after',
             [TodaysGridCloseListener::class, 'handle']
+        );
+
+        // Shipping Performance: collected vs carrier-billed shipping (margin)
+        // + free-shipping subsidy count. Reads `order_shipping_costs` (manual /
+        // CSV) and `shipping_rule_logs`. Moved to the BOTTOM per request —
+        // registered after TodaysGridClose so it renders as a full-width block
+        // directly below the Today's Details grid (above stock/store-stats).
+        Event::listen(
+            'bagisto.admin.dashboard.todays_details.after',
+            [ShippingPerformanceListener::class, 'handle']
         );
 
         Event::listen(

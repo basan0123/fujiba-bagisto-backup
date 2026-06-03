@@ -6,12 +6,12 @@
     "isDynamicEntry": true
   },
   "src/Resources/assets/css/admin.css": {
-    "file": "assets/admin-Drn4CRkm.css",
+    "file": "assets/admin-BvK1N2kM.css",
     "src": "src/Resources/assets/css/admin.css",
     "isEntry": true
   },
   "src/Resources/assets/css/shop.css": {
-    "file": "assets/shop-l_YyIhW5.css",
+    "file": "assets/shop-F5FjPhvl.css",
     "src": "src/Resources/assets/css/shop.css",
     "isEntry": true
   },
@@ -54,7 +54,7 @@
     "isEntry": true
   },
   "src/Resources/assets/js/shop.js": {
-    "file": "assets/shop-BCDWiSDC.js",
+    "file": "assets/shop-DVeXblmc.js",
     "name": "shop",
     "src": "src/Resources/assets/js/shop.js",
     "isEntry": true,
@@ -63,7 +63,7 @@
       "node_modules/vue3-apexcharts/dist/apexcharts.ssr.esm-fe46cd2d.js"
     ],
     "css": [
-      "assets/shop-CWWNtFb0.css"
+      "assets/shop-BaVi75KL.css"
     ],
     "assets": [
       "assets/logo-D5m9rjCn.png",

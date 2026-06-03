@@ -19,6 +19,16 @@ class SaleController extends Controller
         'tax-collected' => 'getTaxCollectedStats',
         'shipping-collected' => 'getShippingCollectedStats',
         'top-payment-methods' => 'getTopPaymentMethods',
+
+        // Fujiba custom reports
+        'monthly-sales' => 'getMonthlySalesStats',
+        'top-products' => 'getTopSellingProductsStats',
+        'customer-location' => 'getCustomerLocationStats',
+        'new-vs-returning' => 'getNewVsReturningStats',
+        'sales-heatmap' => 'getSalesHeatmapStats',
+        'sales-by-channel' => 'getSalesByChannelStats',
+        'sales-by-category' => 'getSalesByCategoryStats',
+        'sales-by-brand' => 'getSalesByBrandStats',
     ];
 
     /**

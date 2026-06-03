@@ -1,0 +1,76 @@
+# outlet/orders/manage-edit-items.graphql — POS line-item editing
+# (add / remove / change-qty), the GraphQL face of the admin advanced screen's
+# item editor. Delegates to Fujiba\OrdersAdmin\Services\OrderItemEditor.
+# Cashier+; scoped to the agent's outlet channel.
+
+extend type Mutation @guard(with: ["pos_user"]) {
+    editOrderItems(
+        input: editOrderItemsInput! @spread
+    ): editOrderItemsResult @field(resolver: "Webkul\\Pos\\Mutations\\Outlet\\OrderItemEditMutation@editItems")
+}
+
+extend type Query @guard(with: ["pos_user"]) {
+    # Product picker for "add line" — simple products on the order's channel.
+    searchEditableProducts(
+        orderId: Int!
+        query: String
+        page: Int
+        perPage: Int
+    ): editableProductSearch @field(resolver: "Webkul\\Pos\\Mutations\\Outlet\\OrderItemEditMutation@searchProducts")
+}
+
+input editOrderItemsInput {
+    orderId: Int!
+    items: [editOrderLineInput!]!
+    shippingAmount: Float   # manual override; omit to keep current shipping
+    note: String
+}
+
+input editOrderLineInput {
+    productId: Int!
+    qty: Int!
+}
+
+type editOrderItemsResult {
+    success: Boolean!
+    message: String
+    order: editedOrderTotals
+    items: [editedOrderItem!]
+}
+
+type editedOrderTotals {
+    subTotal: Float
+    shippingAmount: Float
+    taxAmount: Float
+    discountAmount: Float
+    codFee: Float
+    coolSurcharge: Float
+    grandTotal: Float
+}
+
+type editedOrderItem {
+    id: Int!
+    productId: Int!
+    sku: String
+    name: String
+    qty: Int!
+    price: Float
+    total: Float
+}
+
+type editableProductSearch {
+    data: [editableProduct!]!
+    page: Int!
+    perPage: Int!
+    total: Int!
+    hasMore: Boolean!
+}
+
+type editableProduct {
+    id: Int!
+    sku: String
+    name: String
+    image: String
+    price: Float!
+    qtyInStock: Int!
+}

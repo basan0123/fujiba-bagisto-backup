@@ -8,13 +8,30 @@ extend type Mutation @guard(with: ["pos_user"]) {
 input createCustomerInput {
     firstName: String! @rename(attribute: "first_name")
     lastName: String! @rename(attribute: "last_name")
-    phone: String  
+    phone: String
     email: String!
+    gender: String
+    dateOfBirth: String @rename(attribute: "date_of_birth")
     address: [String]
+    address1: String
+    address2: String
     city: String
     country: String
     state: String
     postcode: String
+    companyName: String @rename(attribute: "company_name")
+    vatId: String @rename(attribute: "vat_id")
+    shippingSameAsBilling: Boolean
+    shippingFirstName: String
+    shippingLastName: String
+    shippingCompanyName: String
+    shippingPhone: String
+    shippingAddress1: String
+    shippingAddress2: String
+    shippingCity: String
+    shippingState: String
+    shippingCountry: String
+    shippingPostcode: String
 }
 
 type CreateCustomerResult {

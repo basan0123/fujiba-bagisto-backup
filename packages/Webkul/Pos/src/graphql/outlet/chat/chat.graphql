@@ -1,0 +1,133 @@
+# POS Messenger operator panel — agent (POS) side.
+#
+# POS chat is MESSENGER-ONLY. Every operation here proxies the existing
+# Fujiba\LiveChat / Chatpion Facebook Messenger stack (the same backend the
+# admin LiveChat UI uses). There is no POS chat database and no storefront
+# widget. A conversation `id` IS the Messenger subscriber PSID (a string), so
+# the RN client passes PSIDs straight through.
+#
+# Transport is polling: the inbox lists conversations; the thread view fetches
+# messages and only appends rows beyond the count it already holds (sinceCount).
+# Everything is scoped to the logged-in agent's outlet → channel → Facebook page
+# (multi-page: Kimono / Myanmar food are different channels).
+
+extend type Query @guard(with: ["pos_user"]) {
+    # Inbox for the agent's channel. `search` matches Chatpion (name/id/email).
+    getChatConversations(
+        first: Int,
+        search: String
+    ): [ChatConversation!]! @field(resolver: "Webkul\\Pos\\Queries\\Chat\\ChatQuery@conversations")
+
+    # One conversation by PSID (channel-scoped). Synthesizes a minimal row for
+    # idle threads so the thread view can always open.
+    getChatConversation(id: ID!): ChatConversation
+        @field(resolver: "Webkul\\Pos\\Queries\\Chat\\ChatQuery@conversation")
+
+    # Polling: the full thread window; client appends rows with id > sinceCount.
+    getChatMessages(
+        conversationId: ID!,
+        sinceId: Int
+    ): [ChatMessage!]! @field(resolver: "Webkul\\Pos\\Queries\\Chat\\ChatQuery@messages")
+
+    # Sendable Chatpion bot flows for this channel's Facebook page.
+    getChatpionFlows: [ChatpionBotFlow!]! @field(resolver: "Webkul\\Pos\\Queries\\Chat\\ChatQuery@chatpionFlows")
+
+    # Canned (quick-reply) response templates for the page.
+    getChatCannedResponses: [ChatCannedResponse!]! @field(resolver: "Webkul\\Pos\\Queries\\Chat\\ChatQuery@cannedResponses")
+
+    # Find the Messenger thread for a Bagisto customer / order so the POS can
+    # auto-open it after a sale. Resolves PSID from the customer (or the order's
+    # customer) and returns the conversation, or null when not linked to FB.
+    findMessengerThread(
+        customerId: Int,
+        orderId: Int
+    ): ChatConversation @field(resolver: "Webkul\\Pos\\Queries\\Chat\\ChatQuery@findThread")
+
+    # Whether this channel has a Facebook page wired (controls UI affordances).
+    messengerEnabled: Boolean! @field(resolver: "Webkul\\Pos\\Queries\\Chat\\ChatQuery@messengerEnabled")
+}
+
+extend type Mutation @guard(with: ["pos_user"]) {
+    # Agent posts a plain-text reply (Chatpion livechat_reply, HUMAN_AGENT tag).
+    sendChatMessage(
+        conversationId: ID!,
+        body: String!
+    ): ChatActionResult @field(resolver: "Webkul\\Pos\\Mutations\\Outlet\\ChatMutation@send")
+
+    # Fire a Chatpion bot flow to the conversation's Messenger subscriber.
+    sendChatpionBotFlow(
+        conversationId: ID!,
+        postbackId: String!
+    ): ChatActionResult @field(resolver: "Webkul\\Pos\\Mutations\\Outlet\\ChatMutation@sendChatpionBotFlow")
+
+    # Send a button template (offer / "Pay Now" / "Order Ready"). buttons is a
+    # JSON array string: [{"title":"...","url":"..."}|{"title":"...","payload":"..."}].
+    sendChatButtons(
+        conversationId: ID!,
+        text: String!,
+        buttons: String!
+    ): ChatActionResult @field(resolver: "Webkul\\Pos\\Mutations\\Outlet\\ChatMutation@sendButtons")
+
+    # Send a file attachment by public URL (PDF receipt / 請求書 / 納品書 / image).
+    # type ∈ file|image|video|audio (PDF → file).
+    sendChatAttachment(
+        conversationId: ID!,
+        url: String!,
+        type: String
+    ): ChatActionResult @field(resolver: "Webkul\\Pos\\Mutations\\Outlet\\ChatMutation@sendAttachment")
+
+    # Send an order summary ("cart") as text + a Pay-Now / view-order button.
+    # Looks the order up channel-scoped and posts a concise summary.
+    sendChatOrderSummary(
+        conversationId: ID!,
+        orderId: Int!,
+        payUrl: String
+    ): ChatActionResult @field(resolver: "Webkul\\Pos\\Mutations\\Outlet\\ChatMutation@sendOrderSummary")
+}
+
+# A Messenger conversation. `id` is the subscriber PSID.
+type ChatConversation {
+    id: ID!
+    channelId: Int @rename(attribute: "channel_id")
+    visitorName: String @rename(attribute: "visitor_name")
+    visitorEmail: String @rename(attribute: "visitor_email")
+    visitorPhone: String @rename(attribute: "visitor_phone")
+    profilePic: String @rename(attribute: "profile_pic")
+    lastMessage: String @rename(attribute: "last_message")
+    lastMessageAt: String @rename(attribute: "last_message_at")
+    agentUnreadCount: Int @rename(attribute: "agent_unread_count")
+    createdAt: String @rename(attribute: "created_at")
+    # The Messenger PSID (same as id) — kept explicit for the RN bot-flow path.
+    chatpionSubscriberId: String @rename(attribute: "chatpion_subscriber_id")
+    # Always "messenger" — POS chat has no other source now.
+    source: String @field(resolver: "Webkul\\Pos\\Queries\\Chat\\ChatQuery@resolveSource")
+}
+
+type ChatMessage {
+    id: ID!
+    # PSID of the conversation this message belongs to.
+    conversationId: String @rename(attribute: "psid")
+    senderType: String! @rename(attribute: "sender_type")
+    body: String!
+    messageType: String @rename(attribute: "message_type")
+    mediaUrl: String @rename(attribute: "media_url")
+    agentName: String @rename(attribute: "agent_name")
+    createdAt: String @rename(attribute: "created_at")
+}
+
+type ChatActionResult {
+    success: Boolean!
+    message: String
+}
+
+# Chatpion bot-flow row. postbackId is the flow's stable ID; botName is the label.
+type ChatpionBotFlow {
+    postbackId: String!
+    botName: String!
+}
+
+type ChatCannedResponse {
+    id: String!
+    title: String!
+    message: String!
+}

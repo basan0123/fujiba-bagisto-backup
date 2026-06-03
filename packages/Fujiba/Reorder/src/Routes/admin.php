@@ -30,6 +30,7 @@ Route::middleware(['web', 'admin', 'auth:admin'])
         // Full-screen pages.
         Route::get('/history', [ReorderController::class, 'historyIndex'])->name('history');
         Route::get('/batches/{id}/edit', [ReorderController::class, 'editBatch'])->name('batches.edit');
+        Route::get('/batches/{id}/export.csv', [ReorderController::class, 'exportBatchCsv'])->name('batches.export-csv');
         Route::get('/batches/{id}/receive', [ReorderController::class, 'receiveScreen'])->name('batches.receive-screen');
 
         // Receive flow: start → save draft → confirm.

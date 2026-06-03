@@ -105,7 +105,11 @@
 body.pos-fullbleed,
 body.pos-fullbleed [class*="min-h-[calc(100vh-62px)]"],
 body.pos-fullbleed .w-full.overflow-x-hidden { overflow: visible !important; }
-#pos-topbar { position: sticky; top: 0; }
+/* Stick BELOW the 62px-tall admin header (which is itself sticky top:0 with a
+   higher z-index). With top:0 the topbar pinned to the same line and was painted
+   behind the header — looked "missing" on iPad while scrolling. !important beats
+   the Tailwind `top-0` utility on the element. */
+#pos-topbar { position: sticky; top: 62px !important; z-index: 40; }
 
 /* ── Mobile (≤768px): compact topbar — smaller fonts/padding so it stays out of the way when pinned ── */
 @media(max-width:768px){
@@ -130,7 +134,7 @@ body.pos-fullbleed .w-full.overflow-x-hidden { overflow: visible !important; }
 @media(min-width:769px){
   .pos-row { padding:12px 12px; }
   .pos-thumb { width:140px !important; height:140px !important; }
-  .pos-row-body { padding-left:16px !important; padding-right:64px !important; }
+  .pos-row-body { padding-left:16px !important; padding-right:16px !important; }
   .pos-corner-toggle { right:8px !important; }
   .pos-corner-chk { right:8px !important; }
 
@@ -523,8 +527,16 @@ window.posSort=function(col){
   applyFilterSort(); renderRows();
 };
 
+// Effective sell price: special_price wins only when it's a positive number.
+// Note special_price arrives as the string "0.0000" when unset, which is
+// truthy in JS — so `special_price || price` would wrongly yield 0. Compare > 0.
+function sellPrice(r){
+  const sp=parseFloat(r.special_price)||0;
+  return sp>0 ? sp : (parseFloat(r.price)||0);
+}
+
 function getRowValue(r){
-  if(mode==='price')    return parseFloat(r.special_price||r.price)||0;
+  if(mode==='price')    return sellPrice(r);
   if(mode==='stock')    return parseInt(r.stock)||0;
   if(mode==='category') return ((r.category_names&&r.category_names[0])||r.category_name||'').toLowerCase();
   if(mode==='brand')    return (r.brand||'').toLowerCase();
@@ -564,8 +576,17 @@ function applyFilterSort(){
 /* ── CHANNEL ── */
 window.posChannelChange=async function(){
   allData=[]; offset=0; ended=false; selected.clear(); updateBulkBar();
-  await loadOptions(); await fetchMore(true);
+  await loadOptions(); await fetchMore(true); await loadAllRemaining();
 };
+
+/* Pull every remaining page sequentially until the backend signals end.
+   Independent of the scroll observer so the grid always loads in full. */
+async function loadAllRemaining(){
+  let guard=0; // hard cap (pages) to avoid any pathological infinite loop
+  while(!ended && !loading && guard++ < 200){
+    await fetchMore(false);
+  }
+}
 
 /* ── FETCH ── */
 async function fetchMore(reset){
@@ -616,7 +637,34 @@ function buildRow(row){
   div.className='pos-row'; div.dataset.id=row.id;
   const active=String(row.status)==='1', stock=parseInt(row.stock)||0, pid=row.id, isSel=selected.has(String(pid));
   let valHTML='';
-  if(mode==='price'){const p=parseFloat(row.special_price||row.price)||0;valHTML=`<span class="pos-val-click pos-ar-under font-bold text-gray-900 dark:text-white" style="font-size:24px;" data-pid="${pid}">¥${p.toLocaleString('ja-JP')}</span>`;}
+  if(mode==='price'){
+    // Inline-editable sell + buy price. Both inputs save on blur / Enter via
+    // pos-price-inline handler — no modal. Sell = product_flat.price, buy =
+    // cost attribute (float_value), shipped to updateInline as `price`/`cost`.
+    const sell=parseFloat(row.price)||0;
+    const buy=parseFloat(row.cost)||0;
+    valHTML=`
+      <div class="pos-price-inline" data-pid="${pid}" style="display:flex;flex-direction:column;gap:4px;align-items:flex-end;">
+        <label style="display:flex;align-items:center;gap:6px;font-size:11px;color:#6b7280;">
+          <span>売</span>
+          <span style="font-size:16px;color:#111827;">¥</span>
+          <input type="number" min="0" step="1" inputmode="decimal"
+                 class="pos-price-input pos-sell-input"
+                 data-pid="${pid}" data-field="price"
+                 value="${sell||''}"
+                 style="width:110px;font-size:20px;font-weight:700;text-align:right;padding:2px 6px;border:1px solid #e5e7eb;border-radius:6px;background:#fff;color:#111827;">
+        </label>
+        <label style="display:flex;align-items:center;gap:6px;font-size:11px;color:#6b7280;">
+          <span>買</span>
+          <span style="font-size:14px;color:#6b7280;">¥</span>
+          <input type="number" min="0" step="1" inputmode="decimal"
+                 class="pos-price-input pos-buy-input"
+                 data-pid="${pid}" data-field="cost"
+                 value="${buy||''}"
+                 style="width:110px;font-size:16px;font-weight:600;text-align:right;padding:2px 6px;border:1px solid #e5e7eb;border-radius:6px;background:#fff;color:#374151;">
+        </label>
+      </div>`;
+  }
   else if(mode==='stock'){const cls=stock===0?'color:#ef4444':'color:#16a34a';valHTML=`<span class="pos-val-click pos-ar-under font-bold" style="${cls};font-size:26px;" data-pid="${pid}">${stock===0?esc(I18N.outShort):stock}</span>`;}
   else if(mode==='weight'){const w=parseFloat(row.weight_kg||row.weight)||0;valHTML=`<span class="pos-val-click pos-ar-under font-bold text-gray-800 dark:text-gray-100" style="font-size:24px;" data-pid="${pid}">${w?w+' kg':'—'}</span>`;}
   else if(mode==='category'){const lbl=(row.category_names&&row.category_names.length)?row.category_names.join(', '):(row.category_name||'—');valHTML=`<span class="pos-cat-click pos-ar-dashed font-semibold text-gray-800 dark:text-gray-100" data-pid="${pid}" title="${esc(lbl)}" style="display:inline-block;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;max-width:100%;font-size:18px;">${esc(lbl)}</span>`;}
@@ -633,12 +681,12 @@ function buildRow(row){
       ${resvBadge}
       ${row.image_url?`<img src="${esc(row.image_url)}" style="width:100%;height:100%;object-fit:cover;" loading="lazy">`:`<div style="width:100%;height:100%;display:flex;align-items:center;justify-content:center;font-size:12px;color:#9ca3af;">N/A</div>`}
     </div>
-    <div class="pos-row-body" style="flex:1;min-width:0;display:flex;flex-direction:column;justify-content:center;padding:0 12px;position:relative;align-self:stretch;">
-      <div class="pos-val-col" style="margin-bottom:4px;line-height:1.1;">${valHTML}</div>
-      <div class="pos-name-click" data-pid="${pid}" style="min-width:0;cursor:pointer;">
+    <div class="pos-row-body" style="flex:1;min-width:0;display:flex;flex-direction:row;align-items:center;gap:12px;justify-content:space-between;padding:0 12px;position:relative;align-self:stretch;">
+      <div class="pos-name-click" data-pid="${pid}" style="flex:1;min-width:0;cursor:pointer;">
         <p style="font-size:15px;font-weight:600;color:#1f2937;word-break:break-word;overflow-wrap:anywhere;" class="dark:text-white">${esc(row.name||'')}</p>
         <p style="font-size:12px;color:#9ca3af;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">${esc(row.sku||'')}</p>
       </div>
+      <div class="pos-val-col" style="flex-shrink:0;max-width:45%;overflow:hidden;text-align:right;line-height:1.1;margin-right:58px;">${valHTML}</div>
       <label class="pos-corner-toggle" style="position:absolute;top:0;right:4px;cursor:pointer;display:flex;align-items:center;">
         <input type="checkbox" class="pos-status-toggle sr-only" data-pid="${pid}" ${active?'checked':''}>
         <div style="width:52px;height:30px;border-radius:15px;background:${toggleBg};position:relative;transition:background .2s;">
@@ -658,6 +706,9 @@ function buildRow(row){
 
 /* ── EVENTS ── */
 document.addEventListener('click',function(e){
+  // Inline price inputs handle themselves — do not let the click bubble to
+  // pos-name-click / openEditPanel, which would re-open the modal.
+  if(e.target.closest('.pos-price-inline')) return;
   const pidToIdx=pid=>filtered.findIndex(r=>String(r.id)===String(pid));
   const resvBadge=e.target.closest('.pm-reserved-corner');
   if(resvBadge){e.stopPropagation();e.preventDefault();if(typeof window.pmShowReservations==='function')window.pmShowReservations(resvBadge.dataset.pid);return;}
@@ -716,19 +767,33 @@ function openEditPanel(idx,field){
 window.posCloseEdit=function(){$('pos-edit-backdrop').classList.add('hidden');$('pos-edit-panel').classList.add('hidden');editIdx=-1;};
 window.posEditNav=function(dir){const field=$('pos-edit-panel').dataset.field;const ni=editIdx+dir;if(ni>=0&&ni<filtered.length){posSaveEdit(false);openEditPanel(ni,field);}};
 window.posSaveEdit=async function(close=true){
-  if(editIdx<0)return;
-  const row=filtered[editIdx];
+  // Snapshot everything up front. On touch devices a stray tap can close the
+  // panel (resetting editIdx to -1) between tapping Save and this running —
+  // which made saves silently no-op. Resolve the target row by id, not index.
+  const idx=editIdx;
+  if(idx<0||idx>=filtered.length){ toast(I18N.saveFailed,'error'); return; }
+  const targetId=filtered[idx].id;
   const field=$('pos-edit-panel').dataset.field;
   const inp=$('pos-edit-input');
+  const val=inp?inp.value:'';
   const payload={};
-  if(field==='name')  {payload.name=inp.value;row.name=inp.value;}
-  if(field==='price') {payload.price=inp.value;row.price=inp.value;}
-  if(field==='stock') {payload.stock=inp.value;row.stock=inp.value;}
-  if(field==='weight'){payload.weight_kg=inp.value;row.weight_kg=inp.value;}
-  const orig=allData.find(r=>r.id==row.id);if(orig)Object.assign(orig,row);
-  try{await persistNow(row.id,payload);toast(I18N.saveSuccess);}catch(e){toast(I18N.saveFailed,'error');}
-  applyFilterSort();renderRows();
-  if(close)posCloseEdit();
+  if(field==='name')  payload.name=val;
+  if(field==='price') payload.price=val;
+  if(field==='stock') payload.stock=val;
+  if(field==='weight')payload.weight_kg=val;
+  if(Object.keys(payload).length===0){ if(close)posCloseEdit(); return; }
+  try{
+    await persistNow(targetId,payload);
+    // Apply to local data only after the server confirms.
+    [allData,filtered].forEach(arr=>{const r=arr.find(x=>x.id==targetId);if(r)Object.assign(r,payload);});
+    toast(I18N.saveSuccess);
+    applyFilterSort();renderRows();
+    if(close)posCloseEdit();
+  }catch(e){
+    const status=e?.response?.status;
+    console.error('[POS] save failed',status,e?.response?.data||e);
+    toast(status?`${I18N.saveFailed} (${status})`:I18N.saveFailed,'error');
+  }
 };
 
 /* ── BULK ── */
@@ -1004,6 +1069,39 @@ document.addEventListener('keydown',function(e){
   if(e.key==='Enter'&&!$('pos-edit-panel').classList.contains('hidden')){e.preventDefault();posSaveEdit();}
 });
 
+/* ── INLINE PRICE EDIT (price mode rows) ── */
+// Save on blur or Enter. Both inputs (sell=price, buy=cost) share one path.
+// Only persist when the value actually changed vs. the row's current value,
+// so passive taps don't generate save traffic.
+async function posInlinePriceSave(inp){
+  const pid=inp.dataset.pid, field=inp.dataset.field;
+  const row=allData.find(r=>String(r.id)===String(pid)); if(!row) return;
+  const raw=inp.value.trim();
+  const num=raw===''?0:parseFloat(raw);
+  if(isNaN(num)||num<0){toast(I18N.invalid,'error');inp.value=parseFloat(row[field])||'';return;}
+  if((parseFloat(row[field])||0)===num) return;
+  inp.disabled=true;
+  try{
+    await persistNow(pid,{[field]:num});
+    row[field]=num;
+    const f=filtered.find(r=>String(r.id)===String(pid)); if(f)f[field]=num;
+    toast(I18N.saveSuccess);
+  }catch(err){
+    console.error('[POS] inline price save failed',err);
+    toast(I18N.saveFailed,'error');
+    inp.value=parseFloat(row[field])||'';
+  }finally{inp.disabled=false;}
+}
+document.addEventListener('change',function(e){
+  const inp=e.target.closest('.pos-price-input'); if(!inp) return;
+  posInlinePriceSave(inp);
+});
+document.addEventListener('keydown',function(e){
+  if(e.key!=='Enter') return;
+  const inp=e.target.closest('.pos-price-input'); if(!inp) return;
+  e.preventDefault(); inp.blur();
+});
+
 /* ── TOAST ── */
 function toast(msg,type){
   const t=document.createElement('div');
@@ -1034,6 +1132,14 @@ async function boot(){
     const svb=$('pos-sort-val-btn');if(svb)svb.textContent=I18N.stock;
     await fetchMore(true);
     setupObserver();
+    // Safety net: keep pulling pages until everything is loaded, in case the
+    // IntersectionObserver never fires (content shorter than viewport, or
+    // certain iPad WebKit builds). Without this the grid could appear to
+    // "stop" partway even though more products exist.
+    await loadAllRemaining();
+    // A scan from another admin page lands here with ?scan=<sku>. Filter to it
+    // and flash-highlight the matching row (same UX as scanning while on POS).
+    applyScanFromUrl();
   }catch(e){
     console.error('[POS] init failed',e);
     showFatal(I18N.initFailed.replace(':message', (e?.message||e)));
@@ -1074,6 +1180,24 @@ function flashRow(pid){
     row.classList.add('bcs-hit');
     setTimeout(()=>row.classList.remove('bcs-hit'), 1600);
   }, 60);
+}
+
+/* A barcode scanned on another admin page redirects here with ?scan=<sku>.
+   Filter the grid to it and highlight the matching row, then strip the param
+   so a manual reload doesn't keep re-filtering. */
+function applyScanFromUrl(){
+  let scan='';
+  try{ scan=new URLSearchParams(window.location.search).get('scan')||''; }catch(_){}
+  if(!scan) return;
+  const searchEl=$('pos-search');
+  if(searchEl){ searchEl.value=scan; }
+  searchQ=scan;
+  applyFilterSort(); renderRows();
+  const hit=allData.find(r=>String(r.sku||'').toLowerCase()===scan.toLowerCase());
+  if(hit) flashRow(String(hit.id));
+  else toast('No product for '+scan,'error');
+  // Clean the URL (keep history entry; just drop the query)
+  try{ window.history.replaceState({}, '', window.location.pathname); }catch(_){}
 }
 
 })();

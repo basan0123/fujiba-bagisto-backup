@@ -92,10 +92,10 @@ class TenantProvisioner
             );
         }
 
-        $posUserId = null;
+        $seed = null;
 
         try {
-            $posUserId = $this->seedTenantContent(
+            $seed = $this->seedTenantContent(
                 $tenant,
                 $storeName,
                 $email,
@@ -111,11 +111,14 @@ class TenantProvisioner
         }
 
         return [
-            'tenant'       => $tenant,
-            'pos_user_id'  => $posUserId,
-            'subdomain'    => $subdomain,
-            'domain'       => $domain,
-            'tenant_id'    => $tenantId,
+            'tenant'              => $tenant,
+            'pos_user_id'         => $seed['pos_user_id'],
+            'channel_id'          => $seed['channel_id'],
+            'inventory_source_id' => $seed['inventory_source_id'],
+            'outlet_id'           => $seed['outlet_id'],
+            'subdomain'           => $subdomain,
+            'domain'              => $domain,
+            'tenant_id'           => $tenantId,
         ];
     }
 
@@ -127,7 +130,11 @@ class TenantProvisioner
      *   - create one pos_outlet
      *   - create one pos_user (role=owner) with the signup credentials
      *
-     * Returns the new pos_user.id.
+     * Returns ['pos_user_id', 'channel_id', 'inventory_source_id', 'outlet_id'].
+     * The channel/inventory ids must travel back to the caller so the gateway
+     * can bake them into the JWT + signup response, exactly as login() does —
+     * a token without channel_id makes ValidatePosJwtTenant fall back to
+     * host/subdomain channel resolution. See [pos-jwt-channel-resolution].
      */
     protected function seedTenantContent(
         Tenant $tenant,
@@ -135,7 +142,7 @@ class TenantProvisioner
         string $email,
         string $passwordPlain,
         ?string $name
-    ): int {
+    ): array {
         $tenant->run(function () use ($storeName, $email, $passwordPlain, $name) {
             // 1. Currency JPY + Locale ja
             $jpyId = $this->ensureCurrency('JPY', '¥');
@@ -256,25 +263,65 @@ class TenantProvisioner
                 'updated_at' => now(),
             ]);
 
-            // Stash the id where the outer closure can grab it.
-            DB::statement("SET @gateway_provisioner_pos_user_id = {$posUserId}");
+            // Stash the ids where the outer closure can grab them. Each ->run()
+            // is its own connection bootstrap but stays in the same MySQL
+            // session, so user-defined session vars survive to the read below.
+            DB::statement("SET @gw_pos_user_id = {$posUserId}");
+            DB::statement('SET @gw_channel_id = ' . ((int) $channelId));
+            DB::statement('SET @gw_inventory_source_id = ' . ((int) $inventorySourceId));
+            DB::statement("SET @gw_outlet_id = {$outletId}");
         });
 
-        // Pull the id back out (set in the same MySQL session inside ->run())
-        $posUserId = $tenant->run(fn () => (int) DB::selectOne('SELECT @gateway_provisioner_pos_user_id AS id')->id);
+        // Pull the ids back out (set in the same MySQL session inside ->run()).
+        $ids = $tenant->run(fn () => DB::selectOne(
+            'SELECT @gw_pos_user_id AS pos_user_id, @gw_channel_id AS channel_id, '
+            . '@gw_inventory_source_id AS inventory_source_id, @gw_outlet_id AS outlet_id'
+        ));
+
+        $posUserId         = (int) ($ids->pos_user_id ?? 0);
+        $channelId         = (int) ($ids->channel_id ?? 0);
+        $inventorySourceId = (int) ($ids->inventory_source_id ?? 0);
+        $outletId          = (int) ($ids->outlet_id ?? 0);
 
         if (! $posUserId) {
-            // Last-resort fallback: query by email
-            $posUserId = (int) ($tenant->run(fn () =>
-                DB::table('pos_users')->where('email', $email)->value('id')
-            ) ?? 0);
+            // Last-resort fallback: query by email (and re-derive the rest).
+            $fallback = $tenant->run(function () use ($email) {
+                $u = DB::table('pos_users')->where('email', $email)->first();
+                if (! $u) {
+                    return null;
+                }
+                $outlet = $u->outlet_id ? DB::table('pos_outlets')->where('id', $u->outlet_id)->first() : null;
+                $invId  = $outlet->inventory_source_id ?? (int) (DB::table('inventory_sources')->value('id') ?? 0);
+                $chId   = (int) (DB::table('channel_inventory_sources')
+                    ->where('inventory_source_id', $invId)
+                    ->value('channel_id') ?? (DB::table('channels')->value('id') ?? 0));
+
+                return [
+                    'pos_user_id'         => (int) $u->id,
+                    'channel_id'          => $chId,
+                    'inventory_source_id' => (int) $invId,
+                    'outlet_id'           => (int) ($u->outlet_id ?? 0),
+                ];
+            });
+
+            if ($fallback) {
+                $posUserId         = $fallback['pos_user_id'];
+                $channelId         = $fallback['channel_id'];
+                $inventorySourceId = $fallback['inventory_source_id'];
+                $outletId          = $fallback['outlet_id'];
+            }
         }
 
         if (! $posUserId) {
             throw new \RuntimeException('pos_user creation succeeded but id was not recoverable.');
         }
 
-        return $posUserId;
+        return [
+            'pos_user_id'         => $posUserId,
+            'channel_id'          => $channelId,
+            'inventory_source_id' => $inventorySourceId,
+            'outlet_id'           => $outletId,
+        ];
     }
 
     protected function ensureCurrency(string $code, string $symbol): int

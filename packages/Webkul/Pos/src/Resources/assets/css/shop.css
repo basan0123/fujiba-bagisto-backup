@@ -97,11 +97,27 @@
         @apply shadow-[0px_2px_16px_0px_#22161614];
     }
 
-    @media (min-width: 1240px) {
+    /*
+     * Reserve grid space for the fixed inline cart. Two tiers, kept in sync
+     * with Cart.vue's w-[...] (default layout) and window.js isMobileOrTab:
+     *   iPad   (≥768px)  → narrow cart  clamp(300px, 38vw, 360px)
+     *   desktop(≥1280px) → full cart    clamp(420px, 30vw, 600px)  (Tailwind `xl`)
+     */
+    @media (min-width: 768px) {
+        [dir="ltr"] .padding-right {
+            padding-right: clamp(300px, 38vw, 360px);
+        }
+
+        [dir="rtl"] .padding-right {
+            padding-left: clamp(300px, 38vw, 360px);
+        }
+    }
+
+    @media (min-width: 1280px) {
         [dir="ltr"] .padding-right {
             padding-right: clamp(420px, 30vw, 600px);
         }
-        
+
         [dir="rtl"] .padding-right {
             padding-left: clamp(420px, 30vw, 600px);
         }

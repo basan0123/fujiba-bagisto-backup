@@ -21,6 +21,7 @@ input updateOutletProductInput {
     quantity: Int
     weight: Float
     taxCategoryId: Int
+    categoryId: Int
     description: String
     shortDescription: String
     status: Boolean

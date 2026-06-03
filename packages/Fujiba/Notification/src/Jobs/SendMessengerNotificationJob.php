@@ -14,7 +14,7 @@ class SendMessengerNotificationJob implements ShouldQueue
 {
     use Dispatchable, InteractsWithQueue, Queueable, SerializesModels;
 
-    public int $tries   = 3;
+    public int $tries   = 5;
 
     public int $backoff = 60;
 
@@ -31,7 +31,27 @@ class SendMessengerNotificationJob implements ShouldQueue
     {
         $log = NotificationLog::find($this->logId);
 
-        if (! $log || $log->status === NotificationLog::STATUS_SENT) {
+        // Row not visible yet. This used to be a silent return — the single
+        // biggest source of lost notifications: when the job was dispatched
+        // from inside OrderRepository's still-open transaction, the worker
+        // raced ahead of the commit, find() returned null, and the alert
+        // vanished with status stuck at 'pending'. after_commit (config/queue.php)
+        // now prevents that at the source, but we NEVER silently drop again:
+        // release the job back to the queue so it retries once the row commits.
+        // Only after $tries attempts (≈5 min of backoff) do we give up — by
+        // then the row is genuinely gone (manually deleted), not just uncommitted.
+        if (! $log) {
+            if ($this->attempts() < $this->tries) {
+                $this->release($this->backoff);
+
+                return;
+            }
+
+            // Exhausted retries with no row — nothing left to send or mark.
+            return;
+        }
+
+        if ($log->status === NotificationLog::STATUS_SENT) {
             return;
         }
 
