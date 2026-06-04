@@ -45,7 +45,7 @@ class DispatchAutoFlowCommand extends Command
             return self::SUCCESS;
         }
 
-        $totals = ['candidates' => 0, 'sent' => 0, 'skipped_dup' => 0, 'skipped_not_new' => 0, 'failed' => 0];
+        $totals = ['candidates' => 0, 'sent' => 0, 'skipped_dup' => 0, 'skipped_not_new' => 0, 'failed' => 0, 'retried' => 0];
 
         foreach ($settings as $setting) {
             $channelTotals = $this->processChannel($setting, $sender, $isDryRun, $limit);
@@ -56,8 +56,8 @@ class DispatchAutoFlowCommand extends Command
 
         $this->line('');
         $this->info(sprintf(
-            'Done. candidates=%d sent=%d skipped_dup=%d skipped_not_new=%d failed=%d%s',
-            $totals['candidates'], $totals['sent'], $totals['skipped_dup'],
+            'Done. candidates=%d sent=%d retried=%d skipped_dup=%d skipped_not_new=%d failed=%d%s',
+            $totals['candidates'], $totals['sent'], $totals['retried'], $totals['skipped_dup'],
             $totals['skipped_not_new'], $totals['failed'],
             $isDryRun ? ' [DRY RUN]' : ''
         ));
@@ -101,7 +101,7 @@ class DispatchAutoFlowCommand extends Command
      */
     protected function processChannel(LiveChatSetting $setting, BotFlowSender $sender, bool $isDryRun, int $limit): array
     {
-        $totals = ['candidates' => 0, 'sent' => 0, 'skipped_dup' => 0, 'skipped_not_new' => 0, 'failed' => 0];
+        $totals = ['candidates' => 0, 'sent' => 0, 'skipped_dup' => 0, 'skipped_not_new' => 0, 'failed' => 0, 'retried' => 0];
 
         $tag = "channel={$setting->channel_id}({$setting->channel_code}) bot={$setting->fb_bot_id}";
 
@@ -189,11 +189,46 @@ class DispatchAutoFlowCommand extends Command
                     'status'           => 'pending',
                 ]);
             } catch (QueryException $e) {
-                if ($this->isDuplicateKey($e)) {
+                if (! $this->isDuplicateKey($e)) {
+                    throw $e;
+                }
+
+                // A row already exists for this (tenant, channel, subscriber, flow).
+                // 'sent' and 'skipped_not_new' are terminal — never retry them.
+                // 'failed' (a transient FB/Graph error) and 'pending' (a previous run
+                // crashed mid-loop before resolving status) ARE retryable: re-run the
+                // fresh-customer check + send IN PLACE on the existing row instead of
+                // skipping. No-migration approach — reusing the row means the UNIQUE
+                // constraint no longer permanently strands a customer after one bad
+                // attempt. Retries continue until the send succeeds (-> 'sent') or the
+                // customer is no longer fresh / drops out of the lookback window.
+                $logRow = AutoFlowDispatchLog::where('tenant_id', $setting->tenant_id)
+                    ->where('channel_id', $setting->channel_id)
+                    ->where('subscriber_id', $subscriberId)
+                    ->where('postback_id', $setting->auto_flow_postback_id)
+                    ->first();
+
+                if (! $logRow || ! in_array($logRow->status, ['failed', 'pending'], true)) {
                     $totals['skipped_dup']++;
                     continue;
                 }
-                throw $e;
+
+                Log::info('DispatchAutoFlow retrying previously-unresolved row', [
+                    'channel_id'    => $setting->channel_id,
+                    'subscriber_id' => $subscriberId,
+                    'prior_status'  => $logRow->status,
+                    'prior_error'   => $logRow->error_message,
+                    'first_seen_at' => optional($logRow->candidate_seen_at)->toDateTimeString(),
+                ]);
+                $this->line("  [retry] subscriber={$subscriberId} prior_status={$logRow->status}");
+                $totals['retried']++;
+
+                // Re-stamp this attempt; reset to pending so a fresh crash is visible.
+                $logRow->update([
+                    'status'            => 'pending',
+                    'fb_thread_id'      => $threadId ?: $logRow->fb_thread_id,
+                    'candidate_seen_at' => Carbon::now(),
+                ]);
             }
 
             try {
@@ -218,6 +253,16 @@ class DispatchAutoFlowCommand extends Command
                     'error_message'  => $isSuccess ? null : ($result['message'] ?? 'unknown'),
                     'dispatched_at'  => Carbon::now(),
                 ]);
+
+                if (! $isSuccess) {
+                    // Leave status='failed' so the next scheduled run picks this row
+                    // back up via the retry path above (UNIQUE dup -> retry in place).
+                    Log::warning('DispatchAutoFlow send failed — will retry on next run', [
+                        'channel_id'    => $setting->channel_id,
+                        'subscriber_id' => $subscriberId,
+                        'message'       => $result['message'] ?? 'unknown',
+                    ]);
+                }
 
                 $isSuccess ? $totals['sent']++ : $totals['failed']++;
             } catch (\Throwable $e) {
