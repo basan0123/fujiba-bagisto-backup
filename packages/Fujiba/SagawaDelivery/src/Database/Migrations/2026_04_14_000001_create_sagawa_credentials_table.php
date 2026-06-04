@@ -18,6 +18,10 @@ return new class extends Migration
 
     public function up(): void
     {
+        if (Schema::connection($this->getConnection())->hasTable('sagawa_credentials')) {
+            return;
+        }
+
         Schema::connection($this->getConnection())->create('sagawa_credentials', function (Blueprint $table) {
             $table->id();
             $table->string('tenant_id')->index();
@@ -41,6 +45,20 @@ return new class extends Migration
             $table->string('sender_phone')->default('');
 
             $table->boolean('enabled')->default(false);
+
+            // daibikiType: '0' どちらでも | '1' 現金 | '2' カード/Jデビット | null=システム設定
+            // (folded in from add_daibiki_columns; that migration is hasColumn-guarded so it no-ops)
+            $table->string('daibiki_payment_type', 1)->nullable();
+
+            // Per-channel toggles + support contact (folded in from expand_sagawa_credentials,
+            // which is already recorded as "run" on existing tenants and will NOT re-run).
+            $table->boolean('use_sagawa_rate')->default(false);
+            $table->unsignedSmallInteger('priority')->default(20);
+            $table->unsignedSmallInteger('preparation_days')->default(1);
+            $table->string('support_phone')->default('');
+            $table->string('support_hours')->default('');
+            $table->string('support_branch')->default('');
+
             $table->timestamps();
 
             $table->unique(['tenant_id', 'channel_id']);

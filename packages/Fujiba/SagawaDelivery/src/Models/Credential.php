@@ -30,7 +30,7 @@ class Credential extends Model
         'preparation_days' => 'integer',
     ];
 
-    protected $connection = 'mysql';
+    // No connection override — lives on the tenant DB; follow the current tenant connection.
 
     protected function apiCustomerId(): Attribute
     {

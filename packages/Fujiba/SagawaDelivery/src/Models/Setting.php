@@ -8,7 +8,7 @@ class Setting extends Model
 {
     protected $table = 'sagawa_shipping_settings';
 
-    protected $connection = 'mysql';
+    // No connection override — lives on the tenant DB; follow the current tenant connection.
 
     protected $fillable = [
         'tenant_id', 'channel_id', 'channel_code',

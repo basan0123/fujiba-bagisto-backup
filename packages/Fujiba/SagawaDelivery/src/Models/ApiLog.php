@@ -8,7 +8,7 @@ class ApiLog extends Model
 {
     protected $table = 'sagawa_api_logs';
 
-    protected $connection = 'mysql';
+    // No connection override — lives on the tenant DB; follow the current tenant connection.
 
     protected $fillable = [
         'tenant_id',

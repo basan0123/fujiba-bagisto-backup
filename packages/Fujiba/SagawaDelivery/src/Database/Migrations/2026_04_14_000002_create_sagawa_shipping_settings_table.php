@@ -17,6 +17,10 @@ return new class extends Migration
 
     public function up(): void
     {
+        if (Schema::connection($this->getConnection())->hasTable('sagawa_shipping_settings')) {
+            return;
+        }
+
         Schema::connection($this->getConnection())->create('sagawa_shipping_settings', function (Blueprint $table) {
             $table->id();
             $table->string('tenant_id')->index();
