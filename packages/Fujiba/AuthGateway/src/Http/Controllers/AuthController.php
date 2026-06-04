@@ -365,7 +365,12 @@ class AuthController extends Controller
             return response()->json(['error' => 'invalid_token', 'message' => $e->getMessage()], 401);
         }
 
-        $userId = $claims['sub'] ?? null;
+        // The gateway user is identified by the `gateway_user_id` claim, NOT
+        // `sub`. `sub` is the tenant-side pos_users.id (the auth:pos guard's key
+        // — see issueToken()), so looking up gateway_users by `sub` returned
+        // user_not_found for every gateway-issued token. Fall back to `sub`
+        // only for any legacy token that predates the gateway_user_id claim.
+        $userId = $claims['gateway_user_id'] ?? $claims['sub'] ?? null;
         if (! $userId) {
             return response()->json(['error' => 'invalid_token'], 401);
         }

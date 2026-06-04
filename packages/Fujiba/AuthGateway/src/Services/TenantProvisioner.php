@@ -150,14 +150,44 @@ class TenantProvisioner
 
             // 2. Channel update — master template ships with code='default',
             //    USD currency, en locale.
-            DB::table('channels')->where('code', 'default')->update([
-                'base_currency_id'  => $jpyId,
-                'default_locale_id' => $jaId,
-                'hostname'          => null, // tenancy resolves via domains table
-                'updated_at'        => now(),
-            ]);
+            //
+            // BUG #2 GUARD: the whole flow hard-depends on the template carrying
+            // a code='default' channel. If a future template rebuild/restore
+            // drops it (this has happened — see the locale-migration dump that
+            // reverted central rows), update() silently affects 0 rows, ->value()
+            // returns null, and every downstream insert (translations, pivots,
+            // outlet, the JWT channel_id claim) goes null → the new shop comes up
+            // channel-null and getCurrentChannel()/LocaleMiddleware 500s. So:
+            // CREATE the default channel if it's absent rather than failing.
+            $existingChannelId = DB::table('channels')->where('code', 'default')->value('id');
 
-            $channelId = DB::table('channels')->where('code', 'default')->value('id');
+            if (! $existingChannelId) {
+                $channelId = DB::table('channels')->insertGetId([
+                    'code'              => 'default',
+                    'theme'             => null,
+                    'base_currency_id'  => $jpyId,
+                    'default_locale_id' => $jaId,
+                    'root_category_id'  => DB::table('categories')->min('id') ?? 1,
+                    'hostname'          => null,
+                    'created_at'        => now(),
+                    'updated_at'        => now(),
+                ]);
+            } else {
+                DB::table('channels')->where('code', 'default')->update([
+                    'base_currency_id'  => $jpyId,
+                    'default_locale_id' => $jaId,
+                    'hostname'          => null, // tenancy resolves via domains table
+                    'updated_at'        => now(),
+                ]);
+                $channelId = $existingChannelId;
+            }
+
+            if (! $channelId) {
+                // Belt-and-suspenders: never let a null channel id propagate.
+                throw new \RuntimeException(
+                    'tenant_seed: default channel could not be resolved or created'
+                );
+            }
 
             // Channel translation (the merchant-facing name)
             DB::table('channel_translations')
@@ -239,9 +269,18 @@ class TenantProvisioner
             );
 
             // 5. Pos outlet
+            //
+            // BUG #1 FIX: pin the outlet to the channel explicitly. The
+            // channel_id column exists on new tenants (the Webkul/Pos migration
+            // runs via tenants:migrate before this seed) and $channelId is in
+            // scope. Without it, POS login falls back to the
+            // channel_inventory_sources pivot — works for a single-channel shop
+            // by luck, but it is the exact ambiguity behind the "wrong outlet"
+            // class of bug the REST-JWT redesign was meant to kill.
             $outletId = DB::table('pos_outlets')->insertGetId([
                 'name'                => $storeName,
                 'email'               => $email,
+                'channel_id'          => $channelId,
                 'inventory_source_id' => $inventorySourceId,
                 'country'             => 'JP',
                 'status'              => 1,
@@ -316,12 +355,87 @@ class TenantProvisioner
             throw new \RuntimeException('pos_user creation succeeded but id was not recoverable.');
         }
 
+        // BUG #3 FIX — write the central user_channel_map row at signup.
+        //
+        // The per-tenant REST /api/v1/pos/login fast-path resolves the tenant by
+        // looking up the email in the central user_channel_map. seedTenantContent
+        // creates the pos_user via raw DB::table()->insertGetId(), which bypasses
+        // PosUserObserver, so the map row was never written — the owner's first
+        // login fell back to scanning every tenant DB (slow, O(tenants)). This
+        // mirrors BackfillPosUserChannelMap::processTenant() so a new signup
+        // never needs the backfill. Idempotent (updateOrInsert).
+        try {
+            $this->writeUserChannelMap(
+                $tenant,
+                $email,
+                $name,
+                $passwordPlain,
+                $channelId,
+                $inventorySourceId
+            );
+        } catch (\Throwable $e) {
+            // Non-fatal: login still works via the tenant-scan fallback, and the
+            // backfill command can repair it later. Don't fail the whole signup
+            // over the fast-path cache row.
+            Log::warning('[AuthGateway] user_channel_map write failed at signup', [
+                'email'   => $email,
+                'tenant'  => (string) $tenant->id,
+                'message' => $e->getMessage(),
+            ]);
+        }
+
         return [
             'pos_user_id'         => $posUserId,
             'channel_id'          => $channelId,
             'inventory_source_id' => $inventorySourceId,
             'outlet_id'           => $outletId,
         ];
+    }
+
+    /**
+     * Upsert the central user_channel_map row for a freshly-provisioned owner.
+     *
+     * Lives on the central (`mysql`) connection. Mirrors
+     * App\Console\Commands\BackfillPosUserChannelMap::processTenant():
+     *   - firstOrCreate the central App\Models\User by email (reusing the
+     *     pos_user password hash so credentials line up), then
+     *   - updateOrInsert the user_channel_map keyed on (user_id, channel_id).
+     */
+    protected function writeUserChannelMap(
+        Tenant $tenant,
+        string $email,
+        ?string $name,
+        string $passwordPlain,
+        int $channelId,
+        int $inventorySourceId
+    ): void {
+        // Reuse the pos_user's stored hash so the central user mirrors it; if it
+        // can't be read for any reason, hash the plain password we already hold.
+        $posUserHash = $tenant->run(
+            fn () => DB::table('pos_users')->where('email', $email)->value('password')
+        );
+
+        $centralUser = \App\Models\User::firstOrCreate(
+            ['email' => $email],
+            [
+                'name'     => $name ?: $email,
+                'password' => $posUserHash ?: Hash::make($passwordPlain),
+            ]
+        );
+
+        \App\Models\UserChannelMap::on('mysql')->updateOrInsert(
+            [
+                'user_id'    => $centralUser->id,
+                'channel_id' => $channelId,
+            ],
+            [
+                'tenant_id'           => (string) $tenant->id,
+                'inventory_source_id' => $inventorySourceId ?: null,
+                'is_active'           => true,
+                'updated_at'          => now(),
+                'created_at'          => DB::raw('IFNULL(created_at, NOW())'),
+            ]
+        );
     }
 
     protected function ensureCurrency(string $code, string $symbol): int

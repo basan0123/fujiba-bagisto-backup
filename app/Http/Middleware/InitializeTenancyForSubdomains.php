@@ -122,6 +122,15 @@ class InitializeTenancyForSubdomains
         // Path prefixes that legitimately exist on the central domain. Any
         // request matching one of these is dispatched normally.
         $allowedPrefixes = [
+            // Central auth gateway (signup/login/logout/me/forgot-password/health).
+            // These routes are registered by Fujiba\AuthGateway on the gateway
+            // domains (snssale.com etc., a SUBSET of central_domains) and MUST
+            // resolve here — signup CREATES the tenant, so it cannot fall back to
+            // a per-tenant endpoint. Without this entry guardCentralDomain() emits
+            // the branded "Shop not found" 404 before the gateway routes dispatch
+            // (global middleware runs before route matching). See
+            // packages/Fujiba/AuthGateway/routes/api.php.
+            'api/auth',
             'superadmin',
             'storage',
             'language',
