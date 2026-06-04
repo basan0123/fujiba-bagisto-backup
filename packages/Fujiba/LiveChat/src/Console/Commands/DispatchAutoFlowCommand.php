@@ -39,6 +39,12 @@ class DispatchAutoFlowCommand extends Command
         $isDryRun = (bool) $this->option('dry-run');
         $limit    = max(1, (int) $this->option('limit'));
 
+        // Config-drift guard: warn loudly if a channel that operators expect to
+        // have auto-flow enabled is found disabled/misconfigured. Runs BEFORE
+        // resolveTargets() so it still fires on the "No matching channels found"
+        // path — the exact silent-revert symptom from the 2026-05 cutover restore.
+        $this->warnOnUnexpectedlyDisabledChannels();
+
         $settings = $this->resolveTargets();
         if ($settings->isEmpty()) {
             $this->info('No matching channels found.');
@@ -92,6 +98,63 @@ class DispatchAutoFlowCommand extends Command
         return LiveChatSetting::where('tenant_id', $tenant)
             ->where('channel_id', (int) $channel)
             ->get();
+    }
+
+    /**
+     * Config-drift guard.
+     *
+     * Compares the operator-declared allowlist (config fujiba_livechat
+     * .auto_flow_expected_channels, env LIVECHAT_AUTOFLOW_EXPECTED) against the
+     * live livechat_settings rows and Log::warning()s for any expected channel
+     * that is missing, has auto_flow_enabled=false, or has an empty postback_id.
+     *
+     * Motivation: a stale pre-feature DB dump restored over the 2026-05 cutover
+     * silently reset auto_flow_enabled to its 0 default; the dispatcher merely
+     * logged "No matching channels found" and exited SUCCESS, so a live feature
+     * went dark with no signal. This makes that failure mode loud. Heuristic
+     * only — does not modify data. Skipped for targeted (--tenant/--channel)
+     * runs, which intentionally scope to a single channel.
+     */
+    protected function warnOnUnexpectedlyDisabledChannels(): void
+    {
+        if (! $this->option('all')) {
+            return;
+        }
+
+        $expected = (array) config('fujiba_livechat.auto_flow_expected_channels', []);
+        if (empty($expected)) {
+            return;
+        }
+
+        $byCode = LiveChatSetting::whereIn('channel_code', $expected)
+            ->get()
+            ->keyBy('channel_code');
+
+        foreach ($expected as $code) {
+            $setting = $byCode->get($code);
+
+            if (! $setting) {
+                $reason = 'no livechat_settings row';
+            } elseif (! $setting->auto_flow_enabled) {
+                $reason = 'auto_flow_enabled=false';
+            } elseif (empty($setting->auto_flow_postback_id)) {
+                $reason = 'auto_flow_postback_id empty';
+            } else {
+                continue; // healthy
+            }
+
+            $msg = "Auto-flow config drift: expected channel '{$code}' is not dispatch-ready ({$reason}). "
+                 . 'A live new-customer greeting flow may be silently OFF — check '
+                 . '/admin/fujiba-livechat/settings after any DB restore/cutover.';
+
+            Log::warning('DispatchAutoFlow config drift detected', [
+                'channel_code' => $code,
+                'reason'       => $reason,
+                'tenant_id'    => $setting->tenant_id ?? null,
+                'channel_id'   => $setting->channel_id ?? null,
+            ]);
+            $this->warn("[config-drift] {$msg}");
+        }
     }
 
     /**
