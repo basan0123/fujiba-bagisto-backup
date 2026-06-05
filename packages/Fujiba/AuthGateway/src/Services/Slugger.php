@@ -20,6 +20,10 @@ class Slugger
     {
         $slug = Str::ascii($storeName);
         $slug = strtolower($slug);
+        // Spaces are REMOVED (not dashed): "My Shop" → "myshop". Other
+        // punctuation still collapses to a single dash so unrelated tokens
+        // stay readable ("Tom's & Jerry" → "toms-jerry").
+        $slug = preg_replace('/\s+/', '', $slug);
         $slug = preg_replace('/[^a-z0-9]+/', '-', $slug);
         $slug = trim($slug, '-');
 
