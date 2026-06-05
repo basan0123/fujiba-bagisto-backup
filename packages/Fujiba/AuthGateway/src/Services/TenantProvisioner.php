@@ -302,6 +302,32 @@ class TenantProvisioner
                 'updated_at' => now(),
             ]);
 
+            // 7. Admin-panel user — so the owner can sign in to /admin with the
+            //    SAME credentials as the POS. The cloned template already ships
+            //    the `admins` table + an Administrator role (perm='all'); we
+            //    reuse that role (fall back to the first role / id 1) and upsert
+            //    by email so re-provisioning never duplicates. The template's
+            //    default admin@example.com row is left in place. Admin login is
+            //    a standard Laravel guard('admin')->attempt() (bcrypt) gated on
+            //    status, so a Hash::make password with status=1 works directly.
+            $adminRoleId = (int) (
+                DB::table('roles')->where('permission_type', 'all')->value('id')
+                ?? DB::table('roles')->min('id')
+                ?? 1
+            );
+
+            DB::table('admins')->updateOrInsert(
+                ['email' => $email],
+                [
+                    'name'       => $name ?: 'Owner',
+                    'password'   => Hash::make($passwordPlain),
+                    'role_id'    => $adminRoleId,
+                    'status'     => 1,
+                    'updated_at' => now(),
+                    'created_at' => now(),
+                ]
+            );
+
             // Stash the ids where the outer closure can grab them. Each ->run()
             // is its own connection bootstrap but stays in the same MySQL
             // session, so user-defined session vars survive to the read below.
