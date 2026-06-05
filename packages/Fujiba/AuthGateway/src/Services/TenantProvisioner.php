@@ -328,6 +328,86 @@ class TenantProvisioner
                 ]
             );
 
+            // 8. Demo catalog wiring. The master template ships a small demo
+            //    catalog (DEMO-* products) so a new shop isn't empty. But two
+            //    things must be done PER TENANT for those products to actually
+            //    sell in the POS:
+            //
+            //    (a) product_flat carries only the template's `en`/`default`
+            //        rows. This tenant runs locale `ja` (set above), and the POS
+            //        getOutletProducts join filters product_flat on the requested
+            //        locale — so without a `ja` flat row the grid shows null
+            //        name/price. Re-run the flat + price indexers now (tenant
+            //        context) to flatten for every channel locale.
+            //
+            //    (b) the POS catalog joins through pos_outlet_product; a product
+            //        with no row there is invisible to the POS even though it's
+            //        on the storefront. The AutoAssignOutletProduct listener only
+            //        fires on catalog.product.create.after — these products were
+            //        created in the template, not here, so link them explicitly.
+            $now = now();
+            $productIds = DB::table('products')->whereNull('parent_id')->pluck('id');
+            foreach ($productIds as $pid) {
+                DB::table('pos_outlet_product')->updateOrInsert(
+                    ['outlet_id' => $outletId, 'product_id' => $pid],
+                    ['status' => 1, 'created_at' => $now, 'updated_at' => $now]
+                );
+            }
+
+            // The demo products' `name` (a per-locale attribute) exists only in
+            // `en` from the template. This tenant runs `ja`, so the ja flat row
+            // would carry a NULL name. Seed a `ja` name value for each demo
+            // product (Japanese where known, else copy the en value) so the POS
+            // (locale=ja) shows a proper name. Idempotent via updateOrInsert.
+            $nameAttrId = DB::table('attributes')->where('code', 'name')->value('id');
+            if ($nameAttrId) {
+                $jaNames = [
+                    'DEMO-WATER-500' => 'ミネラルウォーター 500ml',
+                    'DEMO-GREENTEA'  => '緑茶（ボトル）',
+                    'DEMO-ONIGIRI'   => 'おにぎり',
+                    'DEMO-BENTO'     => '弁当',
+                    'DEMO-COFFEE'    => 'ホットコーヒー',
+                    'DEMO-CHOCO'     => 'チョコレートバー',
+                ];
+                $demoProducts = DB::table('products')
+                    ->whereNull('parent_id')
+                    ->where('sku', 'like', 'DEMO-%')
+                    ->get(['id', 'sku']);
+
+                foreach ($demoProducts as $dp) {
+                    // Fall back to the en value if the SKU isn't in the map.
+                    $enName = DB::table('product_attribute_values')
+                        ->where('product_id', $dp->id)
+                        ->where('attribute_id', $nameAttrId)
+                        ->where('locale', 'en')
+                        ->value('text_value');
+
+                    $jaName = $jaNames[$dp->sku] ?? $enName;
+                    if ($jaName === null) {
+                        continue;
+                    }
+
+                    DB::table('product_attribute_values')->updateOrInsert(
+                        [
+                            'product_id'   => $dp->id,
+                            'attribute_id' => $nameAttrId,
+                            'channel'      => null,
+                            'locale'       => 'ja',
+                        ],
+                        ['text_value' => $jaName]
+                    );
+                }
+            }
+
+            try {
+                app(\Webkul\Product\Helpers\Indexers\Flat::class)->reindexFull();
+                app(\Webkul\Product\Helpers\Indexers\Price::class)->reindexFull();
+            } catch (\Throwable $e) {
+                // Never fail provisioning over a reindex — the products still
+                // exist and a later indexer:index run will flatten them.
+                \Log::warning('tenant_seed: demo-product reindex failed: '.$e->getMessage());
+            }
+
             // Stash the ids where the outer closure can grab them. Each ->run()
             // is its own connection bootstrap but stays in the same MySQL
             // session, so user-defined session vars survive to the read below.
