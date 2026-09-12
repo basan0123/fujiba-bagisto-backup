@@ -120,10 +120,12 @@
             "Fujiba\\AdminSecurity\\": "packages/Fujiba/AdminSecurity/src",
             "Fujiba\\CatalogAdmin\\": "packages/Fujiba/CatalogAdmin/src",
             "Fujiba\\FacebookCatalog\\": "packages/Fujiba/FacebookCatalog/src",
+            "Fujiba\\AutoPoster\\": "packages/Fujiba/AutoPoster/src",
             "Fujiba\\MessengerBridge\\": "packages/Fujiba/MessengerBridge/src",
             "Fujiba\\Accounting\\": "packages/Fujiba/Accounting/src",
             "Fujiba\\AuthGateway\\": "packages/Fujiba/AuthGateway/src",
             "Fujiba\\CustomerRanks\\": "packages/Fujiba/CustomerRanks/src",
+            "Fujiba\\KimonoPromo\\": "packages/Fujiba/KimonoPromo/src",
             "Modules\\": "packages/"
         }
     },

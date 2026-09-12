@@ -98,6 +98,19 @@ return Application::configure(basePath: dirname(__DIR__))
             ->name('revoke-expired-customer-displays')
             ->withoutOverlapping();
 
+        // Catalog-rule price index lives in tenant DBs. catalog_rule_product_prices
+        // stores one row per (product, rule_date); the cart's qty>1 path looks up
+        // the row for rule_date=today, so the window must be rolled forward daily or
+        // discounted prices silently revert to full price the next day (the mmfood
+        // 25%-off bug, 2026-06-06). The package's own schedule (CatalogRuleService
+        // Provider dailyAt 00:01) only runs in the CENTRAL context and never reaches
+        // tenant DBs, so wrap product:price-rule:index via tenants:run here.
+        $schedule->command('tenants:run', ['product:price-rule:index'])
+            ->dailyAt('00:05')
+            ->onOneServer()
+            ->name('reindex-catalog-rule-prices')
+            ->withoutOverlapping();
+
         // === TikTok Shop schedules ===
         // Per master prompt §6: each closure sweeps tenants via chunkById(50)
         // and dispatches one job per tenant. NEVER iterate tenants inside a
@@ -120,6 +133,38 @@ return Application::configure(basePath: dirname(__DIR__))
                 $tenants->each(fn ($t) => \Fujiba\TikTokShop\Jobs\RefreshTikTokTokens::dispatch((string) $t->id)->onQueue('tiktok'));
             });
         })->everyThirtyMinutes()->name('tiktok-refresh-tokens')->withoutOverlapping();
+
+        // === Facebook Auto Poster (Fujiba\AutoPoster) ===
+        // Gated on config('autoposter.schedule_enabled'), default FALSE. The
+        // per-channel autoposter_settings.auto_posting_enabled flag is the
+        // admin-facing switch; this env gate is the operator's kill switch for
+        // ALL tenants at once, so a runaway poster can be stopped without
+        // editing any tenant's settings. Both must be on for anything to post.
+        //
+        // Wrapped in tenants:run because the scheduler itself runs on the
+        // CENTRAL database — the queue and settings tables are tenant-only.
+        if (config('autoposter.schedule_enabled')) {
+            // Plan: top up today's remaining slots. Idempotent per slot, so an
+            // hourly cadence just fills gaps rather than stacking duplicates.
+            $schedule->command('tenants:run', ['autoposter:plan'])
+                ->hourly()
+                ->onOneServer()
+                ->name('autoposter-plan')
+                ->withoutOverlapping(30)
+                ->runInBackground()
+                ->appendOutputTo(storage_path('logs/autoposter-plan.log'));
+
+            // Dispatch: publish anything due. Every five minutes keeps posts
+            // close to their scheduled minute without hammering Graph; the
+            // atomic claim makes overlapping runs harmless anyway.
+            $schedule->command('tenants:run', ['autoposter:dispatch'])
+                ->everyFiveMinutes()
+                ->onOneServer()
+                ->name('autoposter-dispatch')
+                ->withoutOverlapping(10)
+                ->runInBackground()
+                ->appendOutputTo(storage_path('logs/autoposter-dispatch.log'));
+        }
 
         // SSL auto-renew: daily refresh of cert status + renew anything < 30 days to expiry.
         // Runs in central context (no tenants:run wrapper) since it walks the
