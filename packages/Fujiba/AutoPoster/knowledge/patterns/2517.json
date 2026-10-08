@@ -1,0 +1,107 @@
+{
+  "sku": "KIMONO-3091",
+  "name": "FV-61-C",
+  "closeup": {
+    "image": "product/2517/product_1_1765752090558422.jpg",
+    "box": [
+      0,
+      0,
+      800,
+      800
+    ]
+  },
+  "motifs": [
+    {
+      "en": "peacock",
+      "ja": "孔雀",
+      "grade": "A"
+    },
+    {
+      "en": "chrysanthemum (blue, large)",
+      "ja": "菊",
+      "grade": "A"
+    },
+    {
+      "en": "peony (pink/red)",
+      "ja": "牡丹",
+      "grade": "A"
+    },
+    {
+      "en": "wisteria",
+      "ja": "藤",
+      "grade": "A"
+    }
+  ],
+  "pattern": {
+    "category": "開花 Kaika print — peacock and flowers",
+    "repeat": "large tossed",
+    "scale": "large (peacock ~25 cm)",
+    "background": "black (measured)",
+    "texture": "cotton 細布, gold metallic",
+    "metallic": "gold (A)"
+  },
+  "meanings": [
+    {
+      "motif": "孔雀 peacock",
+      "claim": "beauty and elegance; in Buddhist art protection (Kujaku Myō-ō)",
+      "grade": "B",
+      "source": "widely documented Japanese motif symbolism (e.g. Japan National Tourism Org. / kimono-pattern references); verify before stating as fact"
+    },
+    {
+      "motif": "菊 chrysanthemum",
+      "claim": "longevity; autumn flower; emblem associated with the Japanese imperial family",
+      "grade": "B",
+      "source": "widely documented Japanese motif symbolism (e.g. Japan National Tourism Org. / kimono-pattern references); verify before stating as fact"
+    },
+    {
+      "motif": "牡丹 peony",
+      "claim": "\"king of flowers\" — prosperity, nobility",
+      "grade": "B",
+      "source": "widely documented Japanese motif symbolism (e.g. Japan National Tourism Org. / kimono-pattern references); verify before stating as fact"
+    },
+    {
+      "motif": "藤 wisteria",
+      "claim": "spring (Apr–May) flower; grace",
+      "grade": "B",
+      "source": "widely documented Japanese motif symbolism (e.g. Japan National Tourism Org. / kimono-pattern references); verify before stating as fact"
+    }
+  ],
+  "seasons": [
+    "spring cue (wisteria) but sold all-season"
+  ],
+  "occasions": [
+    {
+      "occasion": "party / wedding guest outfit — most dramatic of the five",
+      "grade": "C"
+    },
+    {
+      "occasion": "gift for mother/family in Myanmar (htamein / longyi fabric)",
+      "grade": "C",
+      "note": "marketing angle from our audience; not a cultural fact about the motif"
+    },
+    {
+      "occasion": "gift for family in Nepal (kurta/sari blouse, Dashain/Tihar gift)",
+      "grade": "C",
+      "note": "marketing angle"
+    }
+  ],
+  "fingerprint": "Black ground; blue-green peacock with gold detailing; large blue chrysanthemum; pink-red peonies; purple wisteria; gold accents. Peacock must stay whole in hero crops.",
+  "photo_needs": [
+    "Only one 800x800 photo — too small for 1080x1920 close-ups; shoot a full-res flat photo."
+  ],
+  "hooks": {
+    "en": [
+      "The peacock: Japan's bird of beauty, in gold and jewel colours."
+    ],
+    "ja": [
+      "金彩の孔雀と藤、宝石のような色合い。"
+    ],
+    "my": [
+      "ရွှေရောင် ဒေါင်းနဲ့ ပန်းတွေ — ပွဲတက်ဝတ်စုံအတွက် အကောင်းဆုံး"
+    ],
+    "ne": [
+      "सुनौलो मयूर र फूलहरू — पार्टीको लागि उत्तम कपडा"
+    ]
+  },
+  "product_id": 2517
+}

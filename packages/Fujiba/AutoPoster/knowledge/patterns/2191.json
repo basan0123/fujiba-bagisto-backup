@@ -1,0 +1,106 @@
+{
+  "sku": "KIMONO-2765",
+  "name": "FV-59-A",
+  "closeup": {
+    "image": "product/2191/CNwFZRoKDv1XyavopcVhcr4Uqi5S4hcOez0Drq80.jpg",
+    "box": [
+      0,
+      0,
+      1496,
+      2000
+    ],
+    "focus": [
+      440,
+      560,
+      440,
+      440
+    ]
+  },
+  "motifs": [
+    {
+      "en": "dragons",
+      "ja": "龍",
+      "grade": "A"
+    },
+    {
+      "en": "crashing waves",
+      "ja": "荒波",
+      "grade": "A"
+    },
+    {
+      "en": "clouds",
+      "ja": "雲",
+      "grade": "A"
+    },
+    {
+      "en": "flower roundels (chrysanthemum, plum)",
+      "ja": "花丸紋",
+      "grade": "A"
+    }
+  ],
+  "pattern": {
+    "category": "開花 Kaika print — rising dragons and waves",
+    "repeat": "vertical/diagonal all-over",
+    "scale": "large (dragons span ~25 cm)",
+    "background": "navy blue (measured)",
+    "texture": "cotton 細布, gold outlines",
+    "metallic": "gold outlines (A)"
+  },
+  "meanings": [
+    {
+      "motif": "龍 dragon",
+      "claim": "power, protection; rises with clouds and water",
+      "grade": "B",
+      "source": "widely documented Japanese motif symbolism (e.g. Japan National Tourism Org. / kimono-pattern references); verify before stating as fact"
+    },
+    {
+      "motif": "波 waves",
+      "claim": "strength and endless movement",
+      "grade": "B",
+      "source": "widely documented Japanese motif symbolism (e.g. Japan National Tourism Org. / kimono-pattern references); verify before stating as fact"
+    },
+    {
+      "motif": "菊 chrysanthemum",
+      "claim": "longevity; autumn flower; emblem associated with the Japanese imperial family",
+      "grade": "B",
+      "source": "widely documented Japanese motif symbolism (e.g. Japan National Tourism Org. / kimono-pattern references); verify before stating as fact"
+    }
+  ],
+  "seasons": [
+    "all-season"
+  ],
+  "occasions": [
+    {
+      "occasion": "gift for brother/son/husband — bold, masculine-leaning print",
+      "grade": "C"
+    },
+    {
+      "occasion": "gift for mother/family in Myanmar (htamein / longyi fabric)",
+      "grade": "C",
+      "note": "marketing angle from our audience; not a cultural fact about the motif"
+    },
+    {
+      "occasion": "gift for family in Nepal (kurta/sari blouse, Dashain/Tihar gift)",
+      "grade": "C",
+      "note": "marketing angle"
+    }
+  ],
+  "fingerprint": "Navy ground; grey-blue dragons with gold outlines among white-blue waves and white clouds; round flower medallions in orange/gold. Dragon faces and wave crests must stay intact; never crop a dragon head in half on close-ups.",
+  "photo_needs": [],
+  "hooks": {
+    "en": [
+      "A dragon rising through the waves — power you can wear.",
+      "Bold enough for him, beautiful enough for everyone."
+    ],
+    "ja": [
+      "荒波を昇る龍。力強い和柄。"
+    ],
+    "my": [
+      "လှိုင်းထဲက ထွက်လာတဲ့ နဂါး — ခွန်အားပြည့် ဂျပန်ပိတ်စ"
+    ],
+    "ne": [
+      "छालबाट उठ्दै गरेको ड्रागन — शक्तिको प्रतीक जापानी कपडा"
+    ]
+  },
+  "product_id": 2191
+}

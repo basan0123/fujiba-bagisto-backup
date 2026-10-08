@@ -1,0 +1,129 @@
+{
+  "sku": "KIMONO-2562",
+  "name": "FV-10-A",
+  "closeup": {
+    "image": "product/1988/FV-10-A.jpeg",
+    "box": [
+      90,
+      0,
+      510,
+      860
+    ]
+  },
+  "motifs": [
+    {
+      "en": "ukiyo-e beauties in kimono (bijin-ga)",
+      "ja": "美人画",
+      "grade": "A"
+    },
+    {
+      "en": "folding fans",
+      "ja": "扇",
+      "grade": "A"
+    },
+    {
+      "en": "peony",
+      "ja": "牡丹",
+      "grade": "A"
+    },
+    {
+      "en": "cherry blossom",
+      "ja": "桜",
+      "grade": "A"
+    },
+    {
+      "en": "crane",
+      "ja": "鶴",
+      "grade": "A"
+    },
+    {
+      "en": "diamond lattice",
+      "ja": "菱",
+      "grade": "A"
+    },
+    {
+      "en": "hexagon (tortoise-shell)",
+      "ja": "亀甲",
+      "grade": "A"
+    },
+    {
+      "en": "scallop waves",
+      "ja": "青海波",
+      "grade": "A",
+      "note": "small gold areas"
+    }
+  ],
+  "pattern": {
+    "category": "開花 Kaika print — ukiyo-e panel collage",
+    "repeat": "all-over patchwork of panels",
+    "scale": "large (figures ~15–20 cm)",
+    "background": "black with gold, sky-blue and purple panels",
+    "texture": "cotton 細布, gold metallic print",
+    "metallic": "gold (A)"
+  },
+  "meanings": [
+    {
+      "motif": "牡丹 peony",
+      "claim": "\"king of flowers\" — prosperity, nobility",
+      "grade": "B",
+      "source": "widely documented Japanese motif symbolism (e.g. Japan National Tourism Org. / kimono-pattern references); verify before stating as fact"
+    },
+    {
+      "motif": "鶴 crane",
+      "claim": "symbol of longevity and good fortune; common on celebratory and wedding kimono",
+      "grade": "B",
+      "source": "widely documented Japanese motif symbolism (e.g. Japan National Tourism Org. / kimono-pattern references); verify before stating as fact"
+    },
+    {
+      "motif": "扇 folding fan",
+      "claim": "widening shape = growing prosperity (末広がり)",
+      "grade": "B",
+      "source": "widely documented Japanese motif symbolism (e.g. Japan National Tourism Org. / kimono-pattern references); verify before stating as fact"
+    },
+    {
+      "motif": "美人画",
+      "claim": "Edo-period ukiyo-e genre of beautiful women",
+      "grade": "B",
+      "source": "art-history standard term"
+    }
+  ],
+  "seasons": [
+    "all-season (spring cues: sakura)"
+  ],
+  "occasions": [
+    {
+      "occasion": "gift for mother/family in Myanmar (htamein / longyi fabric)",
+      "grade": "C",
+      "note": "marketing angle from our audience; not a cultural fact about the motif"
+    },
+    {
+      "occasion": "gift for family in Nepal (kurta/sari blouse, Dashain/Tihar gift)",
+      "grade": "C",
+      "note": "marketing angle"
+    },
+    {
+      "occasion": "New Year / celebrations (gold + crane + peony)",
+      "grade": "C"
+    }
+  ],
+  "fingerprint": "Black ground; women in kimono with fans; red peonies; pink sakura; one white crane; blue 菱 lattice and gold 亀甲 panels. Faces/fans/peony shapes and gold areas must never be redrawn, recoloured or cropped through faces.",
+  "photo_needs": [
+    "No clean flat fabric photo: every shot has the package label and a \"Fujiba Elegance Emporium\" watermark across the fabric. Clean area is only ~510x860 px — shoot a flat, unwatermarked photo."
+  ],
+  "hooks": {
+    "en": [
+      "Ukiyo-e beauties, gold and peonies — a kimono print straight from Edo Japan.",
+      "The fabric that turns a simple dress into a story."
+    ],
+    "ja": [
+      "浮世絵の美人と牡丹、金彩がきらめく開花プリント。"
+    ],
+    "my": [
+      "ဂျပန် ဧဒိုခေတ် အလှပန်းချီ ပုံစံ ပိတ်စ — အမေ့အတွက် အထူးလက်ဆောင်"
+    ],
+    "ne": [
+      "जापानी उकियो-ए चित्रको सुन्दर कपडा — आमाको लागि विशेष उपहार"
+    ]
+  },
+  "product_id": 1988
+}

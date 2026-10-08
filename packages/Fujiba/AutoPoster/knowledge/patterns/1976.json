@@ -1,0 +1,102 @@
+{
+  "sku": "KIMONO-2550",
+  "name": "FV-81-A",
+  "closeup": {
+    "image": "product/1976/LaZdGHMYXgNiYDU7t6Urk7EVEg84mBG6pyebfoK2.jpg",
+    "box": [
+      0,
+      0,
+      1496,
+      2000
+    ]
+  },
+  "motifs": [
+    {
+      "en": "peony",
+      "ja": "牡丹",
+      "grade": "A"
+    },
+    {
+      "en": "chrysanthemum (several kinds)",
+      "ja": "菊",
+      "grade": "A"
+    },
+    {
+      "en": "plum blossom",
+      "ja": "梅",
+      "grade": "A"
+    },
+    {
+      "en": "bamboo rings",
+      "ja": "竹の輪",
+      "grade": "A",
+      "note": "circular bamboo stems"
+    }
+  ],
+  "pattern": {
+    "category": "開花 Kaika print — dense floral",
+    "repeat": "tossed all-over, dense",
+    "scale": "medium (flowers 5–8 cm)",
+    "background": "teal (measured) — description says \"Green\"",
+    "texture": "cotton 細布, gold outlines",
+    "metallic": "gold outlines (A)"
+  },
+  "meanings": [
+    {
+      "motif": "牡丹 peony",
+      "claim": "\"king of flowers\" — prosperity, nobility",
+      "grade": "B",
+      "source": "widely documented Japanese motif symbolism (e.g. Japan National Tourism Org. / kimono-pattern references); verify before stating as fact"
+    },
+    {
+      "motif": "菊 chrysanthemum",
+      "claim": "longevity; autumn flower; emblem associated with the Japanese imperial family",
+      "grade": "B",
+      "source": "widely documented Japanese motif symbolism (e.g. Japan National Tourism Org. / kimono-pattern references); verify before stating as fact"
+    },
+    {
+      "motif": "梅 plum",
+      "claim": "first flower of the year — endurance, hope (late winter)",
+      "grade": "B",
+      "source": "widely documented Japanese motif symbolism (e.g. Japan National Tourism Org. / kimono-pattern references); verify before stating as fact"
+    }
+  ],
+  "seasons": [
+    "all-season (mixed-season florals)"
+  ],
+  "occasions": [
+    {
+      "occasion": "gift for mother/family in Myanmar (htamein / longyi fabric)",
+      "grade": "C",
+      "note": "marketing angle from our audience; not a cultural fact about the motif"
+    },
+    {
+      "occasion": "gift for family in Nepal (kurta/sari blouse, Dashain/Tihar gift)",
+      "grade": "C",
+      "note": "marketing angle"
+    },
+    {
+      "occasion": "everyday elegant wear — soft, feminine",
+      "grade": "C"
+    }
+  ],
+  "fingerprint": "Teal ground densely covered with purple/white peonies, orange/gold and blue chrysanthemums, red plum blossoms and gold bamboo rings. Teal must not drift to green or blue in grading (ΔE ≤ 2).",
+  "photo_needs": [
+    "Description colour \"Green\" vs photo teal — confirm the colour name on the product page."
+  ],
+  "hooks": {
+    "en": [
+      "A garden that never stops blooming — peony, chrysanthemum and plum on teal."
+    ],
+    "ja": [
+      "牡丹・菊・梅が咲きそろう、ティール地の華やかな開花プリント。"
+    ],
+    "my": [
+      "ပန်းတွေ အမြဲပွင့်နေတဲ့ ဥယျာဉ် — ဂျပန်ပန်းပိတ်စ"
+    ],
+    "ne": [
+      "कहिल्यै नओइलाउने फूलबारी — जापानी फूलको कपडा"
+    ]
+  },
+  "product_id": 1976
+}

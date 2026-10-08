@@ -1,0 +1,97 @@
+{
+  "sku": "KIMONO-2619",
+  "name": "FV-73-C",
+  "closeup": {
+    "image": "product/2045/W3aXroEgPBpVp7LjpebLheRTuLfE4fMeRMbFobgH.jpg",
+    "box": [
+      0,
+      0,
+      1496,
+      2000
+    ],
+    "focus": [
+      500,
+      660,
+      520,
+      520
+    ]
+  },
+  "motifs": [
+    {
+      "en": "flying cranes",
+      "ja": "鶴",
+      "grade": "A"
+    },
+    {
+      "en": "scallop-wave clouds",
+      "ja": "青海波",
+      "grade": "A",
+      "note": "gold, cloud-shaped"
+    },
+    {
+      "en": "cloud bands with hexagon lattice",
+      "ja": "雲取り・亀甲",
+      "grade": "A"
+    }
+  ],
+  "pattern": {
+    "category": "開花 Kaika print — cranes over gold clouds",
+    "repeat": "tossed all-over, diagonal flight",
+    "scale": "medium-large (cranes ~10–14 cm)",
+    "background": "deep red (measured)",
+    "texture": "cotton 細布, gold metallic print",
+    "metallic": "gold (A)"
+  },
+  "meanings": [
+    {
+      "motif": "鶴 crane",
+      "claim": "symbol of longevity and good fortune; common on celebratory and wedding kimono",
+      "grade": "B",
+      "source": "widely documented Japanese motif symbolism (e.g. Japan National Tourism Org. / kimono-pattern references); verify before stating as fact"
+    },
+    {
+      "motif": "青海波 seigaiha",
+      "claim": "calm repeating waves — wish for peaceful life continuing forever",
+      "grade": "B",
+      "source": "widely documented Japanese motif symbolism (e.g. Japan National Tourism Org. / kimono-pattern references); verify before stating as fact"
+    }
+  ],
+  "seasons": [
+    "all-season; strong for New Year & weddings"
+  ],
+  "occasions": [
+    {
+      "occasion": "wedding / celebration",
+      "grade": "C",
+      "note": "crane + red ground reads celebratory in JP; for MM/NP audiences frame as feeling, not tradition"
+    },
+    {
+      "occasion": "gift for mother/family in Myanmar (htamein / longyi fabric)",
+      "grade": "C",
+      "note": "marketing angle from our audience; not a cultural fact about the motif"
+    },
+    {
+      "occasion": "gift for family in Nepal (kurta/sari blouse, Dashain/Tihar gift)",
+      "grade": "C",
+      "note": "marketing angle"
+    }
+  ],
+  "fingerprint": "Deep red ground; white cranes with black necks/tails and red crowns flying diagonally; gold 青海波 cloud masses; gold hexagon-lattice cloud bands. Never recolour the red ground or change crane count/direction.",
+  "photo_needs": [],
+  "hooks": {
+    "en": [
+      "Cranes for a long and happy life — on deep red and gold.",
+      "The colour of celebration, the bird of good fortune."
+    ],
+    "ja": [
+      "長寿の鶴と金の青海波。深紅の祝い柄。"
+    ],
+    "my": [
+      "ရှည်ရှည်နေ ပျော်ပျော်နေ — ကြိုးကြာငှက်နဲ့ ရွှေရောင် ပိတ်စ"
+    ],
+    "ne": [
+      "लामो र सुखी जीवनको प्रतीक सारस — रातो र सुनौलो कपडा"
+    ]
+  },
+  "product_id": 2045
+}
