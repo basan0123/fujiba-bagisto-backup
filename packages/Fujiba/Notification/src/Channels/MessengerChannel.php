@@ -64,6 +64,15 @@ class MessengerChannel implements Channel
             $err = $response->json('error.message') ?? $response->body();
             throw new \RuntimeException('Messenger send failed: '.$err);
         }
+
+        // Keep Facebook's proof of delivery on the log row, so "did customer X
+        // get this?" can be answered with the message id Graph returned.
+        $log->forceFill([
+            'payload' => array_merge($log->payload ?? [], [
+                'facebook_message_id' => $response->json('message_id'),
+                'message_tag'         => $messageTag,
+            ]),
+        ])->save();
     }
 
     /**

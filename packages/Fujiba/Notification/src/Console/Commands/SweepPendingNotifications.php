@@ -191,8 +191,11 @@ class SweepPendingNotifications extends Command
         // Reuse the listener's variable builder so re-rendered bodies are byte
         // identical to the original dispatch (same {{order.id}}, {{action_url}},
         // tracking links, etc.). buildVars() is the single source of truth.
-        $vars     = app(OrderEventListener::class)->buildVarsFor($order, $this->resolvePayloadSubject($log, $order));
-        $rendered = $template->render($vars);
+        $listener = app(OrderEventListener::class);
+        $vars     = $listener->buildVarsFor($order, $this->resolvePayloadSubject($log, $order));
+        $rendered = $recipientType === NotificationTemplate::RECIPIENT_CUSTOMER
+            ? $listener->messengerContent($log->event, $template, $vars, $language)
+            : $template->render($vars);
 
         return [
             'body'    => (string) ($rendered['body'] ?? ''),

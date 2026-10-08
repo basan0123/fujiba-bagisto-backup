@@ -57,6 +57,8 @@ class NotificationServiceProvider extends ServiceProvider
                 \Fujiba\Notification\Console\Commands\BackfillMessengerTokens::class,
                 \Fujiba\Notification\Console\Commands\BackfillTokensFromCustomers::class,
                 \Fujiba\Notification\Console\Commands\SweepPendingNotifications::class,
+                \Fujiba\Notification\Console\Commands\InstallStatusTemplates::class,
+                \Fujiba\Notification\Console\Commands\OrderNotificationAudit::class,
             ]);
         }
 
@@ -73,7 +75,7 @@ class NotificationServiceProvider extends ServiceProvider
     }
 
     /**
-     * Register all 5 order-lifecycle events to the same generic handler.
+     * Register every order event in OrderNotificationMatrix::EVENTS to the same generic handler.
      * The closure captures the Bagisto event name so the listener can
      * map it to the internal event key (order.placed, order.invoiced, ...).
      */

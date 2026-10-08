@@ -8,7 +8,9 @@ use Fujiba\Notification\Models\NotificationAdminRecipient;
 use Fujiba\Notification\Models\NotificationLog;
 use Fujiba\Notification\Models\NotificationTemplate;
 use Fujiba\Notification\Services\ChannelManager;
+use Fujiba\Notification\Services\OrderNotificationMatrix;
 use Fujiba\Notification\Services\TemplateRenderer;
+use Illuminate\Database\UniqueConstraintViolationException;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
@@ -25,13 +27,11 @@ use Webkul\Sales\Models\Shipment;
  */
 class OrderEventListener
 {
-    public const EVENT_MAP = [
-        'checkout.order.save.after' => 'order.placed',
-        'sales.invoice.save.after'  => 'order.invoiced',
-        'sales.shipment.save.after' => 'order.shipped',
-        'sales.order.cancel.after'  => 'order.cancelled',
-        'sales.refund.save.after'   => 'order.refunded',
-    ];
+    /**
+     * Bagisto events we subscribe to. What each one MEANS (and its
+     * duplicate-protection identity) lives in OrderNotificationMatrix.
+     */
+    public const EVENT_MAP = OrderNotificationMatrix::EVENTS;
 
     /**
      * Order statuses that qualify for the 'order.placed' notification. A web
@@ -44,6 +44,7 @@ class OrderEventListener
     public function __construct(
         protected TemplateRenderer $renderer,
         protected ChannelManager $channels,
+        protected OrderNotificationMatrix $matrix,
     ) {}
 
     public function handle(string $bagistoEvent, mixed $payload): void
@@ -56,9 +57,7 @@ class OrderEventListener
             return;
         }
 
-        $eventKey = self::EVENT_MAP[$bagistoEvent] ?? null;
-
-        if (! $eventKey) {
+        if (! isset(self::EVENT_MAP[$bagistoEvent])) {
             return;
         }
 
@@ -71,6 +70,15 @@ class OrderEventListener
                 ]);
                 return;
             }
+
+            $decision = $this->matrix->decide($bagistoEvent, $payload, $order);
+
+            if (! $decision) {
+                return;
+            }
+
+            $decision['bagisto_event'] = $bagistoEvent;
+            $eventKey = $decision['type'];
 
             // Draft invoices (POS invoice builder) create a real order that is
             // NOT a confirmed sale — suppress the customer-facing 'order placed'
@@ -88,9 +96,22 @@ class OrderEventListener
                 return;
             }
 
-            // 'order.placed' is a WEB-only, early-status notification. Two gates,
-            // both scoped to order.placed so later lifecycle events (invoiced /
-            // shipped / cancelled / refunded) still fire normally for any order:
+            if (
+                $decision['trigger'] === OrderNotificationMatrix::TRIGGER_STATUS
+                && ($skip = $this->statusSkipReason($eventKey, $order))
+            ) {
+                Log::info('[FujibaNotification] status notification skipped', [
+                    'order_id' => $order->id,
+                    'type'     => $eventKey,
+                    'reason'   => $skip,
+                ]);
+                return;
+            }
+
+            // 'order.placed' is a WEB-only, early-status notification for the
+            // customer + admin-Messenger paths. Two gates, both scoped to
+            // order.placed so later lifecycle events (invoiced / shipped /
+            // cancelled / refunded) still fire normally for any order:
             //   1. Web-only — POS counter sales never trigger an order-placed
             //      alert (customer mail/Messenger AND admin Messenger). The admin
             //      path keeps its own isPosOrder() guard as defence-in-depth.
@@ -98,22 +119,31 @@ class OrderEventListener
             //      (pending / processing / pending_payment) qualify. Anything
             //      else at placement time (e.g. completed, canceled, fraud) sends
             //      nothing.
-            if ($eventKey === 'order.placed') {
-                if ($this->isPosOrder($order)) {
-                    return;
-                }
+            //
+            // These gates deliberately do NOT apply to the admin-mail path. A
+            // counter-only store (every order POS, every order created already
+            // 'completed') would otherwise never alert its owner — which is the
+            // whole point of that path. Admin mail is opt-in per tenant: it
+            // sends only where an admin mail template AND a mail recipient are
+            // configured, so stores that want the web-only behaviour are
+            // unaffected by having no such rows.
+            $webPathsAllowed = true;
 
-                if (! in_array($order->status, self::PLACED_NOTIFY_STATUSES, true)) {
-                    return;
-                }
+            if ($eventKey === 'order.placed') {
+                $webPathsAllowed = ! $this->isPosOrder($order)
+                    && in_array($order->status, self::PLACED_NOTIFY_STATUSES, true);
             }
 
             $vars     = $this->buildVars($order, $payload);
             $language = $this->resolveLanguage($order);
 
-            $this->dispatchMail($eventKey, $order, $vars, $language);
-            $this->dispatchMessenger($eventKey, $order, $vars, $language);
-            $this->dispatchAdminNotifications($eventKey, $order, $vars, $language);
+            if ($webPathsAllowed) {
+                $this->dispatchMail($decision, $order, $vars, $language);
+                $this->dispatchMessenger($decision, $order, $vars, $language);
+                $this->dispatchAdminNotifications($decision, $order, $vars, $language);
+            }
+
+            $this->dispatchAdminMail($decision, $order, $vars, $language);
         } catch (\Throwable $e) {
             // Notification failures must NEVER break the order save flow.
             Log::error('[FujibaNotification] OrderEventListener failed', [
@@ -128,8 +158,10 @@ class OrderEventListener
     // Dispatchers
     // -----------------------------------------------------------------------
 
-    protected function dispatchMail(string $eventKey, Order $order, array $vars, string $language): void
+    protected function dispatchMail(array $decision, Order $order, array $vars, string $language): void
     {
+        $eventKey = $decision['type'];
+
         $template = NotificationTemplate::resolve($eventKey, 'mail', $language, $order->channel_id, NotificationTemplate::RECIPIENT_CUSTOMER);
 
         if (! $template) {
@@ -147,7 +179,7 @@ class OrderEventListener
         $fromName = $template->from_name ? $this->renderer->render($template->from_name, $vars) : null;
         $fromAddr = $template->from_email ? $this->renderer->render($template->from_email, $vars) : null;
 
-        $log = NotificationLog::create([
+        $log = $this->claimLog($decision, $order, [
             'event'                => $eventKey,
             'notification_channel' => 'mail',
             'subject_type'         => Order::class,
@@ -157,6 +189,10 @@ class OrderEventListener
             'status'               => NotificationLog::STATUS_PENDING,
             'payload'              => ['language' => $language],
         ]);
+
+        if (! $log) {
+            return;
+        }
 
         try {
             $this->channels->get('mail')->send($log, $subject, $body, [
@@ -178,8 +214,10 @@ class OrderEventListener
         }
     }
 
-    protected function dispatchMessenger(string $eventKey, Order $order, array $vars, string $language): void
+    protected function dispatchMessenger(array $decision, Order $order, array $vars, string $language): void
     {
+        $eventKey = $decision['type'];
+
         if (! $order->customer_id) {
             return;
         }
@@ -200,14 +238,10 @@ class OrderEventListener
             return;
         }
 
-        // Use the model's render() so buttons are placeholder-replaced together
-        // with body — keeps body and button text/URLs in sync.
-        $rendered = $template->render($vars);
-        $body     = (string) ($rendered['body'] ?? '');
-        $buttons  = $rendered['buttons'] ?? [];
+        ['body' => $body, 'buttons' => $buttons] = $this->messengerContent($eventKey, $template, $vars, $language);
 
         foreach ($tokens as $token) {
-            $log = NotificationLog::create([
+            $log = $this->claimLog($decision, $order, [
                 'event'                => $eventKey,
                 'notification_channel' => 'messenger',
                 'subject_type'         => Order::class,
@@ -216,10 +250,15 @@ class OrderEventListener
                 'recipient'            => $token->token,
                 'status'               => NotificationLog::STATUS_PENDING,
                 'payload'              => [
-                    'language' => $language,
-                    'page_id'  => $token->page_id,
+                    'language'    => $language,
+                    'page_id'     => $token->page_id,
+                    'template_id' => $template->id,
                 ],
             ]);
+
+            if (! $log) {
+                continue;
+            }
 
             SendMessengerNotificationJob::dispatch(
                 logId: $log->id,
@@ -246,8 +285,10 @@ class OrderEventListener
      *   - no admin template configured → silent no-op
      *   - no admin recipients configured for this channel → silent no-op
      */
-    protected function dispatchAdminNotifications(string $eventKey, Order $order, array $vars, string $language): void
+    protected function dispatchAdminNotifications(array $decision, Order $order, array $vars, string $language): void
     {
+        $eventKey = $decision['type'];
+
         // Suppress admin alerts for POS counter sales — admins see those in
         // the cashier UI, and broadcasting every walk-in to the page admin's
         // Messenger thread is noise. Detect three ways:
@@ -278,10 +319,8 @@ class OrderEventListener
 
         $recipients = NotificationAdminRecipient::query()
             ->active()
-            ->where(function ($q) use ($order) {
-                $q->where('channel_id', $order->channel_id)
-                  ->orWhereNull('channel_id'); // global admin recipients fire for every channel
-            })
+            ->delivery(NotificationAdminRecipient::DELIVERY_MESSENGER)
+            ->forChannel($order->channel_id) // NULL channel_id = fires for every channel
             ->get();
 
         if ($recipients->isEmpty()) {
@@ -293,7 +332,7 @@ class OrderEventListener
         $buttons  = $rendered['buttons'] ?? [];
 
         foreach ($recipients as $recipient) {
-            $log = NotificationLog::create([
+            $log = $this->claimLog($decision, $order, [
                 'event'                => $eventKey,
                 'notification_channel' => 'messenger',
                 'subject_type'         => Order::class,
@@ -309,6 +348,10 @@ class OrderEventListener
                 ],
             ]);
 
+            if (! $log) {
+                continue;
+            }
+
             SendMessengerNotificationJob::dispatch(
                 logId: $log->id,
                 subject: '',
@@ -323,9 +366,260 @@ class OrderEventListener
         }
     }
 
+    /**
+     * Email the store's admin recipients about an order.
+     *
+     * The mirror of dispatchAdminNotifications() for owners who want a plain
+     * email rather than a Messenger thread. Recipients are the rows in
+     * notification_admin_recipients with delivery_channel='mail', matched on
+     * the order's channel (a NULL channel_id row is tenant-wide).
+     *
+     * Everything here is tenant-scoped: the recipients table, the template
+     * table and the order all live in the current tenant's database, so a
+     * recipient configured for one store can never be resolved while another
+     * store's order is being handled.
+     *
+     * Falls back silently when no admin mail template or no mail recipient is
+     * configured, which is the state of every tenant that hasn't opted in.
+     */
+    protected function dispatchAdminMail(array $decision, Order $order, array $vars, string $language): void
+    {
+        $eventKey = $decision['type'];
+
+        $template = NotificationTemplate::resolve(
+            $eventKey,
+            'mail',
+            $language,
+            $order->channel_id,
+            NotificationTemplate::RECIPIENT_ADMIN,
+        );
+
+        if (! $template) {
+            return;
+        }
+
+        $recipients = NotificationAdminRecipient::query()
+            ->active()
+            ->delivery(NotificationAdminRecipient::DELIVERY_MAIL)
+            ->forChannel($order->channel_id)
+            ->whereNotNull('email')
+            ->where('email', '!=', '')
+            ->get();
+
+        if ($recipients->isEmpty()) {
+            return;
+        }
+
+        $rendered = $template->render($vars);
+        $subject  = (string) ($rendered['subject'] ?? '');
+        $body     = (string) ($rendered['body'] ?? '');
+        $fromName = $rendered['from_name'] ?: null;
+        $fromAddr = $rendered['from_email'] ?: null;
+
+        foreach ($recipients as $recipient) {
+            $log = $this->claimLog($decision, $order, [
+                'event'                => $eventKey,
+                'notification_channel' => 'mail',
+                'subject_type'         => Order::class,
+                'subject_id'           => $order->id,
+                'customer_id'          => null, // an admin recipient is not a customer
+                'recipient'            => $recipient->email,
+                'status'               => NotificationLog::STATUS_PENDING,
+                'payload'              => [
+                    'language'       => $language,
+                    'recipient_type' => 'admin',
+                    'admin_label'    => $recipient->label,
+                ],
+            ]);
+
+            if (! $log) {
+                continue;
+            }
+
+            try {
+                $this->channels->get('mail')->send($log, $subject, $body, [
+                    'order_id'   => $order->id,
+                    'channel_id' => $order->channel_id,
+                    'from_name'  => $fromName,
+                    'from_email' => $fromAddr,
+                ]);
+                // Queued — "sent" here means handed off to the worker.
+                $log->markSent();
+            } catch (\Throwable $e) {
+                // One bad address must not stop the remaining recipients.
+                $log->markFailed($e->getMessage());
+                Log::error('[FujibaNotification] Admin mail dispatch failed', [
+                    'event'     => $eventKey,
+                    'order_id'  => $order->id,
+                    'recipient' => $recipient->email,
+                    'error'     => $e->getMessage(),
+                ]);
+            }
+        }
+    }
+
     // -----------------------------------------------------------------------
     // Helpers
     // -----------------------------------------------------------------------
+
+    /**
+     * Why a status-change notification should NOT go out, or null to send.
+     * Every skip is logged by the caller so "why didn't customer Y get it?"
+     * has an answer in laravel.log.
+     */
+    public function statusSkipReason(string $type, Order $order): ?string
+    {
+        // Counter sales: the customer is standing at the till. Checked by
+        // ORIGIN only — staff changing a WEB order's status from the POS app
+        // must still notify (the request-context checks in isPosOrder() would
+        // wrongly treat that as a POS sale).
+        if ($this->isPosOriginOrder($order)) {
+            return 'pos_order';
+        }
+
+        if (
+            in_array($type, OrderNotificationMatrix::NEW_STATUS_TYPES, true)
+            && ! config('fujiba-notification.status_updates', true)
+        ) {
+            return 'status_updates_disabled';
+        }
+
+        if ($type === 'order.processing'
+            && ($order->invoices()->exists() || $order->shipments()->exists())) {
+            // Core flips the order to processing as a side effect of creating
+            // an invoice/shipment; the invoiced/shipped message already says it.
+            return 'document_message_covers_it';
+        }
+
+        if ($type === 'order.pending_payment'
+            && NotificationLog::query()
+                ->where('event', 'order.placed')
+                ->where('subject_type', Order::class)
+                ->where('subject_id', $order->id)
+                ->where('notification_channel', 'messenger')
+                ->exists()) {
+            // The order-placed message already asked for payment.
+            return 'placed_message_already_sent';
+        }
+
+        // Wholesale customers must get their 15% / 20% wholesale price. If the
+        // order completes without that discount, hold back the amount message
+        // so the customer isn't told a wrong total.
+        if ($type === 'order.completed' && ! $this->hasWholesaleDiscount($order)) {
+            return 'wholesale_discount_missing';
+        }
+
+        return null;
+    }
+
+    /**
+     * Insert the log row only if this exact notification has never been
+     * claimed. Returns null when it has — the caller then sends nothing.
+     *
+     * The UNIQUE idempotency_key makes this race-safe. For once-per-order
+     * types we also honour legacy rows written before the key existed, so an
+     * order completed in September is not re-announced on a later re-save.
+     */
+    protected function claimLog(array $decision, Order $order, array $attributes): ?NotificationLog
+    {
+        $isAdmin   = ($attributes['payload']['recipient_type'] ?? null) === 'admin';
+        $channel   = ($isAdmin ? 'admin-' : '').$attributes['notification_channel'];
+        $recipient = (string) $attributes['recipient'];
+
+        if ($decision['scope'] === 'once') {
+            $legacy = NotificationLog::query()
+                ->whereNull('idempotency_key')
+                ->where('event', $decision['type'])
+                ->where('subject_type', Order::class)
+                ->where('subject_id', $order->id)
+                ->where('notification_channel', $attributes['notification_channel'])
+                ->where('recipient', $recipient)
+                ->exists();
+
+            if ($legacy) {
+                return null;
+            }
+        }
+
+        $attributes['idempotency_key'] = $this->matrix->key($order, $decision, $channel, $recipient);
+        $attributes['payload'] = array_merge($attributes['payload'] ?? [], [
+            'trigger'       => $decision['bagisto_event'] ?? null,
+            'trigger_kind'  => $decision['trigger'],
+            'order_status'  => $order->status,
+            'message_tag'   => $attributes['notification_channel'] === 'messenger' ? 'POST_PURCHASE_UPDATE' : null,
+        ]);
+
+        try {
+            return NotificationLog::create($attributes);
+        } catch (UniqueConstraintViolationException) {
+            Log::info('[FujibaNotification] duplicate suppressed', [
+                'order_id' => $order->id,
+                'key'      => $attributes['idempotency_key'],
+            ]);
+
+            return null;
+        }
+    }
+
+    /**
+     * Final customer Messenger body + buttons. Shared with the sweeper so a
+     * re-sent message is identical to the original.
+     *
+     *  - A line whose value rendered empty ("Tracking: ") is dropped, so a
+     *    shipment without a number never shows a blank or invented one.
+     *  - order.shipped gets a tracking button only when a real tracking URL
+     *    exists and the template doesn't already link it.
+     *
+     * @return array{body: string, buttons: array}
+     */
+    public function messengerContent(string $eventKey, NotificationTemplate $template, array $vars, string $language): array
+    {
+        $rendered = $template->render($vars);
+        $buttons  = $rendered['buttons'] ?? [];
+
+        $lines = array_filter(
+            preg_split('/\R/u', (string) $template->body),
+            function (string $line) use ($vars) {
+                if (! preg_match_all('/\{\{\s*[a-zA-Z0-9_.]+\s*\}\}/', $line, $m)) {
+                    return true;
+                }
+
+                foreach ($m[0] as $placeholder) {
+                    if (trim($this->renderer->render($placeholder, $vars)) !== '') {
+                        return true;
+                    }
+                }
+
+                return false;
+            },
+        );
+
+        $body = trim($this->renderer->render(implode("\n", $lines), $vars));
+
+        $trackingUrl = (string) ($vars['tracking_url'] ?? '');
+
+        if ($eventKey === 'order.shipped' && $trackingUrl !== '' && count($buttons) < 3
+            && ! collect($buttons)->contains(fn ($b) => ($b['value'] ?? '') === $trackingUrl)) {
+            $labels = ['ja' => '配送状況を確認', 'my' => 'ပါဆယ် ခြေရာခံရန်'];
+
+            $buttons[] = [
+                'text'  => $labels[$language] ?? 'Track parcel',
+                'type'  => 'url',
+                'value' => $trackingUrl,
+            ];
+        }
+
+        return ['body' => $body, 'buttons' => $buttons];
+    }
+
+    /**
+     * Whether the order was rung up at a POS till (pos_order row). Unlike
+     * isPosOrder(), ignores who is making the current request.
+     */
+    protected function isPosOriginOrder(Order $order): bool
+    {
+        return DB::table('pos_order')->where('order_id', $order->id)->exists();
+    }
 
     protected function resolveOrder(mixed $payload): ?Order
     {
@@ -364,6 +658,27 @@ class OrderEventListener
         return DB::table('pos_order')->where('order_id', $order->id)->exists();
     }
 
+    /**
+     * True for non-wholesale customers, or for wholesale orders carrying at
+     * least a 15% discount (the 15% / 20% wholesale tiers).
+     */
+    protected function hasWholesaleDiscount(Order $order): bool
+    {
+        $groupCode = $order->customer?->group?->code;
+
+        if ($groupCode !== 'wholesale') {
+            return true;
+        }
+
+        $subTotal = (float) $order->sub_total;
+
+        if ($subTotal <= 0) {
+            return false;
+        }
+
+        return ((float) $order->discount_amount / $subTotal) >= 0.145;
+    }
+
     protected function resolveLanguage(Order $order): string
     {
         $code = $order->channel?->default_locale?->code;
@@ -400,9 +715,11 @@ class OrderEventListener
 
         $trackingNumber = '';
         $trackingUrl    = '';
+        $carrier        = '';
 
         if ($payload instanceof Shipment) {
-            $trackingNumber = (string) ($payload->track_number ?? '');
+            $carrier        = trim((string) ($payload->carrier_title ?? ''));
+            $trackingNumber = trim((string) ($payload->track_number ?? ''));
             $trackingUrl    = $trackingNumber !== ''
                 ? 'https://www.17track.net/en/track?nums=' . urlencode($trackingNumber)
                 : '';
@@ -463,6 +780,7 @@ class OrderEventListener
                 'date'            => optional($order->created_at)->format('Y-m-d') ?? '',
                 'tracking_number' => $trackingNumber,
                 'tracking_url'    => $trackingUrl,
+                'carrier'         => $carrier,
                 'product_list'    => $productList,
                 'action_url'      => $actionUrl,
             ],
@@ -481,6 +799,7 @@ class OrderEventListener
             'order_total'     => core()->formatPrice((float) $order->grand_total, $order->order_currency_code),
             'tracking_number' => $trackingNumber,
             'tracking_url'    => $trackingUrl,
+            'carrier'         => $carrier,
             'action_url'      => $actionUrl,
             'product_list'    => $productList,
             'store_name'      => $storeName,

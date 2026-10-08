@@ -20,6 +20,7 @@ class NotificationLog extends Model
         'subject_id',
         'customer_id',
         'recipient',
+        'idempotency_key',
         'status',
         'error',
         'payload',
