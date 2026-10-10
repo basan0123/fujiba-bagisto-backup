@@ -4,6 +4,7 @@ namespace Fujiba\TikTokShop\Jobs;
 
 use App\Models\Tenant;
 use Fujiba\TikTokShop\Models\TikTokCredential;
+use Fujiba\TikTokShop\Support\TenantGuard;
 use Fujiba\TikTokShop\Services\TikTokProductService;
 use Illuminate\Bus\Queueable;
 use Illuminate\Contracts\Queue\ShouldQueue;
@@ -55,6 +56,10 @@ class SyncProductsToTikTok implements ShouldQueue
                 'db'     => DB::connection()->getDatabaseName(),
                 'tenant' => function_exists('tenant') && tenant() ? tenant('id') : 'central',
             ]);
+
+            if (! TenantGuard::configured($this->tenantId, 'product-sync')) {
+                return;
+            }
 
             $activeChannels = TikTokCredential::where('is_active', true)
                 ->where('sync_products', true)

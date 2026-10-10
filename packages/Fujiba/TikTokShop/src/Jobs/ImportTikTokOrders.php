@@ -4,6 +4,7 @@ namespace Fujiba\TikTokShop\Jobs;
 
 use App\Models\Tenant;
 use Fujiba\TikTokShop\Models\TikTokCredential;
+use Fujiba\TikTokShop\Support\TenantGuard;
 use Fujiba\TikTokShop\Services\TikTokOrderImportService;
 use Illuminate\Bus\Queueable;
 use Illuminate\Contracts\Queue\ShouldQueue;
@@ -61,6 +62,10 @@ class ImportTikTokOrders implements ShouldQueue
                 'db'     => DB::connection()->getDatabaseName(),
                 'tenant' => function_exists('tenant') && tenant() ? tenant('id') : 'central',
             ]);
+
+            if (! TenantGuard::configured($this->tenantId, 'order-import')) {
+                return;
+            }
 
             $activeChannels = TikTokCredential::where('is_active', true)
                 ->where('sync_orders', true)
@@ -133,7 +138,7 @@ class ImportTikTokOrders implements ShouldQueue
     {
         $response = Http::withToken($creds->access_token)
             ->asJson()
-            ->post('https://open-api.tiktokshop.com/order/202309/orders/search', [
+            ->post(config('fujiba-tiktok.api_base_url') . '/order/202309/orders/search', [
                 'order_status' => ['AWAITING_SHIPMENT', 'UNPAID'],
                 'page_size'    => 50,
             ]);

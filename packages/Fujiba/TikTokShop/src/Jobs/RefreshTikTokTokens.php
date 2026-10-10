@@ -4,6 +4,7 @@ namespace Fujiba\TikTokShop\Jobs;
 
 use App\Models\Tenant;
 use Fujiba\TikTokShop\Models\TikTokCredential;
+use Fujiba\TikTokShop\Support\TenantGuard;
 use Illuminate\Bus\Queueable;
 use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Foundation\Bus\Dispatchable;
@@ -53,6 +54,10 @@ class RefreshTikTokTokens implements ShouldQueue
                 'db'     => DB::connection()->getDatabaseName(),
                 'tenant' => function_exists('tenant') && tenant() ? tenant('id') : 'central',
             ]);
+
+            if (! TenantGuard::configured($this->tenantId, 'token-refresh')) {
+                return;
+            }
 
             $candidates = TikTokCredential::where('is_active', true)
                 ->whereNotNull('token_expires_at')
