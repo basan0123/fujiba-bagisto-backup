@@ -78,16 +78,7 @@ a{color:inherit;text-decoration:none}img{max-width:100%}
 .hero p{font-size:18px;color:var(--muted);margin:0 0 30px;max-width:560px}
 .hero .actions{display:flex;flex-wrap:wrap;gap:12px}
 .note{margin-top:16px;font-size:13px;color:var(--muted)}
-.mock{position:relative;background:#fff;border-radius:24px;box-shadow:var(--shadow);padding:18px}
-.mock .bar{display:flex;gap:6px;margin-bottom:12px}.mock .bar i{width:10px;height:10px;border-radius:50%;background:var(--line)}
-.mock .row{display:grid;grid-template-columns:repeat(3,1fr);gap:10px}
-.mock .p{border-radius:14px;aspect-ratio:3/4;background:var(--g-pink);opacity:.9}
-.mock .p:nth-child(2){background:var(--g-purple)}.mock .p:nth-child(3){background:var(--g-blue)}
-.mock .line{height:10px;border-radius:6px;background:var(--soft);margin-top:12px}.mock .line.s{width:60%}
-.chip{position:absolute;background:#fff;border-radius:14px;box-shadow:var(--shadow);padding:10px 14px;font-weight:800;font-size:14px}
-.chip.a{left:-22px;bottom:30px}.chip.b{right:-14px;top:-16px;color:var(--pink)}
-@media(max-width:820px){.hero .wrap{grid-template-columns:1fr}.chip.a{left:6px}.chip.b{right:6px}}
-
+@media(max-width:820px){.hero .wrap{grid-template-columns:1fr}}
 /* sections */
 section{padding:80px 0}
 .soft{background:var(--soft)}
@@ -125,30 +116,66 @@ details p{margin:10px 0 0;color:var(--muted)}
 
 .band{background:var(--g-pink);color:#fff;border-radius:28px;padding:56px 32px;text-align:center;box-shadow:0 20px 45px rgba(220,73,133,.3)}
 .band h2{font-size:clamp(24px,4vw,36px);margin:0 0 8px}.band p{margin:0 0 26px;opacity:.92}
-/* liquid automation flow */
-.flow{position:relative;max-width:980px;margin:0 auto;padding:10px 0}
-.pipe{position:absolute;top:0;bottom:0;left:50%;width:14px;margin-left:-7px;border-radius:14px;overflow:hidden;
-  background:linear-gradient(180deg,#dc4985,#a866d1,#4354e2,#2cc590,#dc4985);background-size:100% 400%;animation:liquid 8s linear infinite;
-  box-shadow:0 0 0 6px rgba(222,80,136,.08),0 0 30px rgba(168,102,209,.35)}
-.pipe i{position:absolute;left:3px;width:8px;height:8px;border-radius:50%;background:rgba(255,255,255,.85);animation:bubble 6s linear infinite}
-.pipe i:nth-child(2){animation-delay:-1.5s;width:6px;height:6px;left:4px}.pipe i:nth-child(3){animation-delay:-3s}
-.pipe i:nth-child(4){animation-delay:-4.5s;width:5px;height:5px;left:5px}
-@keyframes liquid{to{background-position:0 400%}}
-@keyframes bubble{from{top:-10px;opacity:0}10%{opacity:1}90%{opacity:1}to{top:100%;opacity:0}}
-.node{position:relative;width:calc(50% - 46px);margin:0 0 22px;background:#fff;border-radius:20px;padding:20px 22px 20px 84px;box-shadow:var(--shadow)}
-.node:nth-child(odd){margin-left:auto}
-.node:before{content:"";position:absolute;top:34px;width:46px;height:4px;border-radius:4px;background:var(--g-pink);opacity:.5}
-.node:nth-child(odd):before{left:-46px}.node:nth-child(even):before{right:-46px}
-.node .icon{position:absolute;left:18px;top:18px;width:50px;height:50px;border-radius:15px;margin:0}
-.node .icon svg{width:24px;height:24px}
-.node h3{margin:0 0 2px;font-size:17px;color:#2d2f4a}.node p{margin:0;font-size:14.5px;color:var(--muted)}
-.tag{display:inline-block;font-size:11.5px;font-weight:800;letter-spacing:.03em;padding:2px 10px;border-radius:99px;margin-bottom:6px;background:rgba(44,197,144,.12);color:#13704F}
-.node.you{border:2px solid var(--pink);box-shadow:0 14px 40px rgba(220,73,133,.25)}
-.node.you .tag{background:var(--g-pink);color:#fff}
-@media(min-width:821px){.node+.node{margin-top:-64px}}
-@media(max-width:820px){.pipe{left:24px}.node,.node:nth-child(odd){width:auto;margin-left:52px}
-  .node:before,.node:nth-child(odd):before,.node:nth-child(even):before{left:-28px;right:auto;width:28px}}
-@media(prefers-reduced-motion:reduce){.pipe,.pipe i{animation:none}.pipe i{display:none}}
+/* animated product-to-order demo */
+.demo{display:flex;gap:22px;align-items:center;justify-content:center}
+.phone{position:relative;flex:none;width:270px;max-width:100%;height:540px;border-radius:40px;background:#fff;border:10px solid #2d2f4a;box-shadow:0 30px 70px rgba(45,47,74,.28),0 0 0 8px rgba(222,80,136,.08);overflow:hidden}
+.notch{position:absolute;top:0;left:50%;width:90px;height:20px;margin-left:-45px;background:#2d2f4a;border-radius:0 0 14px 14px;z-index:3}
+.hero .phone p{font-size:13px;max-width:none;margin:8px 0;color:#2d2f4a}
+.scr{position:absolute;inset:0;padding:30px 14px 14px;opacity:0;transform:translateY(14px) scale(.98);transition:opacity .5s,transform .5s;font-size:13px;line-height:1.55;overflow:hidden}
+.scr.on{opacity:1;transform:none}
+.scr img{display:block;width:100%;height:100%;object-fit:cover}
+.ph{position:relative;height:260px;border-radius:18px;overflow:hidden}.ph.sq{height:200px}
+.scanline{position:absolute;left:0;right:0;height:3px;background:#2cc590;box-shadow:0 0 18px 6px rgba(44,197,144,.55);top:0}
+.on .scanline{animation:scan 1.8s ease-in-out 2}
+@keyframes scan{50%{top:100%}}
+.scan{margin:10px 0 6px;font-weight:800;color:#13704F}
+.tags{display:flex;flex-wrap:wrap;gap:6px}
+.tags span,.bub,.typing,.hand,.ticks li{opacity:0;transform:translateY(8px)}
+.on .tags span,.on .bub,.on .hand,.on .ticks li{animation:pop .45s var(--d) forwards}
+.tags span{background:var(--soft);border:1px solid var(--line);padding:3px 10px;border-radius:99px;font-weight:700;font-size:12px}
+.tags span:last-child{background:var(--g-pink);color:#fff;border:0}
+@keyframes pop{to{opacity:1;transform:none}}
+.sparkle{position:absolute;top:10px;right:10px;background:var(--g-purple);color:#fff;font-size:11px;padding:3px 9px;border-radius:99px}
+.type{min-height:88px;margin:10px 0 4px;color:#2d2f4a}.type:after{content:"";display:inline-block;width:2px;height:14px;background:var(--pink);margin-left:2px;vertical-align:-2px;animation:blink 1s steps(1) infinite}
+@keyframes blink{50%{opacity:0}}
+.hash{margin:0;color:#3b5bdb;font-weight:700;font-size:12px}
+.fb{border:1px solid var(--line);border-radius:14px;overflow:hidden}
+.fbh{display:flex;gap:8px;align-items:center;padding:8px}.fbh small{display:block;color:var(--muted);font-size:11px}
+.av{flex:0 0 30px;width:30px;height:30px;border-radius:50%;background:var(--g-pink)}
+.net{display:inline-grid;place-items:center;width:15px;height:15px;border-radius:4px;background:#1877f2;color:#fff;font-size:9px;font-weight:800}
+.net.ig{background:linear-gradient(135deg,#f58529,#dd2a7b,#8134af)}.net.tt{background:#111}
+.fbc{margin:0;padding:0 8px 8px;font-size:12px}.fb img{height:190px}
+.fbb{display:flex;justify-content:flex-end;padding:8px;background:var(--soft)}.fbb span{background:#1877f2;color:#fff;font-weight:800;font-size:12px;padding:4px 12px;border-radius:6px}
+.likes{padding:6px 8px;color:#e0245e;font-size:12px}
+.ch{display:flex;gap:8px;align-items:center;padding-bottom:8px;border-bottom:1px solid var(--line);margin-bottom:10px}
+.bot{font-size:10px;font-weight:800;background:#e7f8f1;color:#13704F;padding:1px 6px;border-radius:6px}
+.bub{max-width:84%;padding:8px 11px;border-radius:16px;margin-bottom:8px;font-size:12.5px}
+.bub.c{background:#0084ff;color:#fff;margin-left:auto;border-bottom-right-radius:4px}
+.bub.b{background:#f0f0f5;color:#2d2f4a;border-bottom-left-radius:4px}
+.lk{display:flex;gap:8px;align-items:center;background:#fff;border-radius:10px;margin-top:6px;padding:5px;font-size:11.5px}.lk img{width:40px;height:40px;border-radius:7px}
+.typing{display:flex;gap:4px;width:52px;padding:10px;background:#f0f0f5;border-radius:16px;margin-bottom:8px}
+.on .typing{animation:pop .3s var(--d) forwards,gone .2s 1.7s forwards}
+@keyframes gone{to{opacity:0;height:0;padding:0;margin:0}}
+.typing i{width:6px;height:6px;border-radius:50%;background:#9a9db5;animation:blink 1s infinite}.typing i:nth-child(2){animation-delay:.2s}.typing i:nth-child(3){animation-delay:.4s}
+.hand{font-size:11.5px;font-weight:700;color:var(--pink);background:rgba(222,80,136,.08);border-radius:10px;padding:6px 9px;margin-top:6px}
+.scr h4{margin:10px 0 2px;font-size:15px;color:#2d2f4a}.pr{font-size:20px;font-weight:800;color:#2d2f4a}.pr small{font-size:12px;color:var(--muted);font-weight:600}
+.paybtn{position:relative;height:44px;margin-top:12px;border-radius:12px;overflow:hidden;font-weight:800;color:#fff;text-align:center;line-height:44px}
+.paybtn span{position:absolute;inset:0}.paybtn .a{background:#ff0033}.paybtn .b{background:#2cc590;opacity:0}
+.on .paybtn .a{animation:press .25s 1.3s}.on .paybtn .b{animation:pop .35s 1.6s forwards}
+@keyframes press{50%{transform:scale(.94)}}
+.ord{background:var(--g-pink);color:#fff;font-weight:800;border-radius:14px;padding:12px;margin-bottom:12px}
+.ticks{list-style:none;padding:0;margin:0}.ticks li{display:flex;gap:8px;align-items:flex-start;padding:9px 0;border-bottom:1px dashed var(--line);font-weight:700;color:#2d2f4a}
+.ticks i{flex:0 0 20px;height:20px;border-radius:50%;background:#2cc590;color:#fff;font-style:normal;font-size:12px;display:grid;place-items:center}
+.rail{list-style:none;padding:0;margin:0;display:flex;flex-direction:column;gap:6px;position:relative}
+.rail:before{content:"";position:absolute;left:15px;top:14px;bottom:14px;width:4px;border-radius:4px;background:linear-gradient(180deg,#dc4985,#a866d1,#4354e2,#2cc590);background-size:100% 300%;animation:liquid 6s linear infinite;opacity:.35}
+@keyframes liquid{to{background-position:0 300%}}
+.rail button{position:relative;display:flex;gap:10px;align-items:center;width:100%;border:0;background:none;padding:6px 8px 6px 0;font:inherit;font-size:13.5px;font-weight:700;color:#5c607e;text-align:left;cursor:pointer;border-radius:12px}
+.rail button span{flex:0 0 34px;height:34px;border-radius:50%;display:grid;place-items:center;background:#fff;border:2px solid var(--line);font-weight:800;transition:all .3s}
+.rail button[aria-current] {color:#2d2f4a}
+.rail button[aria-current] span{background:var(--g-pink);border-color:transparent;color:#fff;box-shadow:0 0 0 6px rgba(222,80,136,.15)}
+@media(max-width:1000px){.demo{flex-direction:column}.rail{flex-direction:row;overflow-x:auto;max-width:100%;padding-bottom:4px}.rail:before{display:none}
+  .rail li{flex:0 0 auto}.rail button{font-size:0;padding:0}.rail button span{font-size:14px}.rail button[aria-current]{font-size:13px;padding-right:10px}}
+@media(prefers-reduced-motion:reduce){.scr,.scr *{animation:none!important;transition:none!important;opacity:1!important;transform:none!important}.typing{display:none}}
 footer{padding:36px 0;color:var(--muted);font-size:14px;text-align:center}
 </style>
 </head>
@@ -156,7 +183,7 @@ footer{padding:36px 0;color:var(--muted);font-size:14px;text-align:center}
 <header class="top"><div class="wrap">
   <a class="brand" href="?lang={{ $locale }}">sns<b>sale</b></a>
   <nav class="menu">
-    <a href="#features">{{ $t['nav']['features'] }}</a><a href="#flow">{{ $t['nav']['flow'] }}</a><a href="#how">{{ $t['nav']['how'] }}</a>
+    <a href="#features">{{ $t['nav']['features'] }}</a><a href="#demo">{{ $t['nav']['flow'] }}</a><a href="#how">{{ $t['nav']['how'] }}</a>
     <a href="#pricing">{{ $t['nav']['pricing'] }}</a><a href="#faq">{{ $t['nav']['faq'] }}</a>
   </nav>
   <nav class="langs" aria-label="Language">
@@ -178,9 +205,63 @@ footer{padding:36px 0;color:var(--muted);font-size:14px;text-align:center}
     </div>
     <div class="note">{{ $t['preview'] }}</div>
   </div>
-  <div class="mock" aria-hidden="true">
-    <div class="bar"><i></i><i></i><i></i></div>
-    <div class="row"><div class="p"></div><div class="p"></div><div class="p"></div></div>
+  @php $d = $t['demo_flow']; @endphp
+  <div class="demo" id="demo">
+    <div class="phone" aria-hidden="true">
+      <div class="notch"></div>
+      {{-- 1 learn --}}
+      <div class="scr on" data-s="0">
+        <div class="ph"><img src="/saas/demo-fabric.webp" alt="" width="480" height="480"><i class="scanline"></i></div>
+        <div class="scan">{{ $d['scan'] }}</div>
+        <div class="tags">@foreach ($d['tags'] as $k => $tag)<span style="--d:{{ .5 + $k * .45 }}s">{{ $tag }}</span>@endforeach</div>
+      </div>
+      {{-- 2 create --}}
+      <div class="scr" data-s="1">
+        <div class="ph sq"><img src="/saas/demo-fabric.webp" alt="" width="480" height="480"><b class="sparkle">✦ AI</b></div>
+        <p class="type" data-text="{{ $d['caption'] }}"></p>
+        <p class="hash">{{ $d['hashtags'] }}</p>
+      </div>
+      {{-- 3 publish --}}
+      <div class="scr" data-s="2">
+        <div class="fb">
+          <div class="fbh"><i class="av"></i><div><b>{{ $d['shop'] }}</b><small>{{ $d['sponsored'] }} · <span class="net">f</span> <span class="net ig">ig</span> <span class="net tt">tt</span></small></div></div>
+          <p class="fbc">{{ \Illuminate\Support\Str::limit($d['caption'], 70) }}</p>
+          <img src="/saas/demo-fabric.webp" alt="" width="480" height="480">
+          <div class="fbb"><span>{{ $d['shop_now'] }}</span></div>
+          <div class="likes">♥ <b class="count" data-to="248">0</b> {{ $d['likes'] }}</div>
+        </div>
+      </div>
+      {{-- 4 chat --}}
+      <div class="scr chat" data-s="3">
+        <div class="ch"><i class="av"></i><b>{{ $d['shop'] }}</b><span class="bot">BOT</span></div>
+        <div class="bub c" style="--d:.3s">{{ $d['c1'] }}</div>
+        <div class="typing" style="--d:1s"><i></i><i></i><i></i></div>
+        <div class="bub b" style="--d:1.8s">{{ $d['b1'] }}
+          <div class="lk"><img src="/saas/demo-fabric.webp" alt="" width="480" height="480"><span>{{ $d['product'] }}<br><b>¥1,595 / m</b></span></div></div>
+        <div class="bub c" style="--d:2.8s">{{ $d['c2'] }}</div>
+        <div class="hand" style="--d:3.4s">{{ $d['handover'] }}</div>
+      </div>
+      {{-- 5 buy --}}
+      <div class="scr" data-s="4">
+        <div class="ph sq"><img src="/saas/demo-fabric.webp" alt="" width="480" height="480"></div>
+        <h4>{{ $d['product'] }}</h4>
+        <div class="pr">¥3,190 <small>{{ $d['qty'] }}</small></div>
+        <div class="paybtn"><span class="a">{{ $d['pay'] }}</span><span class="b">✓ {{ $d['paid'] }}</span></div>
+      </div>
+      {{-- 6 done --}}
+      <div class="scr" data-s="5">
+        <div class="ord">{{ $d['order'] }}</div>
+        <ul class="ticks">@foreach ($d['done'] as $k => $line)<li style="--d:{{ .3 + $k * .55 }}s"><i>✓</i>{{ $line }}</li>@endforeach</ul>
+        <div class="hand" style="--d:2.8s">{{ $d['handover'] }}</div>
+      </div>
+    </div>
+    <ol class="rail">
+      @foreach ($d['steps'] as $i => $step)
+        <li><button type="button" data-go="{{ $i }}" @if ($i === 0) aria-current="step" @endif><span>{{ $i + 1 }}</span>{{ $step }}</button></li>
+      @endforeach
+    </ol>
+  </div>
+</div></div>
     <div class="line"></div><div class="line s"></div>
     <div class="chip a">POS ✓</div><div class="chip b">PayPay</div>
   </div>
@@ -191,20 +272,6 @@ footer{padding:36px 0;color:var(--muted);font-size:14px;text-align:center}
   <div class="grid">
     @foreach ($t['features'] as $i => [$h, $p])
       <div class="feat"><div class="icon {{ $tiles[$i % 6] }}">{!! $icon($featureIcons[$i % 6]) !!}</div><h3>{{ $h }}</h3><p>{{ $p }}</p></div>
-    @endforeach
-  </div>
-</div></section>
-
-<section id="flow"><div class="wrap">
-  <div class="title"><h2>{{ $t['flow_h'] }}</h2><p style="color:var(--muted);margin:10px 0 0">{{ $t['flow_sub'] }}</p></div>
-  <div class="flow">
-    <div class="pipe" aria-hidden="true"><i></i><i></i><i></i><i></i></div>
-    @foreach ($t['flow'] as $i => [$ic, $h, $p, $who])
-      <div class="node {{ $who }}">
-        <div class="icon {{ $who === 'you' ? 'pink' : $tiles[$i % 6] }}">{!! $icon($ic) !!}</div>
-        <span class="tag">{{ $t[$who] }}</span>
-        <h3>{{ $h }}</h3><p>{{ $p }}</p>
-      </div>
     @endforeach
   </div>
 </div></section>
@@ -260,5 +327,31 @@ footer{padding:36px 0;color:var(--muted);font-size:14px;text-align:center}
 </main>
 
 <footer>© {{ date('Y') }} snssale · {{ $t['footer'] }}</footer>
+<script>
+(function () {
+  var root = document.getElementById('demo'); if (!root) return;
+  var scr = root.querySelectorAll('.scr'), btn = root.querySelectorAll('[data-go]');
+  var cur = 0, timer, still = matchMedia('(prefers-reduced-motion: reduce)').matches;
+  var hold = [4200, 5200, 4200, 5600, 3800, 4600];
+  function type(el) {
+    var full = el.getAttribute('data-text'), i = 0; el.textContent = '';
+    (function tick() { if (!scr[1].classList.contains('on')) return; el.textContent = full.slice(0, ++i); if (i < full.length) setTimeout(tick, 22); })();
+  }
+  function count(el) {
+    var to = +el.getAttribute('data-to'), n = 0;
+    (function tick() { n = Math.min(to, n + 9); el.textContent = n; if (n < to && scr[2].classList.contains('on')) setTimeout(tick, 40); })();
+  }
+  function show(n) {
+    cur = n;
+    scr.forEach(function (s, i) { s.classList.remove('on'); void s.offsetWidth; if (i === n) s.classList.add('on'); });
+    btn.forEach(function (b, i) { i === n ? b.setAttribute('aria-current', 'step') : b.removeAttribute('aria-current'); });
+    if (n === 1) { var t = scr[1].querySelector('.type'); still ? t.textContent = t.getAttribute('data-text') : type(t); }
+    if (n === 2) { var c = scr[2].querySelector('.count'); still ? c.textContent = c.getAttribute('data-to') : count(c); }
+    clearTimeout(timer); if (!still) timer = setTimeout(function () { show((cur + 1) % scr.length); }, hold[n]);
+  }
+  btn.forEach(function (b) { b.addEventListener('click', function () { show(+b.getAttribute('data-go')); }); });
+  show(0);
+})();
+</script>
 </body>
 </html>

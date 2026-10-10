@@ -13,7 +13,8 @@ class SaasLandingTest extends TestCase
         $this->get('http://snssale.com/', ['Accept-Language' => 'ja'])
             ->assertOk()
             ->assertSee('今日からあなたのネットショップを')
-            ->assertSee('data-plan="business"', false);
+            ->assertSee('data-plan="business"', false)
+            ->assertSee('id="demo"', false);
     }
 
     public function test_lang_query_switches_to_english_and_myanmar_and_untranslated_fallback(): void
@@ -29,7 +30,10 @@ class SaasLandingTest extends TestCase
     {
         config(['saas.plans.starter.monthly_price' => null]);
 
-        $this->get('http://snssale.com/?lang=ja')->assertOk()->assertSee('お問い合わせ')->assertDontSee('¥');
+        $html = $this->get('http://snssale.com/?lang=ja')->assertOk()->assertSee('お問い合わせ')->getContent();
+        // Only the plan cards must be yen-free (the demo shows a real product price).
+        $pricing = substr($html, strpos($html, 'id="pricing"'), strpos($html, 'id="faq"') - strpos($html, 'id="pricing"'));
+        $this->assertStringNotContainsString('¥', $pricing);
         $this->get('http://snssale.com/?lang=my')->assertOk()->assertSee('ဆက်သွယ်ရန်');
     }
 
