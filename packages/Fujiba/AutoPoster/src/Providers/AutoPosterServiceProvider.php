@@ -6,6 +6,9 @@ use Fujiba\AutoPoster\Console\Commands\DispatchPostsCommand;
 use Fujiba\AutoPoster\Console\Commands\PlanPostsCommand;
 use Fujiba\AutoPoster\Services\CaptionGenerator;
 use Fujiba\AutoPoster\Services\ClaudeCaptionClient;
+use Fujiba\AutoPoster\Services\ChatpionPostClient;
+use Fujiba\AutoPoster\Services\PostCoverRenderer;
+use Fujiba\AutoPoster\Services\CollectionPostBuilder;
 use Fujiba\AutoPoster\Services\PostPublisher;
 use Fujiba\AutoPoster\Services\ProductSelectionService;
 use Fujiba\AutoPoster\Services\QueueBuilder;
@@ -34,7 +37,14 @@ class AutoPosterServiceProvider extends ServiceProvider
         if ($this->app->runningInConsole()) {
             $this->commands([
                 PlanPostsCommand::class,
+                \Fujiba\AutoPoster\Console\Commands\RebuildCollectionsCommand::class,
                 DispatchPostsCommand::class,
+                \Fujiba\AutoPoster\Console\Commands\PublishInstagramCommand::class,
+                \Fujiba\AutoPoster\Console\Commands\KnowledgeCommand::class,
+                \Fujiba\AutoPoster\Console\Commands\V2DryRunCommand::class,
+                // Intelligence layer (shadow-only; cannot publish).
+                \Fujiba\AutoPoster\Console\Commands\Intel\PhotoAuditCommand::class,
+                \Fujiba\AutoPoster\Console\Commands\Intel\ExplainCommand::class,
             ]);
         }
     }
@@ -55,8 +65,17 @@ class AutoPosterServiceProvider extends ServiceProvider
             $app->make(UrlResolver::class)
         ));
 
-        $this->app->singleton(PostPublisher::class, fn ($app) => new PostPublisher(
+        $this->app->singleton(ChatpionPostClient::class);
+        $this->app->singleton(PostCoverRenderer::class, fn ($app) => new PostCoverRenderer(
             $app->make(UrlResolver::class)
+        ));
+
+        $this->app->singleton(PostPublisher::class, fn ($app) => new PostPublisher(
+            $app->make(UrlResolver::class),
+            $app->make(ChatpionPostClient::class),
+            $app->make(CaptionGenerator::class),
+            $app->make(PostCoverRenderer::class),
+            $app->make(CollectionPostBuilder::class),
         ));
 
         $this->app->singleton(ClaudeCaptionClient::class);

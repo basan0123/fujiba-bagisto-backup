@@ -4,8 +4,10 @@ namespace Fujiba\FacebookCatalog\Services;
 
 use Fujiba\FacebookCatalog\Models\FacebookCatalogProductSync;
 use Fujiba\FacebookCatalog\Models\FacebookCatalogSetting;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
 use Throwable;
+use Webkul\Core\Models\Channel;
 use Webkul\Product\Models\Product;
 
 class BatchSyncService
@@ -38,13 +40,39 @@ class BatchSyncService
             return ['sent' => 0, 'failed' => 0, 'skipped' => 0, 'reason' => 'no approved products'];
         }
 
-        return $this->syncProducts($settings, $approvedIds);
+        // Approval alone is not enough to advertise a product: a catalog entry
+        // links back to the storefront PDP, so a disabled or individually-hidden
+        // product becomes a dead link (and a Meta policy risk). Approval is an
+        // operator intent flag that persists; storefront status is live state
+        // that changes without anyone revisiting this screen. Re-check it at
+        // send time rather than trusting the flag set weeks ago.
+        $channelCode = Channel::where('id', $channelId)->value('code') ?: 'default';
+        $locale      = $settings->default_locale ?: 'ja';
+
+        $activeIds = DB::table('product_flat')
+            ->whereIn('product_id', $approvedIds)
+            ->where('channel', $channelCode)
+            ->where('locale', $locale)
+            ->where('status', 1)
+            ->where('visible_individually', 1)
+            ->pluck('product_id')
+            ->all();
+
+        // Approved-but-disabled products are still sent, forced to
+        // out of stock + archived, so stale "in stock" catalog items stop
+        // appearing in ads (they used to be skipped and left as-is on Meta).
+        $inactiveIds = array_values(array_diff($approvedIds, $activeIds));
+
+        $result = $this->syncProducts($settings, $approvedIds, $inactiveIds);
+        $result['archived_inactive'] = count($inactiveIds);
+
+        return $result;
     }
 
     /**
      * Push a specific list of product ids. Skips ids without an approved row.
      */
-    public function syncProducts(FacebookCatalogSetting $settings, array $productIds): array
+    public function syncProducts(FacebookCatalogSetting $settings, array $productIds, array $forceInactiveIds = []): array
     {
         $batchSize = (int) config('fujiba-facebook-catalog.batch_size', 200);
         $client    = new GraphClient($settings->access_token);
@@ -72,7 +100,7 @@ class BatchSyncService
                     continue;
                 }
 
-                $payload = $this->builder->build($product, $settings);
+                $payload = $this->builder->build($product, $settings, in_array($productId, $forceInactiveIds, true));
                 if (! $payload) {
                     $row->sync_status = FacebookCatalogProductSync::STATUS_FAILED;
                     $row->sync_error  = 'no image or product_flat row';

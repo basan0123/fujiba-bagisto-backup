@@ -74,6 +74,73 @@ class ProductSelectionService
     }
 
     /**
+     * Bulk picker pool: the WHOLE kimono catalog (All Kimono subtree), not just
+     * what the auto-selector would pick. The admin chooses by hand here, so
+     * cooldown / already-queued / out-of-stock only become tags on the card
+     * instead of hiding the product. Must still have a photo.
+     *
+     * @return array<int,array{product_id:int,tags:array<int,string>}>
+     */
+    public function bulkCandidates(AutoPosterSetting $settings): array
+    {
+        $channelId   = (int) $settings->channel_id;
+        $channelCode = Channel::where('id', $channelId)->value('code') ?: 'default';
+        $locale      = $this->catalogLocale($channelId);
+
+        $root = DB::table('categories as c')
+            ->join('category_translations as ct', 'ct.category_id', '=', 'c.id')
+            ->where('ct.name', 'All Kimono')
+            ->select('c._lft', 'c._rgt')
+            ->first();
+
+        if (! $root) {
+            return [];
+        }
+
+        $rows = DB::table('product_flat as pf')
+            ->where('pf.channel', $channelCode)
+            ->where('pf.locale', $locale)
+            ->where('pf.visible_individually', 1)
+            ->whereExists(fn ($q) => $q->select(DB::raw(1))
+                ->from('product_categories as pc')
+                ->join('categories as cc', 'cc.id', '=', 'pc.category_id')
+                ->whereColumn('pc.product_id', 'pf.product_id')
+                ->where('cc._lft', '>=', $root->_lft)
+                ->where('cc._rgt', '<=', $root->_rgt))
+            ->whereExists(fn ($q) => $q->select(DB::raw(1))
+                ->from('product_images as pi')
+                ->whereColumn('pi.product_id', 'pf.product_id'))
+            ->select('pf.product_id', 'pf.status',
+                DB::raw('(SELECT COALESCE(SUM(qty),0) FROM product_inventories WHERE product_id = pf.product_id) as qty'))
+            ->distinct()
+            ->get();
+
+        $queued = DB::table('autoposter_post_products as pp')
+            ->join('autoposter_queue as pq', 'pq.id', '=', 'pp.queue_id')
+            ->where('pq.channel_id', $channelId)
+            ->whereIn('pq.status', ['draft', 'scheduled', 'processing'])
+            ->pluck('pp.product_id')->flip();
+
+        $out = [];
+        foreach ($rows as $r) {
+            $tags = [];
+            if ((int) $r->status !== 1 || (int) $r->qty <= 0) {
+                $tags[] = 'out of stock';
+            }
+            if ($queued->has($r->product_id)) {
+                $tags[] = 'queued';
+            }
+            $out[] = ['product_id' => (int) $r->product_id, 'tags' => $tags];
+        }
+
+        // Fresh in-stock first, then queued, then out of stock.
+        usort($out, fn ($a, $b) => (in_array('out of stock', $a['tags']) <=> in_array('out of stock', $b['tags']))
+            ?: (in_array('queued', $a['tags']) <=> in_array('queued', $b['tags'])));
+
+        return $out;
+    }
+
+    /**
      * Base eligibility query — returns a builder over product_flat aliased `pf`.
      */
     protected function eligibleQuery(AutoPosterSetting $settings, array $excludeProductIds)
@@ -181,7 +248,7 @@ class ProductSelectionService
                             ->whereIn('pc.category_id', $categoryIds);
                     });
                 }
-                $query->inRandomOrder();
+                $query->orderByRaw('RAND()');
                 break;
 
             case AutoPosterSetting::MODE_PRODUCT_SET:
@@ -197,7 +264,7 @@ class ProductSelectionService
                             ->whereIn('p.sku', $retailerIds);
                     });
                 }
-                $query->inRandomOrder();
+                $query->orderByRaw('RAND()');
                 break;
 
             case AutoPosterSetting::MODE_NEVER_POSTED:
@@ -207,7 +274,7 @@ class ProductSelectionService
                         ->whereColumn('hn.product_id', 'pf.product_id')
                         ->where('hn.channel_id', $channelId)
                         ->whereNotNull('hn.last_posted_at');
-                })->inRandomOrder();
+                })->orderByRaw('RAND()');
                 break;
 
             case AutoPosterSetting::MODE_LEAST_RECENTLY_POSTED:
@@ -221,7 +288,7 @@ class ProductSelectionService
 
             case AutoPosterSetting::MODE_RANDOM:
             default:
-                $query->inRandomOrder();
+                $query->orderByRaw('RAND()');
                 break;
         }
     }

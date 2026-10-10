@@ -16,6 +16,31 @@ return [
     'dispatch_limit' => (int) env('AUTOPOSTER_DISPATCH_LIMIT', 10),
 
     /*
+     * How posts reach Facebook. 'chatpion' posts through ChatPion's
+     * fujiba_post/publish endpoint with the page token ChatPion holds;
+     * 'graph' uses the Facebook Catalog token directly (needs
+     * pages_manage_posts, which the current system-user token lacks).
+     * page_id is the Facebook page id as ChatPion stores it.
+     */
+    'transport'     => env('AUTOPOSTER_TRANSPORT', 'chatpion'),
+    'chatpion_url'  => env('AUTOPOSTER_CHATPION_URL', 'https://bot.snssale.com'),
+    'page_ids'      => [1 => env('AUTOPOSTER_PAGE_ID_CHANNEL_1', '103196179075087')],
+
+    /*
+     * Instagram cross-post: every post that goes live on Facebook is queued
+     * for the Instagram account linked to the same page (same caption, same
+     * photos / reel) and sent by `autoposter:instagram`. Off until ChatPion
+     * has the fujiba_post/publish_instagram endpoint.
+     */
+    'instagram' => [
+        'enabled'      => (bool) env('AUTOPOSTER_INSTAGRAM_ENABLED', false),
+        'max_attempts' => 3,
+    ],
+
+    /* Days of posts kept planned ahead (admins review/edit them in advance). */
+    'plan_days_ahead' => (int) env('AUTOPOSTER_PLAN_DAYS_AHEAD', 7),
+
+    /*
      * Caption generation. When no API key is present the generator falls back
      * to template-only output — see CaptionGenerator (step 4).
      */

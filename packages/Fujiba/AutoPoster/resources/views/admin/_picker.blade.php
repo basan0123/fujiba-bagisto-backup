@@ -5,7 +5,8 @@
      x-template + app.component() pattern the core admin components use.
 
      Selection ORDER is preserved and submitted as product_ids[] — the order the
-     admin clicks in becomes the carousel order. --}}
+     admin clicks in becomes the carousel order. Every change is broadcast as
+     window "ap:items" so a <v-fb-preview> on the page follows along. --}}
 
 <v-product-picker
     :candidates='@json($candidates)'
@@ -14,55 +15,53 @@
 
 @pushOnce('scripts')
     <script type="text/x-template" id="v-product-picker-template">
-        <div class="flex flex-col gap-3">
-            <div class="flex items-center justify-between flex-wrap gap-2">
-                <div class="text-sm text-gray-600 dark:text-gray-300">
-                    @{{ selected.length }} selected
-                    <span class="text-gray-400">
-                        · click to add, click again to remove · order = carousel order
+        <div>
+            <div class="ap-picker-bar">
+                <div style="display: flex; align-items: center; gap: 10px; flex-wrap: wrap;">
+                    <span class="ap-badge" :class="selected.length ? 'ap-tone-blue' : 'ap-tone-gray'">
+                        @{{ selected.length }} selected
                     </span>
+                    <span class="ap-muted ap-small">Click to add · click again to remove · order = carousel order</span>
                 </div>
-                <button type="button" @click="selected = []"
-                        class="px-3 py-1.5 border rounded text-sm dark:border-gray-700">
-                    Clear
-                </button>
+                <div style="display: flex; gap: 8px; align-items: center; flex: 1; justify-content: flex-end; min-width: 220px;">
+                    <input type="search" v-model="query" placeholder="Search products…" style="max-width: 240px; min-height: 34px; padding: 6px 12px;">
+                    <button type="button" class="ap-btn ap-btn-ghost ap-btn-sm" :disabled="! selected.length" @click="clear">Clear</button>
+                </div>
             </div>
 
-            <input v-for="id in selected" :key="'in-'+id"
-                   type="hidden" :name="inputName + '[]'" :value="id">
+            <input v-for="id in selected" :key="'in-'+id" type="hidden" :name="inputName + '[]'" :value="id">
 
-            <div class="grid gap-3 grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-6">
-                <div v-for="card in candidates" :key="card.product_id"
+            <div class="ap-picker-grid">
+                <div v-for="card in filtered" :key="card.product_id"
                      @click="toggle(card.product_id)"
-                     class="relative border rounded overflow-hidden cursor-pointer transition dark:border-gray-700"
-                     :class="isSelected(card.product_id)
-                             ? 'ring-2 ring-blue-500 border-blue-500'
-                             : 'hover:border-gray-400'">
+                     class="ap-pcard"
+                     :class="{ 'is-selected': isSelected(card.product_id) }">
+                    <span v-if="isSelected(card.product_id)" class="ap-pcard-num">@{{ position(card.product_id) }}</span>
+                    <span class="ap-pcard-check"></span>
 
-                    <div v-if="isSelected(card.product_id)"
-                         class="absolute top-1 left-1 z-10 w-6 h-6 rounded-full bg-blue-600 text-white
-                                text-xs flex items-center justify-center font-bold">
-                        @{{ position(card.product_id) }}
+                    <div style="overflow: hidden;">
+                        <img v-if="card.image" :src="card.image" loading="lazy" alt="" class="ap-pcard-img">
+                        <div v-else class="ap-pcard-noimg">No image</div>
                     </div>
 
-                    <img v-if="card.image" :src="card.image" loading="lazy" alt=""
-                         class="w-full aspect-square object-cover bg-gray-100 dark:bg-gray-800">
-                    <div v-else
-                         class="w-full aspect-square bg-gray-100 dark:bg-gray-800 flex items-center justify-center text-xs text-gray-400">
-                        no image
-                    </div>
-
-                    <div class="p-1.5">
-                        <div class="text-xs truncate" :title="card.name">@{{ card.name }}</div>
-                        <div class="text-xs text-gray-500">@{{ formatPrice(card.price) }}</div>
+                    <div class="ap-pcard-body">
+                        <div class="ap-pcard-name" :title="card.name">@{{ card.name }}</div>
+                        <div class="ap-pcard-price">@{{ formatPrice(card.price) }}</div>
+                        <div v-if="card.tags && card.tags.length" style="display:flex;gap:4px;flex-wrap:wrap;margin-top:4px;">
+                            <span v-for="t in card.tags" :key="t" class="ap-badge" :class="t === 'out of stock' ? 'ap-tone-red' : 'ap-tone-gray'" style="font-size:10px;">@{{ t }}</span>
+                        </div>
                     </div>
                 </div>
             </div>
 
-            <div v-if="! candidates.length"
-                 class="p-4 border rounded text-sm text-gray-500 dark:border-gray-700">
-                No eligible products. Approve products for Facebook, or relax the
-                cooldown / selection mode.
+            <div v-if="candidates.length && ! filtered.length" class="ap-empty">
+                <h3>No matches</h3>
+                <p>Nothing matches “@{{ query }}”.</p>
+            </div>
+
+            <div v-if="! candidates.length" class="ap-empty">
+                <h3>No eligible products</h3>
+                <p>Approve products for Facebook, or relax the cooldown / selection mode in Settings.</p>
             </div>
         </div>
     </script>
@@ -77,7 +76,32 @@
             },
 
             data() {
-                return { selected: [] };
+                return { selected: [], query: '' };
+            },
+
+            computed: {
+                filtered() {
+                    const q = this.query.trim().toLowerCase();
+
+                    if (! q) {
+                        return this.candidates;
+                    }
+
+                    return this.candidates.filter(c => (c.name || '').toLowerCase().includes(q));
+                },
+            },
+
+            watch: {
+                selected: {
+                    deep: true,
+                    handler() {
+                        const byId = Object.fromEntries(this.candidates.map(c => [c.product_id, c]));
+
+                        window.dispatchEvent(new CustomEvent('ap:items', {
+                            detail: this.selected.map(id => byId[id]).filter(Boolean),
+                        }));
+                    },
+                },
             },
 
             methods: {
@@ -95,12 +119,16 @@
                     }
                 },
 
+                clear() {
+                    this.selected = [];
+                },
+
                 position(id) {
                     return this.selected.indexOf(id) + 1;
                 },
 
                 formatPrice(price) {
-                    if (! price) {
+                    if (! (Number(price) > 0)) {
                         return '';
                     }
 

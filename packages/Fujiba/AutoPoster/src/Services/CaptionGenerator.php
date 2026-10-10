@@ -274,11 +274,15 @@ class CaptionGenerator
             }
         }
 
-        return AutoPosterTemplate::where('channel_id', $post->channel_id)
+        $active = AutoPosterTemplate::where('channel_id', $post->channel_id)
             ->where('is_active', true)
-            ->orderByDesc('is_default')
             ->orderBy('id')
-            ->first();
+            ->get();
+
+        // A default wins; otherwise rotate through the active templates so
+        // consecutive posts don't all read the same.
+        return $active->firstWhere('is_default', true)
+            ?? ($active->isEmpty() ? null : $active[$post->id % $active->count()]);
     }
 
     /**

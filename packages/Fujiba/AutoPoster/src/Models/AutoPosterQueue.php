@@ -33,6 +33,13 @@ class AutoPosterQueue extends Model
         'origin',
         'created_by',
         'idempotency_key',
+        'instagram_status',
+        'instagram_payload',
+        'instagram_media_id',
+        'instagram_permalink',
+        'instagram_attempts',
+        'instagram_error',
+        'instagram_published_at',
     ];
 
     protected $casts = [
@@ -44,6 +51,9 @@ class AutoPosterQueue extends Model
         'next_retry_at'     => 'datetime',
         'locked_at'         => 'datetime',
         'attempts'          => 'integer',
+        'instagram_payload'      => 'array',
+        'instagram_published_at' => 'datetime',
+        'instagram_attempts'     => 'integer',
     ];
 
     public const STATUS_DRAFT      = 'draft';

@@ -38,6 +38,10 @@ class PostPublisher
 
     public function __construct(
         protected UrlResolver $urls,
+        protected ChatpionPostClient $chatpion,
+        protected CaptionGenerator $captions,
+        protected PostCoverRenderer $covers,
+        protected CollectionPostBuilder $collections,
     ) {}
 
     /**
@@ -87,6 +91,11 @@ class PostPublisher
         }
 
         $settings = AutoPosterSetting::where('channel_id', $post->channel_id)->first();
+
+        if (config('autoposter.transport') === 'chatpion') {
+            return $this->publishViaChatpion($post, $settings);
+        }
+
         $catalog  = FacebookCatalogSetting::where('channel_id', $post->channel_id)->first();
 
         if (! $catalog || empty($catalog->page_id) || empty($catalog->access_token)) {
@@ -145,6 +154,103 @@ class PostPublisher
                 : $this->extractApiResponse($e);
 
             return $this->fail($post, $settings, $e->getMessage(), $response, $e);
+        }
+    }
+
+    /**
+     * ChatPion path. Posts planned days ahead may have sold out since, so
+     * out-of-stock products are dropped first; the cover is re-rendered when
+     * that changes the line-up so it never shows a sold-out fabric.
+     */
+    protected function publishViaChatpion(AutoPosterQueue $post, ?AutoPosterSetting $settings): array
+    {
+        $pageId = config('autoposter.page_ids.'.$post->channel_id);
+
+        if (! $pageId) {
+            return $this->fail($post, $settings, 'No Facebook page id configured for this channel', null);
+        }
+
+        $items = $post->products()->get();
+        $stock = DB::table('product_inventories')
+            ->whereIn('product_id', $items->pluck('product_id'))
+            ->groupBy('product_id')
+            ->pluck(DB::raw('SUM(qty)'), 'product_id');
+
+        // A collection may show one sold-out colour on purpose (full A-D set);
+        // keep it, but the post still needs at least one buyable fabric.
+        $keepSoldOut = array_map('intval', ($post->caption_meta ?? [])['sold_out'] ?? []);
+        $buyable     = $items->filter(fn ($p) => (int) ($stock[$p->product_id] ?? 0) > 0);
+        $inStock     = $items->filter(fn ($p) => $buyable->contains($p) || in_array((int) $p->product_id, $keepSoldOut, true));
+
+        // Everything sold out between planning and the slot. Rather than lose
+        // the slot, rebuild the post around a fresh in-stock collection —
+        // fill() draws from pool(), which is in-stock only. Only if there is
+        // genuinely nothing left to post do we fail.
+        if ($buyable->isEmpty()) {
+            if (CollectionPostBuilder::isCollection($post) && $this->collections->fill($post)) {
+                $post->load('products');
+                $items = $post->products()->get();
+
+                $stock = DB::table('product_inventories')
+                    ->whereIn('product_id', $items->pluck('product_id'))
+                    ->groupBy('product_id')
+                    ->pluck(DB::raw('SUM(qty)'), 'product_id');
+
+                $keepSoldOut = array_map('intval', ($post->caption_meta ?? [])['sold_out'] ?? []);
+                $buyable     = $items->filter(fn ($p) => (int) ($stock[$p->product_id] ?? 0) > 0);
+                $inStock     = $items->filter(fn ($p) => $buyable->contains($p) || in_array((int) $p->product_id, $keepSoldOut, true));
+
+                Log::info('[AutoPoster] rebuilt a sold-out post onto a fresh collection', [
+                    'queue_id' => $post->id,
+                    'products' => $items->pluck('product_id')->all(),
+                ]);
+            }
+
+            if ($buyable->isEmpty()) {
+                return $this->fail($post, $settings, 'Every product in this post is out of stock', null);
+            }
+        }
+
+        if ($inStock->count() !== $items->count()) {
+            $post->products()->whereNotIn('product_id', $inStock->pluck('product_id'))->delete();
+            $post->load('products');
+
+            if (CollectionPostBuilder::isCollection($post)) {
+                $this->collections->refresh($post);
+            } else {
+                $this->covers->render($post);
+                $post->update(['caption' => $this->captions->generate($post)['caption']]);
+            }
+        }
+
+        if (empty(trim((string) $post->caption))) {
+            $post->update(['caption' => $this->captions->generate($post->load('products'))['caption']]);
+        }
+
+        $images = $inStock->map(fn ($p) => $p->effectiveImageUrl())->filter()->values()->all();
+
+        if (! CollectionPostBuilder::isCollection($post) && $cover = $this->covers->url($post)) {
+            array_unshift($images, $cover);
+        }
+
+        try {
+            $video    = CollectionPostBuilder::isCollection($post) ? $this->collections->videoUrl($post->fresh()) : null;
+            $message  = $this->composeMessage($post->fresh());
+            $response = $this->chatpion->publish((string) $pageId, $message, $video ? [] : $images, $video);
+            $this->markPublished($post, $response['id'], $this->chatpion->permalink($response['id']), $response);
+
+            // Same post for Instagram, sent by autoposter:instagram. Instagram
+            // links are not clickable, so the caption keeps the m.me text as-is.
+            if (config('autoposter.instagram.enabled')) {
+                $post->update([
+                    'instagram_status'  => 'pending',
+                    'instagram_payload' => ['page_id' => (string) $pageId, 'message' => $message, 'images' => $video ? [] : $images, 'video' => $video],
+                ]);
+            }
+
+            return ['status' => 'success', 'message' => 'Published', 'post_id' => $response['id']];
+        } catch (Throwable $e) {
+            return $this->fail($post, $settings, $e->getMessage(), ['message' => Str::limit($e->getMessage(), 2000, '')], $e);
         }
     }
 

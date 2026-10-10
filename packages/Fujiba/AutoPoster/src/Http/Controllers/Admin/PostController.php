@@ -417,9 +417,20 @@ class PostController extends Controller
             'channels'      => $channels,
             'channelId'     => $channelId,
             'settings'      => $settings,
-            'candidates'    => $this->productCards($this->selection->select($settings, [], 60), $channelId),
-            'eligibleCount' => $this->selection->eligibleCount($settings),
+            'candidates'    => $cards = $this->bulkCards($settings, $channelId),
+            'eligibleCount' => count($cards),
         ]);
+    }
+
+    protected function bulkCards(AutoPosterSetting $settings, int $channelId): array
+    {
+        $pool = collect($this->selection->bulkCandidates($settings));
+        $tags = $pool->pluck('tags', 'product_id');
+
+        return array_map(
+            fn ($c) => $c + ['tags' => $tags[$c['product_id']] ?? []],
+            $this->productCards($pool->pluck('product_id')->all(), $channelId)
+        );
     }
 
     public function bulkStore(Request $request)

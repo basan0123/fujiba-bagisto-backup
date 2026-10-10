@@ -1,6 +1,7 @@
 <?php
 
 use Fujiba\AutoPoster\Http\Controllers\Admin\DashboardController;
+use Fujiba\AutoPoster\Http\Controllers\Admin\MobileController;
 use Fujiba\AutoPoster\Http\Controllers\Admin\PostController;
 use Fujiba\AutoPoster\Http\Controllers\Admin\SettingsController;
 use Fujiba\AutoPoster\Http\Controllers\Admin\TemplateController;
@@ -12,6 +13,16 @@ Route::middleware(['web', 'admin', 'auth:admin'])
     ->name('admin.autoposter.')
     ->group(function () {
         Route::get('/', [DashboardController::class, 'index'])->name('index');
+
+        // Phone planner (week view + bottom-sheet editor, JSON actions).
+        Route::get('/m',                       [MobileController::class, 'index'])->name('mobile');
+        Route::get('/m/posts',                 [MobileController::class, 'posts'])->name('mobile.posts');
+        Route::post('/m/posts/{id}',           [MobileController::class, 'update'])->name('mobile.update');
+        Route::post('/m/posts/{id}/recaption', [MobileController::class, 'recaption'])->name('mobile.recaption');
+        Route::post('/m/posts/{id}/shuffle',   [MobileController::class, 'shuffle'])->name('mobile.shuffle');
+        Route::post('/m/posts/{id}/skip',      [MobileController::class, 'skip'])->name('mobile.skip');
+        Route::post('/m/posts/{id}/publish',   [MobileController::class, 'publish'])->name('mobile.publish');
+        Route::post('/m/toggle',               [MobileController::class, 'toggle'])->name('mobile.toggle');
         Route::post('/preflight', [DashboardController::class, 'preflight'])->name('preflight');
         Route::post('/toggle',    [DashboardController::class, 'toggle'])->name('toggle');
         Route::post('/plan-now',  [DashboardController::class, 'planNow'])->name('plan');
@@ -51,6 +62,11 @@ Route::middleware(['web', 'admin', 'auth:admin'])
         Route::post('/posts/{id}/duplicate',        [PostController::class, 'duplicate'])->name('posts.duplicate');
         Route::delete('/posts/{id}',                [PostController::class, 'destroy'])->name('posts.destroy');
     });
+
+// Short address for phones: /admin/posts
+Route::middleware(['web', 'admin', 'auth:admin'])
+    ->get(config('app.admin_url').'/posts', fn () => redirect()->route('admin.autoposter.mobile'))
+    ->name('admin.autoposter.short');
 
 // TikTok OAuth redirect URI registered in the developer portal: /admin/tiktok/callback
 Route::middleware(['web', 'admin', 'auth:admin'])

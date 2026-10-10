@@ -5,6 +5,7 @@ namespace Fujiba\AutoPoster\Services;
 use Carbon\CarbonInterface;
 use Fujiba\AutoPoster\Models\AutoPosterPostProduct;
 use Fujiba\AutoPoster\Models\AutoPosterQueue;
+use Fujiba\AutoPoster\Models\AutoPosterTemplate;
 use Fujiba\AutoPoster\Models\AutoPosterSetting;
 use Fujiba\FacebookCatalog\Models\FacebookCatalogSetting;
 use Illuminate\Support\Facades\DB;
@@ -81,7 +82,10 @@ class QueueBuilder
                     : AutoPosterQueue::STATUS_DRAFT,
                 'format'                => $settings->default_format ?: AutoPosterSetting::FORMAT_MULTI_PHOTO,
                 'language_mode'         => $settings->default_language,
-                'template_id'           => $settings->default_template_id,
+                // No pinned template -> rotate through the active ones so a
+                // week of posts doesn't read the same.
+                'template_id'           => $settings->default_template_id
+                    ?: AutoPosterTemplate::where('channel_id', $channelId)->where('is_active', true)->pluck('id')->shuffle()->first(),
                 'messenger_destination' => $messenger,
                 'messenger_ref'         => $settings->messenger_ref,
                 'scheduled_at'          => $scheduledAt,
@@ -109,6 +113,19 @@ class QueueBuilder
         $slots = $planner->upcomingSlotsForDay($settings, $day);
 
         if (empty($slots)) {
+            return [];
+        }
+
+        // A day that already holds its quota (including posts the admin moved
+        // to another time, which leave their original slot empty) is done.
+        $tz    = $settings->timezone ?: 'Asia/Tokyo';
+        $local = $slots[0]->copy()->setTimezone($tz);
+        $onDay = AutoPosterQueue::where('channel_id', $settings->channel_id)
+            ->whereNotIn('status', [AutoPosterQueue::STATUS_FAILED])
+            ->whereBetween('scheduled_at', [$local->copy()->startOfDay()->utc(), $local->copy()->endOfDay()->utc()])
+            ->count();
+
+        if ($onDay >= max(1, (int) $settings->posts_per_day)) {
             return [];
         }
 
@@ -208,6 +225,9 @@ class QueueBuilder
                 AutoPosterQueue::STATUS_SCHEDULED,
                 AutoPosterQueue::STATUS_PROCESSING,
                 AutoPosterQueue::STATUS_PUBLISHED,
+                // A post the admin skipped keeps its slot; refilling it would
+                // undo the skip on the next planning run.
+                AutoPosterQueue::STATUS_CANCELLED,
             ])
             ->whereBetween('scheduled_at', [
                 $slot->copy()->subSeconds(60),

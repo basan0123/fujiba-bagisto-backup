@@ -44,6 +44,16 @@
             </label>
 
             <label class="flex flex-col gap-1 text-sm">
+                <span>Storefront status</span>
+                <select name="status" onchange="this.form.submit()"
+                        class="border rounded px-2 py-1 dark:bg-gray-800">
+                    <option value="active"   {{ $status === 'active' ? 'selected' : '' }}>Active only</option>
+                    <option value="inactive" {{ $status === 'inactive' ? 'selected' : '' }}>Disabled / hidden</option>
+                    <option value="any"      {{ $status === 'any' ? 'selected' : '' }}>Any status</option>
+                </select>
+            </label>
+
+            <label class="flex flex-col gap-1 text-sm">
                 <span>Filter</span>
                 <select name="filter" onchange="this.form.submit()"
                         class="border rounded px-2 py-1 dark:bg-gray-800">
@@ -64,6 +74,17 @@
             <button class="px-3 py-1 bg-blue-600 text-white text-sm rounded">Apply</button>
         </form>
 
+        @if ($staleApproved > 0)
+            <div class="p-3 border-l-4 border-red-500 rounded text-sm bg-red-50 dark:bg-red-900/20">
+                <strong>{{ $staleApproved }}</strong> approved product(s) on this channel are disabled or hidden on
+                the storefront. These are still eligible for sync and may already be live on Facebook linking to a
+                dead product page.
+                <a href="{{ request()->fullUrlWithQuery(['status' => 'inactive', 'filter' => 'approved', 'page' => null]) }}"
+                   class="underline font-medium">Review them</a>
+                and untick approval.
+            </div>
+        @endif
+
         @if (! $settings)
             <div class="p-3 border-l-4 border-yellow-500 rounded text-sm bg-yellow-50 dark:bg-yellow-900/20">
                 This channel has no Facebook catalog settings yet. Save credentials on
@@ -76,7 +97,14 @@
             @csrf
             <input type="hidden" name="channel_id" value="{{ $channelId }}">
 
-            <div class="flex items-center gap-2 mb-2 text-sm">
+            {{-- Carries the active filters so "select all matching" resolves the
+                 same set server-side instead of trusting a client id list. --}}
+            <input type="hidden" name="q"      value="{{ $search }}">
+            <input type="hidden" name="filter" value="{{ $filter }}">
+            <input type="hidden" name="status" value="{{ $status }}">
+            <input type="hidden" name="select_all" id="select-all-flag" value="0">
+
+            <div class="flex items-center gap-2 mb-2 text-sm flex-wrap">
                 <span class="text-gray-600">With selected:</span>
                 <button name="approve" value="1"
                         class="px-3 py-1 bg-green-600 text-white text-xs rounded">Approve</button>
@@ -84,6 +112,24 @@
                         class="px-3 py-1 bg-gray-300 text-xs rounded">Unapprove</button>
                 <span class="text-xs text-gray-500 ml-4" id="bulk-count">0 selected</span>
             </div>
+
+            @if ($products->total() > $products->count())
+                <div class="mb-2 p-2 rounded text-xs bg-blue-50 dark:bg-blue-900/20 border border-blue-200 dark:border-blue-800"
+                     id="select-all-bar" style="display:none">
+                    <span id="select-all-prompt">
+                        All <strong>{{ $products->count() }}</strong> on this page are selected.
+                        <button type="button" id="select-all-matching" class="underline font-medium text-blue-700 dark:text-blue-300">
+                            Select all {{ number_format($products->total()) }} products matching the current filter
+                        </button>
+                    </span>
+                    <span id="select-all-active" style="display:none">
+                        All <strong>{{ number_format($products->total()) }}</strong> products matching the current filter are selected.
+                        <button type="button" id="select-all-clear" class="underline font-medium text-blue-700 dark:text-blue-300">
+                            Clear selection
+                        </button>
+                    </span>
+                </div>
+            @endif
 
             <div class="overflow-x-auto border rounded">
                 <table class="min-w-full text-sm">
@@ -194,22 +240,89 @@
                 });
             });
 
-            const allCb = document.getElementById('bulk-toggle-all');
-            const rowCbs = document.querySelectorAll('.bulk-row-cb');
+            const allCb   = document.getElementById('bulk-toggle-all');
+            const rowCbs  = document.querySelectorAll('.bulk-row-cb');
             const counter = document.getElementById('bulk-count');
+
+            const flag       = document.getElementById('select-all-flag');
+            const bar        = document.getElementById('select-all-bar');
+            const promptEl   = document.getElementById('select-all-prompt');
+            const activeEl   = document.getElementById('select-all-active');
+            const matchBtn   = document.getElementById('select-all-matching');
+            const clearBtn   = document.getElementById('select-all-clear');
+            const totalCount = {{ (int) $products->total() }};
+
+            // Leaving select-all-matching mode on any narrower selection change
+            // keeps the flag from silently applying to rows the operator just
+            // deselected — the submitted set must match what the bar claims.
+            const exitSelectAll = () => {
+                if (flag) flag.value = '0';
+                if (promptEl) promptEl.style.display = '';
+                if (activeEl) activeEl.style.display = 'none';
+            };
 
             const updateCount = () => {
                 const n = document.querySelectorAll('.bulk-row-cb:checked').length;
-                if (counter) counter.textContent = n + ' selected';
+                const selectAllOn = flag && flag.value === '1';
+
+                if (counter) {
+                    counter.textContent = selectAllOn
+                        ? totalCount.toLocaleString() + ' selected (all matching)'
+                        : n + ' selected';
+                }
+
+                if (bar) {
+                    bar.style.display = (n > 0 && n === rowCbs.length) ? '' : 'none';
+                }
             };
 
             if (allCb) {
                 allCb.addEventListener('change', () => {
                     rowCbs.forEach(cb => { cb.checked = allCb.checked; });
+                    exitSelectAll();
                     updateCount();
                 });
             }
-            rowCbs.forEach(cb => cb.addEventListener('change', updateCount));
+
+            rowCbs.forEach(cb => cb.addEventListener('change', () => {
+                exitSelectAll();
+                if (allCb) allCb.checked = document.querySelectorAll('.bulk-row-cb:checked').length === rowCbs.length;
+                updateCount();
+            }));
+
+            if (matchBtn) {
+                matchBtn.addEventListener('click', () => {
+                    if (flag) flag.value = '1';
+                    if (promptEl) promptEl.style.display = 'none';
+                    if (activeEl) activeEl.style.display = '';
+                    updateCount();
+                });
+            }
+
+            if (clearBtn) {
+                clearBtn.addEventListener('click', () => {
+                    rowCbs.forEach(cb => { cb.checked = false; });
+                    if (allCb) allCb.checked = false;
+                    exitSelectAll();
+                    updateCount();
+                });
+            }
+
+            // Guard the destructive-ish path: unapproving hundreds of products
+            // pulls them from the live Facebook catalog on the next sync.
+            const bulkForm = document.getElementById('bulk-form');
+            if (bulkForm) {
+                bulkForm.addEventListener('submit', (e) => {
+                    if (flag && flag.value === '1') {
+                        const verb = (e.submitter && e.submitter.value === '0') ? 'Unapprove' : 'Approve';
+                        if (! confirm(verb + ' all ' + totalCount.toLocaleString() + ' products matching the current filter?')) {
+                            e.preventDefault();
+                        }
+                    }
+                });
+            }
+
+            updateCount();
         })();
     </script>
 </x-admin::layouts>

@@ -1,93 +1,95 @@
 <x-admin::layouts>
     <x-slot:title>Auto Poster</x-slot:title>
 
-    <div class="flex flex-col gap-4">
-        <div class="flex items-center justify-between flex-wrap gap-2">
-            <p class="text-xl text-gray-800 dark:text-white font-bold">Facebook Auto Poster</p>
-        </div>
+    <div class="ap">
+        @include('autoposter::admin._header', [
+            'title'    => 'Facebook Auto Poster',
+            'subtitle' => 'Schedule product carousels to your Page and route buyers to Messenger.',
+        ])
 
         @include('autoposter::admin._nav')
         @include('autoposter::admin._flash')
 
         @if (! $channelId)
-            <div class="p-4 border rounded text-sm">No channels configured.</div>
+            <div class="ap-card ap-empty">
+                <div class="ap-empty-icon ap-tone-gray">@include('autoposter::admin._icon', ['i' => 'box'])</div>
+                <h3>No channels configured</h3>
+                <p>Create a sales channel first, then come back to set up auto posting.</p>
+            </div>
         @else
 
         @php($ready = $preflight['ready'] ?? null)
+        @php($on = (bool) $settings?->auto_posting_enabled)
 
-        {{-- ── READY TO LAUNCH banner ─────────────────────────────────── --}}
-        <div class="rounded border p-4 flex flex-col gap-3
-                    {{ $ready === true ? 'border-green-500 bg-green-50 dark:bg-green-900/20'
-                       : ($ready === false ? 'border-red-500 bg-red-50 dark:bg-red-900/20'
-                       : 'border-gray-300 bg-gray-50 dark:bg-gray-800 dark:border-gray-700') }}">
-            <div class="flex items-start justify-between gap-4 flex-wrap">
-                <div>
-                    <div class="text-lg font-bold
-                        {{ $ready === true ? 'text-green-700 dark:text-green-300'
-                           : ($ready === false ? 'text-red-700 dark:text-red-300' : 'text-gray-700 dark:text-gray-200') }}">
-                        @if ($ready === true)
-                            ✅ READY TO LAUNCH
-                        @elseif ($ready === false)
-                            ⚠️ NOT READY — {{ $preflight['blocking_failures'] }} issue(s) to fix
-                        @else
-                            Pre-flight not run yet
-                        @endif
+        {{-- ── Readiness + master switch ──────────────────────────────── --}}
+        <div class="ap-card ap-hero ap-rise {{ $ready === true ? 'is-ready' : ($ready === false ? 'is-blocked' : '') }}">
+            <div class="ap-hero-row">
+                <div class="ap-hero-state">
+                    <div class="ap-hero-icon {{ $ready === true ? 'ap-tone-green' : ($ready === false ? 'ap-tone-red' : 'ap-tone-gray') }}">
+                        @include('autoposter::admin._icon', ['i' => $ready === true ? 'shield' : ($ready === false ? 'alert' : 'info')])
                     </div>
-                    <div class="text-xs text-gray-600 dark:text-gray-400 mt-1">
-                        @if ($preflightAt)
-                            Last checked {{ $preflightAt->diffForHumans() }}
-                            @if (($preflight['warnings'] ?? 0) > 0)
-                                · {{ $preflight['warnings'] }} warning(s)
+                    <div>
+                        <div class="ap-hero-title">
+                            @if ($ready === true)
+                                Ready to launch
+                            @elseif ($ready === false)
+                                Not ready — {{ $preflight['blocking_failures'] }} issue(s) to fix
+                            @else
+                                Pre-flight not run yet
                             @endif
-                        @else
-                            Run the checks to confirm this channel can post.
-                        @endif
+                        </div>
+                        <div class="ap-muted ap-small" style="margin-top: 2px;">
+                            @if ($preflightAt)
+                                Last checked {{ $preflightAt->diffForHumans() }}
+                                @if (($preflight['warnings'] ?? 0) > 0)
+                                    · {{ $preflight['warnings'] }} warning(s)
+                                @endif
+                            @else
+                                Run the checks to confirm this channel can post.
+                            @endif
+                        </div>
                     </div>
                 </div>
 
-                <div class="flex items-center gap-2">
+                <div class="ap-actions">
                     <form method="POST" action="{{ route('admin.autoposter.preflight') }}">
                         @csrf
                         <input type="hidden" name="channel_id" value="{{ $channelId }}">
-                        <button class="px-3 py-2 border rounded text-sm bg-white dark:bg-gray-900 dark:border-gray-700">
-                            Run pre-flight checks
+                        <button class="ap-btn ap-btn-secondary">
+                            @include('autoposter::admin._icon', ['i' => 'refresh']) Run checks
                         </button>
                     </form>
 
                     {{-- Master toggle. Turning ON re-runs pre-flight server-side;
                          turning OFF mid-queue asks for confirmation. --}}
                     <form method="POST" action="{{ route('admin.autoposter.toggle') }}"
-                          @if ($settings?->auto_posting_enabled)
+                          @if ($on)
                               onsubmit="return confirm('Turn OFF auto posting?\n\nScheduled posts will stay in the queue but will NOT be published until you turn it back on.');"
                           @endif>
                         @csrf
                         <input type="hidden" name="channel_id" value="{{ $channelId }}">
-                        <input type="hidden" name="enable" value="{{ $settings?->auto_posting_enabled ? 0 : 1 }}">
-                        <button class="px-4 py-2 rounded text-sm text-white
-                                       {{ $settings?->auto_posting_enabled ? 'bg-red-600' : 'bg-green-600' }}">
-                            {{ $settings?->auto_posting_enabled ? 'Turn OFF auto posting' : 'Turn ON auto posting' }}
+                        <input type="hidden" name="enable" value="{{ $on ? 0 : 1 }}">
+                        <button class="ap-switch {{ $on ? 'is-on' : '' }}" title="{{ $on ? 'Click to turn off' : 'Click to turn on' }}">
+                            <span class="ap-switch-track"></span>
+                            Auto posting {{ $on ? 'ON' : 'OFF' }}
                         </button>
                     </form>
                 </div>
             </div>
 
             @if (! empty($preflight['checks']))
-                <div class="grid gap-1.5 md:grid-cols-2">
+                <div class="ap-checks">
                     @foreach ($preflight['checks'] as $check)
-                        <div class="flex items-start gap-2 text-sm">
-                            <span class="mt-0.5">
-                                @if ($check['status'] === 'pass') ✅
-                                @elseif ($check['status'] === 'warn') ⚠️
-                                @else ❌
-                                @endif
+                        @php($tone = $check['status'] === 'pass' ? 'ap-tone-green' : ($check['status'] === 'warn' ? 'ap-tone-amber' : 'ap-tone-red'))
+                        <div class="ap-check-item">
+                            <span class="ap-check-dot {{ $tone }}">
+                                @include('autoposter::admin._icon', ['i' => $check['status'] === 'pass' ? 'check' : ($check['status'] === 'warn' ? 'alert' : 'x')])
                             </span>
                             <div>
-                                <span class="font-medium">{{ $check['label'] }}</span>
-                                <div class="text-xs text-gray-600 dark:text-gray-400">{{ $check['detail'] }}</div>
+                                <b>{{ $check['label'] }}</b>
+                                <p>{{ $check['detail'] }}</p>
                                 @if (! empty($check['fix']))
-                                    <div class="text-xs mt-0.5 text-blue-700 dark:text-blue-300">
-                                        → {{ $check['fix'] }}
-                                    </div>
+                                    <p class="ap-fix">→ {{ $check['fix'] }}</p>
                                 @endif
                             </div>
                         </div>
@@ -98,133 +100,145 @@
 
         {{-- Operator-level kill switch notice. --}}
         @if (! $scheduleOn)
-            <div class="p-3 border border-yellow-500 rounded text-sm bg-yellow-50 dark:bg-yellow-900/20 text-yellow-800 dark:text-yellow-200">
-                <strong>Global scheduler is OFF.</strong>
-                Posts can be created and scheduled, but nothing will publish automatically until an
-                operator sets <code>AUTOPOSTER_SCHEDULE_ENABLED=true</code> in <code>.env</code>.
-                Manual <em>Post Now</em> still works.
+            <div class="ap-alert ap-alert-warn">
+                @include('autoposter::admin._icon', ['i' => 'alert'])
+                <div class="ap-alert-body">
+                    <strong>Global scheduler is OFF.</strong>
+                    Posts can be created and scheduled, but nothing will publish automatically until an
+                    operator sets <code>AUTOPOSTER_SCHEDULE_ENABLED=true</code> in <code>.env</code>.
+                    Manual <em>Post Now</em> still works.
+                </div>
             </div>
         @endif
 
-        {{-- ── Status tiles ───────────────────────────────────────────── --}}
-        <div class="grid gap-3 grid-cols-2 md:grid-cols-4">
+        {{-- ── Stat tiles ─────────────────────────────────────────────── --}}
+        <div class="ap-grid ap-grid-4">
             @php($tiles = [
-                ['Auto posting', $settings?->auto_posting_enabled ? 'ON' : 'OFF',
-                    $settings?->auto_posting_enabled ? 'text-green-600' : 'text-gray-500'],
-                ['Posts per day', $settings->posts_per_day ?? 5, ''],
-                ['Published today', $stats['published_today'], ''],
-                ['Failed', $stats['failed'], $stats['failed'] > 0 ? 'text-red-600' : ''],
+                ['Auto posting', $on ? 'ON' : 'OFF', 'power', $on ? 'ap-tone-green' : 'ap-tone-gray'],
+                ['Posts per day', $settings->posts_per_day ?? 5, 'calendar', 'ap-tone-blue'],
+                ['Published today', $stats['published_today'], 'send', 'ap-tone-violet'],
+                ['Failed', $stats['failed'], 'alert', $stats['failed'] > 0 ? 'ap-tone-red' : 'ap-tone-gray'],
             ])
 
-            @foreach ($tiles as [$label, $value, $colour])
-                <div class="border rounded p-3 dark:border-gray-700">
-                    <div class="text-xs text-gray-500 dark:text-gray-400">{{ $label }}</div>
-                    <div class="text-2xl font-bold {{ $colour }}">{{ $value }}</div>
+            @foreach ($tiles as [$label, $value, $icon, $tone])
+                <div class="ap-card ap-stat ap-rise">
+                    <div class="ap-stat-icon {{ $tone }}">@include('autoposter::admin._icon', ['i' => $icon])</div>
+                    <div>
+                        <div class="ap-stat-label">{{ $label }}</div>
+                        <div class="ap-stat-value">{{ $value }}</div>
+                    </div>
                 </div>
             @endforeach
         </div>
 
-        <div class="grid gap-4 md:grid-cols-2">
+        <div class="ap-grid ap-grid-2">
             {{-- Connection summary --}}
-            <div class="border rounded p-4 dark:border-gray-700 flex flex-col gap-2">
-                <h2 class="font-semibold">Connection</h2>
-                <dl class="text-sm grid grid-cols-3 gap-y-1.5">
-                    <dt class="text-gray-500 dark:text-gray-400">Page</dt>
-                    <dd class="col-span-2">{{ $catalog?->page_id ?: '—' }}</dd>
+            <div class="ap-card ap-rise">
+                <div class="ap-card-head">
+                    <h2 class="ap-card-title">@include('autoposter::admin._icon', ['i' => 'link']) Connection</h2>
+                </div>
+                <dl class="ap-dl">
+                    <dt>Page</dt>
+                    <dd class="ap-mono">{{ $catalog?->page_id ?: '—' }}</dd>
 
-                    <dt class="text-gray-500 dark:text-gray-400">Catalog</dt>
-                    <dd class="col-span-2">{{ $catalog?->catalog_id ?: '—' }}</dd>
+                    <dt>Catalog</dt>
+                    <dd class="ap-mono">{{ $catalog?->catalog_id ?: '—' }}</dd>
 
-                    <dt class="text-gray-500 dark:text-gray-400">Product set</dt>
-                    <dd class="col-span-2">
+                    <dt>Product set</dt>
+                    <dd>
                         @php($cfg = $settings?->selection_config ?? [])
                         @if (($settings?->selection_mode) === 'product_set' && ! empty($cfg['retailer_ids']))
                             {{ count($cfg['retailer_ids']) }} SKU(s)
                         @else
-                            <span class="text-gray-500">Mode: {{ str_replace('_', ' ', $settings->selection_mode ?? 'random') }}</span>
+                            <span class="ap-badge ap-tone-gray no-dot">{{ str_replace('_', ' ', $settings->selection_mode ?? 'random') }}</span>
                         @endif
                     </dd>
 
-                    <dt class="text-gray-500 dark:text-gray-400">Messenger</dt>
-                    <dd class="col-span-2 break-all">
-                        {{ $settings?->messenger_destination
-                           ?: ($catalog?->page_id ? 'https://m.me/' . $catalog->page_id : '—') }}
+                    <dt>Messenger</dt>
+                    <dd>
+                        @php($mlink = $settings?->messenger_destination ?: ($catalog?->page_id ? 'https://m.me/' . $catalog->page_id : null))
+                        @if ($mlink)
+                            <a href="{{ $mlink }}" target="_blank" rel="noopener" class="ap-link" style="word-break: break-all;">{{ $mlink }}</a>
+                        @else
+                            —
+                        @endif
                     </dd>
 
-                    <dt class="text-gray-500 dark:text-gray-400">Eligible</dt>
-                    <dd class="col-span-2">{{ $eligibleCount }} product(s) ready to post</dd>
+                    <dt>Eligible</dt>
+                    <dd><span class="ap-badge ap-tone-green">{{ $eligibleCount }} products ready</span></dd>
                 </dl>
             </div>
 
             {{-- Timing --}}
-            <div class="border rounded p-4 dark:border-gray-700 flex flex-col gap-2">
-                <h2 class="font-semibold">Timing</h2>
-                <dl class="text-sm grid grid-cols-3 gap-y-1.5">
-                    <dt class="text-gray-500 dark:text-gray-400">Next post</dt>
-                    <dd class="col-span-2">
+            <div class="ap-card ap-rise">
+                <div class="ap-card-head">
+                    <h2 class="ap-card-title">@include('autoposter::admin._icon', ['i' => 'clock']) Timing</h2>
+                    <form method="POST" action="{{ route('admin.autoposter.plan') }}">
+                        @csrf
+                        <input type="hidden" name="channel_id" value="{{ $channelId }}">
+                        <button class="ap-btn ap-btn-secondary ap-btn-sm">
+                            @include('autoposter::admin._icon', ['i' => 'sparkles']) Fill today's slots
+                        </button>
+                    </form>
+                </div>
+                <dl class="ap-dl">
+                    <dt>Next post</dt>
+                    <dd>
                         @if ($nextPost)
-                            <a href="{{ route('admin.autoposter.posts.edit', $nextPost->id) }}" class="text-blue-600">
+                            <a href="{{ route('admin.autoposter.posts.edit', $nextPost->id) }}" class="ap-link">
                                 {{ $nextPost->scheduled_at->format('Y-m-d H:i') }}
-                                ({{ $nextPost->scheduled_at->diffForHumans() }})
                             </a>
+                            <span class="ap-muted ap-small">· {{ $nextPost->scheduled_at->diffForHumans() }}</span>
                         @else
-                            <span class="text-gray-500">Nothing scheduled</span>
+                            <span class="ap-muted">Nothing scheduled</span>
                         @endif
                     </dd>
 
-                    <dt class="text-gray-500 dark:text-gray-400">Last success</dt>
-                    <dd class="col-span-2">
+                    <dt>Last success</dt>
+                    <dd>
                         @if ($lastPublished)
                             {{ $lastPublished->published_at?->format('Y-m-d H:i') }}
                             @if ($lastPublished->facebook_permalink)
-                                <a href="{{ $lastPublished->facebook_permalink }}" target="_blank" rel="noopener"
-                                   class="text-blue-600">view →</a>
+                                <a href="{{ $lastPublished->facebook_permalink }}" target="_blank" rel="noopener" class="ap-link">· view post</a>
                             @endif
                         @else
-                            <span class="text-gray-500">None yet</span>
+                            <span class="ap-muted">None yet</span>
                         @endif
                     </dd>
 
-                    <dt class="text-gray-500 dark:text-gray-400">Window</dt>
-                    <dd class="col-span-2">
+                    <dt>Window</dt>
+                    <dd>
                         @if (! empty($settings?->posting_times))
                             {{ implode(', ', $settings->posting_times) }}
                         @else
                             {{ substr($settings->posting_window_start ?? '09:00:00', 0, 5) }}–{{ substr($settings->posting_window_end ?? '21:30:00', 0, 5) }}
-                            (auto)
+                            <span class="ap-muted">(auto)</span>
                         @endif
-                        <span class="text-gray-500">{{ $settings->timezone ?? 'Asia/Tokyo' }}</span>
+                        <span class="ap-muted ap-small">· {{ $settings->timezone ?? 'Asia/Tokyo' }}</span>
                     </dd>
                 </dl>
-
-                <form method="POST" action="{{ route('admin.autoposter.plan') }}" class="mt-1">
-                    @csrf
-                    <input type="hidden" name="channel_id" value="{{ $channelId }}">
-                    <button class="px-3 py-1.5 border rounded text-sm dark:border-gray-700">
-                        Fill today's remaining slots
-                    </button>
-                </form>
             </div>
         </div>
 
         {{-- ── Queue by status ───────────────────────────────────────── --}}
-        <div class="border rounded p-4 dark:border-gray-700">
-            <div class="flex items-center justify-between mb-3 flex-wrap gap-2">
-                <h2 class="font-semibold">Queue</h2>
-                <div class="flex gap-2">
-                    <a href="{{ route('admin.autoposter.posts.create', ['channel_id' => $channelId]) }}"
-                       class="px-4 py-2 bg-blue-600 text-white rounded text-sm">Manual Post</a>
-                    <a href="{{ route('admin.autoposter.bulk', ['channel_id' => $channelId]) }}"
-                       class="px-4 py-2 bg-indigo-600 text-white rounded text-sm">Bulk Post</a>
+        <div class="ap-card ap-rise">
+            <div class="ap-card-head">
+                <h2 class="ap-card-title">@include('autoposter::admin._icon', ['i' => 'queue']) Queue</h2>
+                <div class="ap-actions">
+                    <a href="{{ route('admin.autoposter.bulk', ['channel_id' => $channelId]) }}" class="ap-btn ap-btn-secondary">
+                        @include('autoposter::admin._icon', ['i' => 'layers']) Bulk schedule
+                    </a>
+                    <a href="{{ route('admin.autoposter.posts.create', ['channel_id' => $channelId]) }}" class="ap-btn ap-btn-primary">
+                        @include('autoposter::admin._icon', ['i' => 'plus']) New post
+                    </a>
                 </div>
             </div>
 
-            <div class="grid gap-2 grid-cols-3 md:grid-cols-6">
+            <div class="ap-status-strip">
                 @foreach (['draft','scheduled','processing','published','failed','cancelled'] as $st)
-                    <a href="{{ route('admin.autoposter.queue', ['channel_id' => $channelId, 'status' => $st]) }}"
-                       class="border rounded p-2 text-center hover:bg-gray-50 dark:hover:bg-gray-800 dark:border-gray-700">
-                        <div class="text-lg font-bold">{{ $stats[$st] }}</div>
-                        <div class="text-xs text-gray-500 capitalize">{{ $st }}</div>
+                    <a href="{{ route('admin.autoposter.queue', ['channel_id' => $channelId, 'status' => $st]) }}" class="ap-status-cell">
+                        @include('autoposter::admin._status', ['status' => $st])
+                        <b>{{ $stats[$st] }}</b>
                     </a>
                 @endforeach
             </div>
@@ -232,38 +246,44 @@
 
         {{-- ── Recent posts ──────────────────────────────────────────── --}}
         @if ($recent->count())
-            <div class="border rounded dark:border-gray-700 overflow-x-auto">
-                <table class="w-full text-sm">
-                    <thead class="bg-gray-50 dark:bg-gray-800">
-                        <tr class="text-left">
-                            <th class="p-2">Post</th>
-                            <th class="p-2">Products</th>
-                            <th class="p-2">Status</th>
-                            <th class="p-2">When</th>
-                            <th class="p-2"></th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        @foreach ($recent as $post)
-                            <tr class="border-t dark:border-gray-700">
-                                <td class="p-2">#{{ $post->id }}
-                                    <span class="text-xs text-gray-500">{{ $post->origin }}</span>
-                                </td>
-                                <td class="p-2">{{ $post->products->count() }}</td>
-                                <td class="p-2">
-                                    @include('autoposter::admin._status', ['status' => $post->status])
-                                </td>
-                                <td class="p-2 whitespace-nowrap">
-                                    {{ optional($post->published_at ?? $post->scheduled_at)->format('m-d H:i') ?? '—' }}
-                                </td>
-                                <td class="p-2 text-right">
-                                    <a href="{{ route('admin.autoposter.posts.edit', $post->id) }}"
-                                       class="text-blue-600">view</a>
-                                </td>
+            <div class="ap-card ap-card-flush ap-rise">
+                <div class="ap-card-head" style="padding: 18px 20px 0;">
+                    <h2 class="ap-card-title">@include('autoposter::admin._icon', ['i' => 'chart']) Recent posts</h2>
+                    <a href="{{ route('admin.autoposter.queue', ['channel_id' => $channelId]) }}" class="ap-link ap-small">View all →</a>
+                </div>
+                <div class="ap-table-wrap">
+                    <table class="ap-table">
+                        <thead>
+                            <tr>
+                                <th>Post</th>
+                                <th>Products</th>
+                                <th>Status</th>
+                                <th>When</th>
+                                <th></th>
                             </tr>
-                        @endforeach
-                    </tbody>
-                </table>
+                        </thead>
+                        <tbody>
+                            @foreach ($recent as $post)
+                                <tr>
+                                    <td>
+                                        <b>#{{ $post->id }}</b>
+                                        <span class="ap-muted ap-small">· {{ $post->origin }}</span>
+                                    </td>
+                                    <td>{{ $post->products->count() }}</td>
+                                    <td>@include('autoposter::admin._status', ['status' => $post->status])</td>
+                                    <td class="ap-muted" style="white-space: nowrap;">
+                                        {{ optional($post->published_at ?? $post->scheduled_at)->format('m-d H:i') ?? '—' }}
+                                    </td>
+                                    <td style="text-align: right;">
+                                        <a href="{{ route('admin.autoposter.posts.edit', $post->id) }}" class="ap-btn ap-btn-ghost ap-btn-sm">
+                                            @include('autoposter::admin._icon', ['i' => 'eye']) Open
+                                        </a>
+                                    </td>
+                                </tr>
+                            @endforeach
+                        </tbody>
+                    </table>
+                </div>
             </div>
         @endif
 

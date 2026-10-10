@@ -53,10 +53,14 @@ class PreflightChecker
         $checks[] = $this->checkPageSelected($catalog);
 
         // Only worth calling Graph if we have something to call it with.
-        $tokenCheck = $catalog && ! empty($catalog->access_token)
+        // With the ChatPion transport the catalog token never publishes —
+        // ChatPion posts with its own page token — so check that path instead.
+        $tokenCheck = config('autoposter.transport') === 'chatpion'
+            ? $this->checkChatpionTransport($channelId)
+            : ($catalog && ! empty($catalog->access_token)
             ? $this->checkTokenAndPermissions($catalog)
             : $this->fail('facebook_token', 'Facebook token', 'No access token stored for this channel.',
-                'Add the Page access token on the Facebook Catalog settings page.');
+                'Add the Page access token on the Facebook Catalog settings page.'));
         $checks[] = $tokenCheck;
 
         $checks[] = $this->checkCatalogConnection($catalog);
@@ -186,6 +190,36 @@ class PreflightChecker
         }
     }
 
+    /**
+     * ChatPion transport: needs a page id mapped for the channel and a ChatPion
+     * API key in LiveChat settings (the key ChatpionPostClient sends).
+     */
+    protected function checkChatpionTransport(int $channelId): array
+    {
+        $pageId = config('autoposter.page_ids.' . $channelId);
+
+        if (empty($pageId)) {
+            return $this->fail('facebook_token', 'Facebook posting (via ChatPion)',
+                'No ChatPion page id mapped for channel ' . $channelId . '.',
+                'Set AUTOPOSTER_PAGE_ID_CHANNEL_' . $channelId . ' in .env.');
+        }
+
+        $hasKey = \Illuminate\Support\Facades\DB::connection(config('tenancy.database.central_connection', 'mysql'))
+            ->table('livechat_settings')
+            ->whereNotNull('chatpion_api_key')
+            ->where('chatpion_api_key', '<>', '')
+            ->exists();
+
+        if (! $hasKey) {
+            return $this->fail('facebook_token', 'Facebook posting (via ChatPion)',
+                'ChatPion API key is not configured.',
+                'Save the ChatPion API key in LiveChat settings.');
+        }
+
+        return $this->pass('facebook_token', 'Facebook posting (via ChatPion)',
+            'Posts publish through ChatPion (' . config('autoposter.chatpion_url') . ') to page ' . $pageId . ' using ChatPion\'s page token.');
+    }
+
     protected function checkCatalogConnection(?FacebookCatalogSetting $catalog): array
     {
         if (! $catalog || empty($catalog->catalog_id) || empty($catalog->access_token)) {
@@ -288,9 +322,8 @@ class PreflightChecker
             })->exists();
 
         if (! $hasDefault) {
-            return $this->warn('caption_template', 'Caption template available',
-                'Templates exist but none is marked default.',
-                'Pick a default template on the Settings page, or the first active one is used.');
+            return $this->pass('caption_template', 'Caption template available',
+                'No default set — posts rotate through the active templates.');
         }
 
         return $this->pass('caption_template', 'Caption template available', 'Default template set.');
