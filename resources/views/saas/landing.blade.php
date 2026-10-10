@@ -176,6 +176,57 @@ details p{margin:10px 0 0;color:var(--muted)}
 @media(max-width:1000px){.demo{flex-direction:column}.rail{flex-direction:row;overflow-x:auto;max-width:100%;padding-bottom:4px}.rail:before{display:none}
   .rail li{flex:0 0 auto}.rail button{font-size:0;padding:0}.rail button span{font-size:14px}.rail button[aria-current]{font-size:13px;padding-right:10px}}
 @media(prefers-reduced-motion:reduce){.scr,.scr *{animation:none!important;transition:none!important;opacity:1!important;transform:none!important}.typing{display:none}}
+/* animated POS demo */
+.sub{color:var(--muted);margin:10px 0 0}
+.posdemo{display:flex;gap:34px;align-items:center;justify-content:center}
+.stage{flex:none;width:560px;max-width:100%;padding-bottom:170px}
+.tab{position:relative;aspect-ratio:16/10.5;background:#fff;border:12px solid #2d2f4a;border-radius:26px;box-shadow:0 30px 70px rgba(45,47,74,.25);overflow:hidden;display:grid;grid-template-columns:1.35fr 1fr;font-size:12px}
+.tgrid{display:grid;grid-template-columns:1fr 1fr;gap:8px;padding:10px;background:var(--soft)}
+.tile{position:relative;border-radius:12px;overflow:hidden;min-height:0}
+.tile img{width:100%;height:100%;object-fit:cover;display:block}
+.tile span{position:absolute;left:6px;bottom:6px;right:6px;background:rgba(255,255,255,.92);border-radius:6px;padding:2px 6px;font-weight:700;font-size:11px;color:#2d2f4a}
+.bc{position:absolute;top:6px;left:6px;background:#fff;border-radius:4px;padding:0 5px;font-size:10px;letter-spacing:-1px;color:#2d2f4a}
+.beam{position:absolute;left:0;right:0;top:50%;height:2px;background:#ff2d55;box-shadow:0 0 12px 4px rgba(255,45,85,.6);opacity:0}
+.tcart{display:flex;flex-direction:column;padding:12px;gap:6px;color:#2d2f4a}
+.ct{font-size:14px}
+.scanning{color:#13704F;font-weight:800;opacity:0}
+.row{display:flex;justify-content:space-between;gap:6px;background:var(--soft);border-radius:8px;padding:6px 8px;opacity:0;transform:translateX(20px);transition:all .4s}
+.row small{display:block;color:var(--muted)}
+.tot{margin-top:auto;display:flex;justify-content:space-between;font-size:15px;font-weight:800;border-top:1px dashed var(--line);padding-top:6px;opacity:.25;transition:opacity .4s}
+.paybar{background:var(--g-pink);color:#fff;text-align:center;font-weight:800;border-radius:10px;padding:8px;transition:transform .2s}
+.modal,.hub{position:absolute;inset:0;display:grid;place-items:center;align-content:center;gap:12px;background:rgba(255,255,255,.96);opacity:0;pointer-events:none;transition:opacity .45s}
+.methods{display:flex;gap:8px}.methods span{border:2px solid var(--line);border-radius:10px;padding:8px 14px;font-weight:800;color:#2d2f4a;transition:all .3s}
+.ok{font-size:20px;font-weight:800;color:#13704F;opacity:0;transform:scale(.8);transition:all .4s .9s}
+.printer{position:relative;width:200px;height:14px;margin:-2px auto 0;background:#2d2f4a;border-radius:0 0 10px 10px}
+.receipt{position:absolute;top:10px;left:14px;right:14px;background:#fff;box-shadow:0 10px 20px rgba(45,47,74,.15);padding:0 10px;font:11px/1.5 ui-monospace,monospace;color:#2d2f4a;max-height:0;overflow:hidden;transition:max-height 1.4s ease-out,padding 1.4s}
+.receipt div{display:flex;justify-content:space-between;gap:6px}.receipt .rt{border-top:1px dashed #999;font-weight:800}
+.receipt p{text-align:center;margin:4px 0}.rbc{display:block;height:18px;background:repeating-linear-gradient(90deg,#2d2f4a 0 2px,transparent 2px 4px,#2d2f4a 4px 5px,transparent 5px 8px)}
+.hub{grid-template-columns:repeat(5,minmax(0,1fr));place-items:stretch;align-content:center;padding:14px;gap:22px 8px}
+.core,.hubcap{justify-self:center}
+.core{grid-column:1/-1;justify-self:center;background:var(--g-pink);color:#fff;border-radius:18px;padding:10px 22px;text-align:center;box-shadow:0 0 0 0 rgba(222,80,136,.5)}
+.core small{display:block;opacity:.85}.core b{font-size:18px}.core s{opacity:.7}
+.chn{position:relative;text-align:center;background:#fff;border:2px solid var(--line);border-radius:12px;padding:8px 4px;opacity:0;transform:translateY(10px);transition:all .4s}
+.chn:before{content:"";position:absolute;left:50%;bottom:100%;width:3px;height:18px;margin-left:-1px;background:linear-gradient(#dc4985,#a866d1);background-size:100% 200%}
+.chn b{display:block;font-size:12px;color:#2d2f4a}.chn small{font-weight:800;font-size:10.5px}
+.chn.instant{border-color:#2cc590}.chn.instant small{color:#13704F}
+.chn.auto{border-color:#6ca3f3}.chn.auto small{color:#2a4fc2}
+.hubcap{grid-column:1/-1;justify-self:center;font-weight:800;color:#2d2f4a}
+/* step states */
+.posdemo.at0 .beam{opacity:1;animation:scan 1.2s ease-in-out infinite}.posdemo.at0 .scanning{opacity:1}
+.posdemo.s1 .r0{opacity:1;transform:none}.posdemo.s1 .r1{opacity:1;transform:none;transition-delay:.7s}.posdemo.s1 .tot{opacity:1}
+.posdemo.at1 .t1,.posdemo.at1 .t2{box-shadow:0 0 0 3px var(--pink)}
+.posdemo.at2 .modal{opacity:1}.posdemo.at2 .methods span:last-child{border-color:#ff0033;background:#ff0033;color:#fff;transition-delay:.5s}.posdemo.at2 .ok{opacity:1;transform:none}
+.posdemo.at2 .paybar{transform:scale(.94)}
+.posdemo.s3 .receipt{max-height:220px;padding:8px 10px}
+.posdemo.at4 .hub{opacity:1}.posdemo.at4 .chn{opacity:1;transform:none}
+.posdemo.at4 .core{animation:pulse 1.6s infinite}.posdemo.at4 .chn:before{animation:liquid 1.2s linear infinite}
+@keyframes pulse{70%{box-shadow:0 0 0 16px rgba(222,80,136,0)}}
+.posdemo.at4 .c1{transition-delay:.15s}.posdemo.at4 .c2{transition-delay:.3s}.posdemo.at4 .c3{transition-delay:.45s}.posdemo.at4 .c4{transition-delay:.6s}
+.posdemo .rail{min-width:220px}
+@media(max-width:1000px){.posdemo{flex-direction:column;gap:0}.posdemo .rail{min-width:0}
+  .tab{grid-template-columns:1.1fr 1fr;font-size:11px}.hub{grid-template-columns:repeat(5,minmax(0,1fr));gap:10px 4px;padding:8px}.chn:before{display:none}
+  .chn{padding:5px 2px}.chn b{font-size:9.5px}.chn small{font-size:8.5px}.core{padding:6px 14px}.core b{font-size:14px}.hubcap{font-size:11px;text-align:center}}
+@media(prefers-reduced-motion:reduce){.posdemo *{animation:none!important;transition:none!important}}
 footer{padding:36px 0;color:var(--muted);font-size:14px;text-align:center}
 </style>
 </head>
@@ -183,7 +234,7 @@ footer{padding:36px 0;color:var(--muted);font-size:14px;text-align:center}
 <header class="top"><div class="wrap">
   <a class="brand" href="?lang={{ $locale }}">sns<b>sale</b></a>
   <nav class="menu">
-    <a href="#features">{{ $t['nav']['features'] }}</a><a href="#demo">{{ $t['nav']['flow'] }}</a><a href="#how">{{ $t['nav']['how'] }}</a>
+    <a href="#pos">{{ $t['nav']['pos'] }}</a><a href="#features">{{ $t['nav']['features'] }}</a><a href="#demo">{{ $t['nav']['flow'] }}</a><a href="#how">{{ $t['nav']['how'] }}</a>
     <a href="#pricing">{{ $t['nav']['pricing'] }}</a><a href="#faq">{{ $t['nav']['faq'] }}</a>
   </nav>
   <nav class="langs" aria-label="Language">
@@ -267,7 +318,54 @@ footer{padding:36px 0;color:var(--muted);font-size:14px;text-align:center}
   </div>
 </div></div>
 
-<section id="features" class="soft"><div class="wrap">
+<section id="pos" class="soft"><div class="wrap">
+  @php $pd = $t['pos_demo']; $sum = array_sum(array_column($pd['items'], 2)); @endphp
+  <div class="title"><h2>{{ $pd['h'] }}</h2><p class="sub">{{ $pd['sub'] }}</p></div>
+  <div class="posdemo" id="posdemo">
+    <div class="stage" aria-hidden="true">
+      <div class="tab">
+        <div class="tgrid">
+          <div class="tile t1"><img src="/saas/demo-fabric.webp" alt="" width="480" height="480"><span>{{ $pd['items'][0][0] }}</span><b class="bc">▮▯▮▮▯▮▯▮▮</b><i class="beam"></i></div>
+          <div class="tile t2 purple"><span>{{ $pd['items'][1][0] }}</span></div>
+          <div class="tile blue"></div><div class="tile green"></div>
+        </div>
+        <div class="tcart">
+          <b class="ct">{{ $pd['cart'] }}</b>
+          <div class="scanning k0">{{ $pd['scanning'] }}</div>
+          @foreach ($pd['items'] as $k => [$name, $qty, $price])
+            <div class="row r{{ $k }}"><span>{{ $name }}<small>{{ $qty }}</small></span><b>¥{{ number_format($price) }}</b></div>
+          @endforeach
+          <div class="tot"><span>{{ $pd['total'] }}</span><b>¥{{ number_format($sum) }}</b></div>
+          <div class="paybar">{{ $pd['pay'] }}</div>
+        </div>
+        <div class="modal">
+          <div class="methods">@foreach ($pd['methods'] as $m)<span>{{ $m }}</span>@endforeach</div>
+          <div class="ok">✓ {{ $pd['paid'] }} ¥{{ number_format($sum) }}</div>
+        </div>
+        <div class="hub">
+          <div class="core"><small>{{ $pd['stock'] }}</small><b><s>12 m</s> → 10 m</b></div>
+          @foreach ([['Web', 'instant'], ['POS', 'instant'], ['Facebook', 'auto'], ['Instagram', 'auto'], ['TikTok', 'auto']] as $k => [$ch, $mode])
+            <div class="chn c{{ $k }} {{ $mode }}"><b>{{ $ch }}</b><small>{{ $pd[$mode] }}</small></div>
+          @endforeach
+          <div class="hubcap">{{ $pd['synced'] }}</div>
+        </div>
+      </div>
+      <div class="printer"><div class="receipt">
+        <b>snssale</b>
+        @foreach ($pd['items'] as [$name, $qty, $price])<div><span>{{ $name }} {{ $qty }}</span><span>¥{{ number_format($price) }}</span></div>@endforeach
+        <div class="rt"><span>{{ $pd['total'] }}</span><span>¥{{ number_format($sum) }}</span></div>
+        <p>{{ $pd['thanks'] }}</p><i class="rbc"></i>
+      </div></div>
+    </div>
+    <ol class="rail">
+      @foreach ($pd['steps'] as $i => $step)
+        <li><button type="button" data-go="{{ $i }}" @if ($i === 0) aria-current="step" @endif><span>{{ $i + 1 }}</span>{{ $step }}</button></li>
+      @endforeach
+    </ol>
+  </div>
+</div></section>
+
+<section id="features"><div class="wrap">
   <div class="title"><h2>{{ $t['features_h'] }}</h2></div>
   <div class="grid">
     @foreach ($t['features'] as $i => [$h, $p])
@@ -351,6 +449,20 @@ footer{padding:36px 0;color:var(--muted);font-size:14px;text-align:center}
   }
   btn.forEach(function (b) { b.addEventListener('click', function () { show(+b.getAttribute('data-go')); }); });
   show(0);
+})();
+</script>
+<script>
+(function () {
+  var root = document.getElementById('posdemo'); if (!root) return;
+  var btn = root.querySelectorAll('[data-go]'), n = 0, timer, still = matchMedia('(prefers-reduced-motion: reduce)').matches;
+  var hold = [2600, 2600, 3200, 3000, 4600];
+  function show(k) {
+    n = k; var c = 'posdemo at' + k; for (var i = 0; i <= k; i++) c += ' s' + i; root.className = c;
+    btn.forEach(function (b, i) { i === k ? b.setAttribute('aria-current', 'step') : b.removeAttribute('aria-current'); });
+    clearTimeout(timer); if (!still) timer = setTimeout(function () { show((n + 1) % btn.length); }, hold[k]);
+  }
+  btn.forEach(function (b) { b.addEventListener('click', function () { show(+b.getAttribute('data-go')); }); });
+  show(still ? 4 : 0);
 })();
 </script>
 </body>

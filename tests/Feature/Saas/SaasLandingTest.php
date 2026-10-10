@@ -12,15 +12,15 @@ class SaasLandingTest extends TestCase
     {
         $this->get('http://snssale.com/', ['Accept-Language' => 'ja'])
             ->assertOk()
-            ->assertSee('今日からあなたのネットショップを')
+            ->assertSee('AIが自動で動かすネットショップとPOS')
             ->assertSee('data-plan="business"', false)
             ->assertSee('id="demo"', false);
     }
 
     public function test_lang_query_switches_to_english_and_myanmar_and_untranslated_fallback(): void
     {
-        $this->get('http://snssale.com/?lang=en')->assertOk()->assertSee('Open your online shop today');
-        $this->get('http://snssale.com/?lang=my')->assertOk()->assertSee('သင့်အွန်လိုင်းဆိုင်ကို ယနေ့ပဲ ဖွင့်လိုက်ပါ');
+        $this->get('http://snssale.com/?lang=en')->assertOk()->assertSee('Your AI-autopilot online shop and POS');
+        $this->get('http://snssale.com/?lang=my')->assertOk()->assertSee('AI က အလိုအလျောက် လည်ပတ်ပေးသော');
         // Nepali is not offered until translated: no button, no English under a Nepali label.
         $this->get('http://snssale.com/?lang=ne', ['Accept-Language' => 'ja'])
             ->assertOk()->assertDontSee('lang=ne', false)->assertSee('lang="ja"', false);
@@ -54,7 +54,7 @@ class SaasLandingTest extends TestCase
 
     public function test_apex_shows_landing_not_admin_login(): void
     {
-        $this->get('http://snssale.com/?lang=en')->assertOk()->assertSee('Open your online shop today')->assertDontSee('superadmin');
+        $this->get('http://snssale.com/?lang=en')->assertOk()->assertSee('Your AI-autopilot online shop and POS')->assertDontSee('superadmin');
         $this->get('http://snssale.com/saas?lang=en')->assertRedirect('/?lang=en');
     }
 
