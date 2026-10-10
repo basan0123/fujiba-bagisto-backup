@@ -67,4 +67,8 @@ return [
         'redirect_uri'  => env('AUTOPOSTER_TIKTOK_REDIRECT_URI', 'https://kimono.fujiba.co.jp/admin/tiktok/callback'),
         'scopes'        => 'user.info.basic,video.publish,video.upload',
     ],
+
+    // Content Engine v2: product ids whose duplicate-image match the owner has
+    // reviewed and accepted (DuplicateImageGuard lets them through). v1 ignores this.
+    'v2_duplicate_resolved_products' => [],
 ];

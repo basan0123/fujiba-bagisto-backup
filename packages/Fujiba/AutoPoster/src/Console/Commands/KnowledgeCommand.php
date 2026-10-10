@@ -2,6 +2,7 @@
 
 namespace Fujiba\AutoPoster\Console\Commands;
 
+use Fujiba\AutoPoster\Services\Intel\DuplicateImageGuard;
 use Fujiba\AutoPoster\Models\AutoPosterPatternKnowledge;
 use Illuminate\Console\Command;
 use Illuminate\Support\Facades\DB;
@@ -24,10 +25,10 @@ class KnowledgeCommand extends Command
 
     public function handle(): int
     {
-        return $this->argument('action') === 'import' ? $this->import() : $this->status();
+        return $this->argument('action') === 'import' ? $this->import(app(DuplicateImageGuard::class)) : $this->status();
     }
 
-    private function import(): int
+    private function import(DuplicateImageGuard $guard): int
     {
         $dir = dirname(__DIR__, 3).'/knowledge/patterns';
         $only = array_map('intval', $this->option('product'));
@@ -36,6 +37,11 @@ class KnowledgeCommand extends Command
             $r = json_decode(file_get_contents($file), true);
             $pid = (int) $r['product_id'];
             if ($only && ! in_array($pid, $only, true)) {
+                continue;
+            }
+            if ($why = $guard->reason($pid)) {   // unresolved duplicate-image group => never learn from it
+                $this->line("{$pid}: {$why}");
+
                 continue;
             }
             $flat = DB::table('product_flat')->where('product_id', $pid)->where('channel', 'default')->where('locale', 'ja')->first(['sku', 'name']);

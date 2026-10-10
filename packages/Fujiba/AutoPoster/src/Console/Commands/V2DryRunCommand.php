@@ -3,6 +3,7 @@
 namespace Fujiba\AutoPoster\Console\Commands;
 
 use Fujiba\AutoPoster\Models\AutoPosterPatternKnowledge;
+use Fujiba\AutoPoster\Services\Intel\DuplicateImageGuard;
 use Illuminate\Console\Command;
 use Illuminate\Support\Facades\DB;
 
@@ -27,7 +28,7 @@ class V2DryRunCommand extends Command
 
     private string $dir;
 
-    public function handle(): int
+    public function handle(DuplicateImageGuard $guard): int
     {
         $this->bin = dirname(__DIR__, 3).'/bin/v2';
         $this->dir = storage_path('app/autoposter/preview/'.now('Asia/Tokyo')->format('Y-m-d'));
@@ -60,6 +61,15 @@ class V2DryRunCommand extends Command
 
         foreach ($assets as $key => [$kind, $tpl, $manifest]) {
             if ($only && ! in_array($key, $only, true)) {
+                continue;
+            }
+            $ids = array_merge(array_column($manifest['products'], 'id'), array_column($manifest['set'] ?? [], 'id'));
+            if ($blocked = $guard->filter($ids)) {   // unresolved duplicate-image group => refuse
+                foreach ($blocked as $pid => $why) {
+                    $this->line("{$key}: product {$pid} {$why}");
+                }
+                $rows[] = [$key, 'BLOCKED', '-', DuplicateImageGuard::REASON];
+
                 continue;
             }
             $master = "{$this->dir}/{$key}.".($kind === 'image' ? 'png' : 'mkv');   // lossless — the only thing the gate trusts
