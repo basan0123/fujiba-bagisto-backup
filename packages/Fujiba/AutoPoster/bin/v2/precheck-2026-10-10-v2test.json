@@ -1,0 +1,200 @@
+{
+    "checked_at": "2026-10-10T23:44:30+09:00",
+    "tenant": "1bd1181f-fcd5-4238-a12d-a207d6ea4006",
+    "messenger_destination": "https://m.me/103196179075087",
+    "skus": [
+        {
+            "product_id": 1976,
+            "sku": "KIMONO-2549",
+            "knowledge_name": "FV-81-A",
+            "name": "FV-81-A",
+            "status": 1,
+            "price": 1595,
+            "price_raw": "1595.0000",
+            "stock": 12,
+            "primary_image": {
+                "path": "/var/www/bagisto/storage/app/public/tenants/1/1bd1181f-fcd5-4238-a12d-a207d6ea4006/product/1976/LaZdGHMYXgNiYDU7t6Urk7EVEg84mBG6pyebfoK2.jpg",
+                "sha256": "f5264e32bb81df3e1c51c4a207da48cf0b9d084481cfcbfb1df33a452a4032f4"
+            },
+            "closeup": {
+                "path": "/var/www/bagisto/storage/app/public/tenants/1/1bd1181f-fcd5-4238-a12d-a207d6ea4006/product/1976/LaZdGHMYXgNiYDU7t6Urk7EVEg84mBG6pyebfoK2.jpg",
+                "sha256": "f5264e32bb81df3e1c51c4a207da48cf0b9d084481cfcbfb1df33a452a4032f4",
+                "box": [
+                    0,
+                    0,
+                    1496,
+                    2000
+                ],
+                "image": "product/1976/LaZdGHMYXgNiYDU7t6Urk7EVEg84mBG6pyebfoK2.jpg",
+                "sharpness": 3663,
+                "source_size": [
+                    1496,
+                    2000
+                ]
+            },
+            "images_chain_sha256": "a03c29dfdbdcbff2f05b8845c3204b0777154bf96d9a0e22afbf92e6e46f8c5b",
+            "knowledge_image_hash": "a03c29dfdbdcbff2f05b8845c3204b0777154bf96d9a0e22afbf92e6e46f8c5b",
+            "duplicate_guard": "clear",
+            "pass": true,
+            "fail": []
+        },
+        {
+            "product_id": 1988,
+            "sku": "KIMONO-2561",
+            "knowledge_name": "FV-10-A",
+            "name": "FV-10-A",
+            "status": 1,
+            "price": 1595,
+            "price_raw": "1595.0000",
+            "stock": 15,
+            "primary_image": {
+                "path": "/var/www/bagisto/storage/app/public/tenants/1/1bd1181f-fcd5-4238-a12d-a207d6ea4006/product/1988/FV-10-A.jpg",
+                "sha256": "d2d32ef89757189477c7602ebbd36d5aa327bef5693693827d2634de42e88309"
+            },
+            "closeup": {
+                "path": "/var/www/bagisto/storage/app/public/tenants/1/1bd1181f-fcd5-4238-a12d-a207d6ea4006/product/1988/FV-10-A.jpeg",
+                "sha256": "876fedc55bcc709a92c6588b5a17eb6874566690cf17e6233636d1d808fc0b76",
+                "box": [
+                    620,
+                    40,
+                    360,
+                    440
+                ],
+                "focus": [
+                    710,
+                    170,
+                    180,
+                    180
+                ],
+                "image": "product/1988/FV-10-A.jpeg",
+                "sharpness": 682.5,
+                "source_size": [
+                    1500,
+                    2000
+                ]
+            },
+            "images_chain_sha256": "03170571c33b456c51d623eddca438ba9eb30a2c1c76a6bb7599cc00760beb4c",
+            "knowledge_image_hash": "03170571c33b456c51d623eddca438ba9eb30a2c1c76a6bb7599cc00760beb4c",
+            "duplicate_guard": "clear",
+            "pass": true,
+            "fail": []
+        },
+        {
+            "product_id": 2045,
+            "sku": "KIMONO-2618",
+            "knowledge_name": "FV-73-C",
+            "name": "FV-73-C",
+            "status": 1,
+            "price": 1595,
+            "price_raw": "1595.0000",
+            "stock": 8,
+            "primary_image": {
+                "path": "/var/www/bagisto/storage/app/public/tenants/1/1bd1181f-fcd5-4238-a12d-a207d6ea4006/product/2045/W3aXroEgPBpVp7LjpebLheRTuLfE4fMeRMbFobgH.jpg",
+                "sha256": "ceb0f09118da4c06e8a300cab5f70b7a59f866e743427916458245aa51b67b41"
+            },
+            "closeup": {
+                "path": "/var/www/bagisto/storage/app/public/tenants/1/1bd1181f-fcd5-4238-a12d-a207d6ea4006/product/2045/W3aXroEgPBpVp7LjpebLheRTuLfE4fMeRMbFobgH.jpg",
+                "sha256": "ceb0f09118da4c06e8a300cab5f70b7a59f866e743427916458245aa51b67b41",
+                "box": [
+                    0,
+                    0,
+                    1496,
+                    2000
+                ],
+                "focus": [
+                    500,
+                    660,
+                    520,
+                    520
+                ],
+                "image": "product/2045/W3aXroEgPBpVp7LjpebLheRTuLfE4fMeRMbFobgH.jpg",
+                "sharpness": 3466.4,
+                "source_size": [
+                    1496,
+                    2000
+                ]
+            },
+            "images_chain_sha256": "e13de4c8923e7c72b90c2ebb692b7c987913aa8b436da6b36d96da98e11e55f0",
+            "knowledge_image_hash": "e13de4c8923e7c72b90c2ebb692b7c987913aa8b436da6b36d96da98e11e55f0",
+            "duplicate_guard": "clear",
+            "pass": true,
+            "fail": []
+        },
+        {
+            "product_id": 2191,
+            "sku": "KIMONO-2773",
+            "knowledge_name": "FV-59-A",
+            "name": "FV-59-A",
+            "status": 1,
+            "price": 1595,
+            "price_raw": "1595.0000",
+            "stock": 13,
+            "primary_image": {
+                "path": "/var/www/bagisto/storage/app/public/tenants/1/1bd1181f-fcd5-4238-a12d-a207d6ea4006/product/2191/CNwFZRoKDv1XyavopcVhcr4Uqi5S4hcOez0Drq80.jpg",
+                "sha256": "1016db0ddec82b25c60c41e511c6047a15b297a2994d6b2e00e29254f113098a"
+            },
+            "closeup": {
+                "path": "/var/www/bagisto/storage/app/public/tenants/1/1bd1181f-fcd5-4238-a12d-a207d6ea4006/product/2191/CNwFZRoKDv1XyavopcVhcr4Uqi5S4hcOez0Drq80.jpg",
+                "sha256": "1016db0ddec82b25c60c41e511c6047a15b297a2994d6b2e00e29254f113098a",
+                "box": [
+                    0,
+                    0,
+                    1496,
+                    2000
+                ],
+                "focus": [
+                    440,
+                    560,
+                    440,
+                    440
+                ],
+                "image": "product/2191/CNwFZRoKDv1XyavopcVhcr4Uqi5S4hcOez0Drq80.jpg",
+                "sharpness": 4043.9,
+                "source_size": [
+                    1496,
+                    2000
+                ]
+            },
+            "images_chain_sha256": "335d027b71666753ff44231bc186cec03ff2012d06718baa31364afbf13c9d73",
+            "knowledge_image_hash": "335d027b71666753ff44231bc186cec03ff2012d06718baa31364afbf13c9d73",
+            "duplicate_guard": "clear",
+            "pass": true,
+            "fail": []
+        },
+        {
+            "product_id": 2517,
+            "sku": "KIMONO-3162",
+            "knowledge_name": "FV-61-C",
+            "name": "FV-61-C",
+            "status": 1,
+            "price": 1595,
+            "price_raw": "1595.0000",
+            "stock": 12,
+            "primary_image": {
+                "path": "/var/www/bagisto/storage/app/public/tenants/1/1bd1181f-fcd5-4238-a12d-a207d6ea4006/product/2517/product_1_1765752090558422.jpg",
+                "sha256": "b86ad3e689f514338de253d1e90f0c8a467326a7b54758e910291f523894e527"
+            },
+            "closeup": {
+                "path": "/var/www/bagisto/storage/app/public/tenants/1/1bd1181f-fcd5-4238-a12d-a207d6ea4006/product/2517/product_1_1765752090558422.jpg",
+                "sha256": "b86ad3e689f514338de253d1e90f0c8a467326a7b54758e910291f523894e527",
+                "box": [
+                    0,
+                    0,
+                    800,
+                    800
+                ],
+                "image": "product/2517/product_1_1765752090558422.jpg",
+                "sharpness": 11028.3,
+                "source_size": [
+                    800,
+                    800
+                ]
+            },
+            "images_chain_sha256": "d817300c9870952c9de39cf3058d2f4f2417823df040bdaad4bd7d17e3debc34",
+            "knowledge_image_hash": "d817300c9870952c9de39cf3058d2f4f2417823df040bdaad4bd7d17e3debc34",
+            "duplicate_guard": "clear",
+            "pass": true,
+            "fail": []
+        }
+    ]
+}

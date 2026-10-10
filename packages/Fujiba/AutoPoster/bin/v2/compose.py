@@ -9,7 +9,12 @@ bin/intel/fabric_gate.py --master can verify it against the source.
 Output is a LOSSLESS PNG master; the JPEG is derived by deliver.py only after
 the gate passes.
 
-    compose.py <manifest.json> <template H|J|B> <master.png>
+    compose.py <manifest.json> <template H|J|B|T> <master.png>
+
+  Text on the image may only carry catalog data (product_flat name / price)
+  or static CTA copy. Fabric drawn without a gate-registered region (J strips,
+  perspective top face) is listed in `unchecked_regions`; any asset with
+  unchecked fabric regions is test_eligible=false.
 """
 import json
 import math
@@ -19,11 +24,12 @@ import numpy as np
 from PIL import Image, ImageDraw, ImageFilter
 
 from common import (CREAM, GOLD, INK, crop_box, cover, cta_bar, darken, draw_text, fit, gradient, line_h, load,
-                    save_master, save_sidecar, shadow)
+                    save_master, save_sidecar, shadow, text_w)
 
 W, H = 1080, 1350
 regions = []
 texts = []
+unchecked = []      # fabric drawn but NOT verifiable by the gate (warped / shaded)
 
 
 def hexrgb(h):
@@ -44,6 +50,16 @@ def place(canvas, src_path, src_box, out_box, img=None):
 def T(d, xy, text, size, fill, kind=None, anchor='l'):
     texts.append({'text': text, 'size': size})
     return draw_text(d, xy, text, size, fill, kind, anchor)
+
+
+def catalog_text(d, tx, y, p, max_w):
+    """Public product name + own price (both from product_flat). Returns next y."""
+    size = fit(p['name'], max_w, 64)
+    T(d, (tx, y), p['name'], size, CREAM, 'serif')
+    y += line_h(p['name'], size, 'serif') + 14
+    price = f"¥{int(p['price']):,}"
+    T(d, (tx, y), price, 56, GOLD, 'serif')
+    return y + line_h(price, 56, 'serif') + 8
 
 
 # ---------- H: colour set ----------
@@ -119,6 +135,7 @@ def stack(m, out):
         strip = cover(crop_box(img, [bx, by + bh // 3, bw, bh // 3]), sw, band)
         shadow(cv, (x, y + 6, x + sw, y + band + 4), 10, (0, 6), 120)
         cv.paste(fold_band(strip), (x, y))
+        unchecked.append({'src': p['image'], 'kind': 'fold_band_strip', 'out_box': [x, y, sw, band]})
     # top face of the top piece, in perspective
     top = ps[-1]
     face = cover(crop_box(imgs[-1], top['box']), 900, 600)
@@ -126,6 +143,7 @@ def stack(m, out):
     quad = [(x0 + 40, ytop - 250), (x0 + sw - 40, ytop - 250), (x0 + sw + 8, ytop + 4), (x0 - 6, ytop + 4)]
     warped, mask = perspective(face, quad, cv.size)
     cv.paste(warped, (0, 0), mask)
+    unchecked.append({'src': top['image'], 'kind': 'perspective_top_face', 'quad': quad})
     d = ImageDraw.Draw(cv)
     # exact swatches = what the customer actually gets, and what the gate checks
     sx, s = 760, 130
@@ -138,11 +156,11 @@ def stack(m, out):
         q = min(bw, bh) // 2
         place(cv, p['image'], [bx + (bw - q) // 2, by + (bh - q) // 2, q, q], [sx, y, s, s], img)
         d = ImageDraw.Draw(cv)
-        T(d, (sx + s + 14, y + s / 2 - 18), p['name'], 28, INK, 'serif')
+        T(d, (sx + s + 14, y + s / 2 - 18), f"{p['name']} · ¥{int(p['price']):,}", 28, INK, 'serif')
     d = ImageDraw.Draw(cv)
     y = 1060
-    for txt, size, kind, col in [(f"Cotton 100% · 110 cm × 2 m · ¥{m['price']:,} each", 32, 'serif', INK),
-                                 ('အမေ့အတွက် ဂျပန်လက်ဆောင် ၊ ခေါက်ပြီးသား အဆင်သင့်', 28, 'my', (60, 50, 50)),
+    # no material/size claims: they are not catalog attributes. Price is per swatch above.
+    for txt, size, kind, col in [('အမေ့အတွက် ဂျပန်လက်ဆောင် ၊ ခေါက်ပြီးသား အဆင်သင့်', 28, 'my', (60, 50, 50)),
                                  ('आमाको लागि जापानबाट उपहार', 28, 'ne', (60, 50, 50))]:
         T(d, (60, y), txt, size, col, kind)
         y += line_h(txt, size, kind) + 6
@@ -192,25 +210,73 @@ def motif(m, out):
     regions.append({'src': p['image'], 'src_box': p['focus'], 'out_box': [zx - R, zy - R, 2 * R, 2 * R], 'mode': 'cover', 'mask': 'circle'})
     d = ImageDraw.Draw(cv)
     tx = 56
-    T(d, (tx, bgh + 20), 'DID YOU KNOW?', 30, GOLD, 'serif')
-    T(d, (tx, bgh + 62), m['story']['title'], 64, CREAM, 'serif')
-    y = bgh + 150
-    for line in m['story']['lines']:
-        size = fit(line, zx - R - tx - 20, 30)
-        T(d, (tx, y), line, size, (240, 232, 215))
-        y += line_h(line, size) + 4
-    assert y <= H - 124, f'B story text overflows into CTA bar (y={y})'
+    # AI-written knowledge (m['story']) is unverified and is never printed — catalog name/price only
+    y = catalog_text(d, tx, bgh + 30, p, zx - R - tx - 20)
+    assert y <= H - 124, f'B text overflows into CTA bar (y={y})'
     cta_bar(cv, H - 120, 120, darken(hexrgb(p['ground']), 1.8))
+    save_master(cv, out)
+
+
+# ---------- T: V2 test card (B layout, catalog data only) ----------
+def test_card(m, out):
+    p = m['products'][0]
+    img = load(p['image'])
+    bx, by, bw, bh = p['box']
+    cv = Image.new('RGB', (W, H))
+    bgh = 790
+    place(cv, p['image'], p['box'], [0, 0, W, bgh], img)
+    bg_region = regions[-1]
+    s = max(W / bw, bgh / bh)
+    ox, oy = (bw * s - W) / 2, (bh * s - bgh) / 2
+    fx, fy, fw, fh = p['focus']
+    cx_bg, cy_bg = (fx + fw / 2 - bx) * s - ox, (fy + fh / 2 - by) * s - oy
+    panel = gradient(W, H - bgh, darken(hexrgb(p['ground']), 0.55), (12, 10, 14))
+    cv.paste(panel, (0, bgh))
+    R = 230
+    zx, zy = W - R - 50, bgh - 120
+    zoom = cover(crop_box(img, p['focus']), 2 * R, 2 * R)
+    mask = Image.new('L', (2 * R, 2 * R), 0)
+    ImageDraw.Draw(mask).ellipse((0, 0, 2 * R, 2 * R), fill=255)
+    shadow(cv, (zx - R, zy - R, zx + R, zy + R), 24, (0, 12), 160)
+    d = ImageDraw.Draw(cv)
+    # focus ring only when the focus is a real sub-area of the background (not the whole photo)
+    ring = fw * s < W * 0.8 and fh * s < bgh * 0.8
+    excl = [[zx - R - 64, zy - R - 64, 2 * R + 128, 2 * R + 128]]          # disc + gold rim + drop shadow
+    if ring:
+        rx, ry = fw * s / 2 + 6, fh * s / 2 + 6
+        d.ellipse((cx_bg - fw * s / 2, cy_bg - fh * s / 2, cx_bg + fw * s / 2, cy_bg + fh * s / 2), outline=GOLD, width=5)
+        ang = math.atan2(zy - cy_bg, zx - cx_bg)
+        rr = max(fw, fh) * s / 2
+        d.line([(cx_bg + rr * math.cos(ang), cy_bg + rr * math.sin(ang)), (zx - (R + 10) * math.cos(ang), zy - (R + 10) * math.sin(ang))], fill=GOLD, width=4)
+        excl += [[int(cx_bg - rx), int(cy_bg - ry), int(2 * rx), int(2 * ry)]] + [
+            [int(cx_bg + (zx - cx_bg) * u) - 8, int(cy_bg + (zy - cy_bg) * u) - 8, 16, 16] for u in [i / 60 for i in range(61)]]
+    d.ellipse((zx - R - 10, zy - R - 10, zx + R + 10, zy + R + 10), fill=GOLD)
+    cv.paste(zoom, (zx - R, zy - R), mask)
+    # "V2 TEST" label, top-left on the background — declared overlay
+    lab = 'V2 TEST'
+    lw = int(text_w(lab, 34, 'sans')) + 40
+    d.rounded_rectangle((32, 32, 32 + lw, 32 + 62), 12, fill=(200, 20, 30))
+    T(d, (32 + lw / 2, 44), lab, 34, (255, 255, 255), 'sans', 'c')
+    excl.append([28, 28, lw + 8, 70])
+    bg_region['exclude'] = excl
+    regions.append({'src': p['image'], 'src_box': p['focus'], 'out_box': [zx - R, zy - R, 2 * R, 2 * R], 'mode': 'cover', 'mask': 'circle'})
+    d = ImageDraw.Draw(cv)
+    y = catalog_text(d, 56, bgh + 140, p, zx - R - 56 - 20)
+    assert y <= H - 124, f'T text overflows into CTA bar (y={y})'
+    g = hexrgb(p['ground'])                       # ORDER pill must stay legible on the white bar
+    lum = 0.299 * g[0] + 0.587 * g[1] + 0.114 * g[2]
+    cta_bar(cv, H - 120, 120, tuple(min(255, int(c * 1.8)) for c in g) if lum < 60 else darken(g, max(0.2, 70 / max(lum, 1))))
     save_master(cv, out)
 
 
 def main():
     m = json.load(open(sys.argv[1]))
     tpl, out = sys.argv[2], sys.argv[3]
-    {'H': colour_set, 'J': stack, 'B': motif}[tpl](m, out)
+    {'H': colour_set, 'J': stack, 'B': motif, 'T': test_card}[tpl](m, out)
     save_sidecar(out, {'template': tpl, 'size': [W, H], 'fabric_regions': regions,
                        'min_exact_share': {'J': 0.04}.get(tpl, 0.15),
-                       'min_text_px': min((t['size'] for t in texts), default=None), 'texts': texts})
+                       'min_text_px': min((t['size'] for t in texts), default=None), 'texts': texts,
+                       'unchecked_regions': unchecked, 'test_eligible': not unchecked})
     print(out)
 
 

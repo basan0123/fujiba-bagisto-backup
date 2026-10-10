@@ -214,7 +214,8 @@ def dragon_story(m):
     r.add(3.5, pull, 'whip', 0.35)
     r.add(3.5, meaning, 'push', 0.4)
     r.add(2.5, colours, 'push', 0.3)
-    r.add(2.5, end_card(m, ground, '4 colours · Made in Japan · Cotton 100%'), 'dip', 0.5)
+    # only catalog-derived facts: colourway count comes from the in-stock set (no origin/material claims)
+    r.add(2.5, end_card(m, ground, f'{len(sets)} colours'), 'dip', 0.5)
     return r, combo
 
 

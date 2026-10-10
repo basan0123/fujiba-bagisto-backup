@@ -60,10 +60,14 @@ def main():
                         '-map', '0:v', '-map', '1:a', '-c:v', 'libx264', '-preset', 'medium', '-crf', '19', '-pix_fmt', 'yuv420p',
                         '-c:a', 'aac', '-shortest', '-movflags', '+faststart', out], check=True)
         d = drift(frame0(master), frame0(out))
-    side.update({'delivered_from': os.path.basename(master), 'gate': gate, 'delivery_drift_deltaE00': d})
+    unchecked = side.get('unchecked_regions') or []
+    side.update({'delivered_from': os.path.basename(master), 'gate': gate, 'delivery_drift_deltaE00': d,
+                 # fabric the gate could not verify => never eligible for a test post
+                 'test_eligible': bool(gate.get('passed')) and not unchecked})
     with open(out + '.json', 'w') as f:
         json.dump(side, f, ensure_ascii=False, indent=1)
-    print(json.dumps({'delivered': True, 'out': out, 'delivery_drift_deltaE00': d}))
+    print(json.dumps({'delivered': True, 'out': out, 'delivery_drift_deltaE00': d, 'test_eligible': side['test_eligible'],
+                      'unchecked_regions': len(unchecked)}))
     return 0
 
 

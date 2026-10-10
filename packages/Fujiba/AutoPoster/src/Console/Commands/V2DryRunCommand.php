@@ -41,12 +41,10 @@ class V2DryRunCommand extends Command
 
             return 1;
         }
-        $price = (int) DB::table('product_flat')->where('product_id', $k['FV-73-C']->product_id)->value('price');
-
         $assets = [
             'H_colourset_FV-59' => ['image', 'H', ['products' => [$this->p($k['FV-59-A'])], 'set' => $this->colourways('FV-59'),
                 'set_title' => 'Rising Dragon · 4 colours', 'set_title_ja' => '荒波に昇龍 — 全4色']],
-            'J_stack_five' => ['image', 'J', ['products' => array_map(fn ($n) => $this->p($k[$n]), ['FV-61-C', 'FV-10-A', 'FV-81-A', 'FV-59-A', 'FV-73-C']), 'price' => $price]],
+            'J_stack_five' => ['image', 'J', ['products' => array_map(fn ($n) => $this->p($k[$n]), ['FV-61-C', 'FV-10-A', 'FV-81-A', 'FV-59-A', 'FV-73-C'])]],
             'B_story_FV-73-C' => ['image', 'B', ['products' => [$this->p($k['FV-73-C'])], 'story' => [
                 'title' => '鶴  The Crane',
                 'lines' => ['In Japan, the crane is a symbol of', 'long life and good fortune.',
@@ -68,7 +66,7 @@ class V2DryRunCommand extends Command
                 foreach ($blocked as $pid => $why) {
                     $this->line("{$key}: product {$pid} {$why}");
                 }
-                $rows[] = [$key, 'BLOCKED', '-', DuplicateImageGuard::REASON];
+                $rows[] = [$key, 'BLOCKED', '-', DuplicateImageGuard::REASON, 'no'];
 
                 continue;
             }
@@ -105,6 +103,9 @@ class V2DryRunCommand extends Command
                 }
             }
             $side = json_decode((string) @file_get_contents("{$master}.json"), true) ?: [];
+            // fabric drawn outside gate-registered regions (J strips / perspective face) => never test-postable
+            $gate['unchecked_regions'] = count($side['unchecked_regions'] ?? []);
+            $gate['test_eligible'] = (bool) $gate['passed'] && $gate['unchecked_regions'] === 0;
             $combo = $side['combo'] ?? ['layout' => $tpl];
             DB::table('autoposter_creative_log')->insert([
                 'queue_id' => null, 'product_ids' => json_encode(array_values(array_unique(array_merge(
@@ -118,9 +119,9 @@ class V2DryRunCommand extends Command
                 @rename($master, "{$master}.FAILED");      // a failed master never gets a delivery file
                 @unlink($out);
             }
-            $rows[] = [$key, $gate['passed'] ? 'PASS' : 'FAIL', $gate['attempt'] ?? '-', $this->worst($gate)];
+            $rows[] = [$key, $gate['passed'] ? 'PASS' : 'FAIL', $gate['attempt'] ?? '-', $this->worst($gate), $gate['test_eligible'] ? 'yes' : 'no'];
         }
-        $this->table(['asset', 'gate', 'try', 'worst fabric region (ΔE00 / SSIM / ORB inliers)'], $rows);
+        $this->table(['asset', 'gate', 'try', 'worst fabric region (ΔE00 / SSIM / ORB inliers)', 'test_eligible'], $rows);
         $this->line("preview: {$this->dir}");
 
         return 0;
@@ -130,8 +131,15 @@ class V2DryRunCommand extends Command
     {
         $root = storage_path('app/public/tenants/1/'.tenancy()->tenant->getTenantKey());
 
-        return ['id' => $k->product_id, 'name' => $k->name, 'image' => $root.'/'.$k->closeup['image'], 'box' => $k->closeup['box'],
+        return ['id' => $k->product_id, 'name' => $k->name, 'price' => $this->price($k->product_id), 'image' => $root.'/'.$k->closeup['image'], 'box' => $k->closeup['box'],
             'focus' => $k->closeup['focus'] ?? $k->closeup['box'], 'ground' => $k->colors[0]['hex'] ?? '#202020'];
+    }
+
+    /** The product's OWN current price (product_flat, channel default). */
+    private function price(int $productId): int
+    {
+        return (int) round((float) DB::table('product_flat')->where('product_id', $productId)
+            ->where('channel', 'default')->where('locale', 'en')->value('price'));
     }
 
     /** In-stock colourways of a pattern (FV-59-A…D), full first photo of each. */
