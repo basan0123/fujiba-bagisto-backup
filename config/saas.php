@@ -15,6 +15,10 @@ return [
 
     'currency' => 'JPY',
 
+    // true once the landing page is live at "/": drops robots noindex for
+    // reviewed locales (unreviewed_locales stay noindex).
+    'public' => true,
+
     // Locales the marketing site renders. Add 'ne' only once fully translated.
     'locales' => ['ja', 'en', 'my'],
 

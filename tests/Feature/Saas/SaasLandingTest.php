@@ -10,7 +10,7 @@ class SaasLandingTest extends TestCase
 {
     public function test_landing_renders_on_central_domain_in_japanese_by_default(): void
     {
-        $this->get('http://snssale.com/saas', ['Accept-Language' => 'ja'])
+        $this->get('http://snssale.com/', ['Accept-Language' => 'ja'])
             ->assertOk()
             ->assertSee('今日からあなたのネットショップを')
             ->assertSee('data-plan="business"', false);
@@ -18,10 +18,10 @@ class SaasLandingTest extends TestCase
 
     public function test_lang_query_switches_to_english_and_myanmar_and_untranslated_fallback(): void
     {
-        $this->get('http://snssale.com/saas?lang=en')->assertOk()->assertSee('Open your online shop today');
-        $this->get('http://snssale.com/saas?lang=my')->assertOk()->assertSee('သင့်အွန်လိုင်းဆိုင်ကို ယနေ့ပဲ ဖွင့်လိုက်ပါ');
+        $this->get('http://snssale.com/?lang=en')->assertOk()->assertSee('Open your online shop today');
+        $this->get('http://snssale.com/?lang=my')->assertOk()->assertSee('သင့်အွန်လိုင်းဆိုင်ကို ယနေ့ပဲ ဖွင့်လိုက်ပါ');
         // Nepali is not offered until translated: no button, no English under a Nepali label.
-        $this->get('http://snssale.com/saas?lang=ne', ['Accept-Language' => 'ja'])
+        $this->get('http://snssale.com/?lang=ne', ['Accept-Language' => 'ja'])
             ->assertOk()->assertDontSee('lang=ne', false)->assertSee('lang="ja"', false);
     }
 
@@ -29,28 +29,35 @@ class SaasLandingTest extends TestCase
     {
         config(['saas.plans.starter.monthly_price' => null]);
 
-        $this->get('http://snssale.com/saas?lang=ja')->assertOk()->assertSee('お問い合わせ')->assertDontSee('¥');
-        $this->get('http://snssale.com/saas?lang=my')->assertOk()->assertSee('ဆက်သွယ်ရန်');
+        $this->get('http://snssale.com/?lang=ja')->assertOk()->assertSee('お問い合わせ')->assertDontSee('¥');
+        $this->get('http://snssale.com/?lang=my')->assertOk()->assertSee('ဆက်သွယ်ရန်');
     }
 
     public function test_myanmar_stays_noindex_even_when_site_is_public(): void
     {
         config(['saas.public' => true]);
 
-        $this->get('http://snssale.com/saas?lang=my')->assertSee('<meta name="robots" content="noindex">', false);
-        $this->get('http://snssale.com/saas?lang=ja')->assertDontSee('name="robots"', false);
+        $this->get('http://snssale.com/?lang=my')->assertSee('<meta name="robots" content="noindex">', false);
+        $this->get('http://snssale.com/?lang=ja')->assertDontSee('name="robots"', false);
     }
 
     public function test_landing_never_links_to_admin_login(): void
     {
         foreach (['ja', 'en', 'my'] as $lang) {
-            $this->get("http://snssale.com/saas?lang={$lang}")->assertDontSee('superadmin')->assertDontSee('/admin');
+            $this->get("http://snssale.com/?lang={$lang}")->assertDontSee('superadmin')->assertDontSee('/admin');
         }
     }
 
-    public function test_apex_still_redirects_to_superadmin_login(): void
+    public function test_apex_shows_landing_not_admin_login(): void
     {
-        $this->get('http://snssale.com/')->assertRedirect('/superadmin/login');
+        $this->get('http://snssale.com/?lang=en')->assertOk()->assertSee('Open your online shop today')->assertDontSee('superadmin');
+        $this->get('http://snssale.com/saas?lang=en')->assertRedirect('/?lang=en');
+    }
+
+    public function test_admin_and_login_routes_send_noindex_header(): void
+    {
+        $this->get('http://snssale.com/superadmin/login')->assertOk()->assertHeader('X-Robots-Tag', 'noindex, nofollow');
+        $this->get('http://snssale.com/?lang=en')->assertHeaderMissing('X-Robots-Tag');
     }
 
     public function test_entitlements_limits_and_features(): void

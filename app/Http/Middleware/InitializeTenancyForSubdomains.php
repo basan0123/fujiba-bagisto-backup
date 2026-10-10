@@ -12,7 +12,27 @@ class InitializeTenancyForSubdomains
 {
     public function __construct(protected Tenancy $tenancy) {}
 
+    /**
+     * Admin / login surfaces must never be indexed by search engines.
+     */
+    protected const NOINDEX_PATTERN = '#^(superadmin|admin|api/auth)(/|$)|(^|/)(login|register|forgot-password)(/|$)#';
+
     public function handle(Request $request, Closure $next)
+    {
+        $response = $this->dispatch($request, $next);
+
+        $adminSlug = trim((string) config('app.admin_url'), '/');
+        $path = trim($request->path(), '/');
+
+        if (preg_match(self::NOINDEX_PATTERN, $path)
+            || ($adminSlug !== '' && ($path === $adminSlug || str_starts_with($path, $adminSlug.'/')))) {
+            $response->headers->set('X-Robots-Tag', 'noindex, nofollow');
+        }
+
+        return $response;
+    }
+
+    protected function dispatch(Request $request, Closure $next)
     {
         $host = $request->getHost();
         $centralDomains = config('tenancy.central_domains', []);
@@ -114,9 +134,14 @@ class InitializeTenancyForSubdomains
     {
         $path = trim($request->path(), '/'); // '' for the bare apex "/"
 
-        // Bare apex → operational destination (SaaS control panel login).
+        // Bare apex: public SaaS landing on the marketing hosts; other central
+        // hosts (IP, nip.io, localhost) keep going to the control-panel login.
         if ($path === '') {
-            return redirect('/superadmin/login');
+            // Served here, not via a route: the Shop package's catch-all `GET /`
+            // registers first and would win, then fatal on the empty central DB.
+            return in_array($request->getHost(), ['snssale.com', 'www.snssale.com'], true)
+                ? app(\App\Saas\Http\LandingController::class)($request)
+                : redirect('/superadmin/login');
         }
 
         // Path prefixes that legitimately exist on the central domain. Any
