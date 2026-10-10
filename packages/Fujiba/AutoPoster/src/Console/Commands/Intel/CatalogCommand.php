@@ -18,7 +18,7 @@ use Illuminate\Support\Facades\DB;
  */
 class CatalogCommand extends Command
 {
-    public const VERSION = 'cat-1.0';
+    public const VERSION = 'cat-1.1';
 
     protected $signature = 'fujiba:intel:catalog
         {--inventory : Rebuild fi_catalog_items/fi_catalog_images from product tables}
