@@ -4,11 +4,18 @@
   "closeup": {
     "image": "product/1988/FV-10-A.jpeg",
     "box": [
-      90,
-      0,
-      510,
-      860
-    ]
+      620,
+      40,
+      360,
+      440
+    ],
+    "focus": [
+      710,
+      170,
+      180,
+      180
+    ],
+    "box_note": "2026-10-10 WS-G: moved to fabric-only area (crane/sakura/lattice, upper-right of top piece); old [90,0,510,860] sliced the bijin face in J_stack_five"
   },
   "motifs": [
     {

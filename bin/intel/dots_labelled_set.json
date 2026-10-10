@@ -1,0 +1,257 @@
+{
+ "description": "Hand-labelled ground truth for fi_catalog_facts 'dots' (does the FABRIC PATTERN contain polka dots / dot motifs). Labelled by WS-G viewing each image 2026-10-10. 'yes' positives are disc/temari-dot motifs; no true polka-dot fabric was found in the 555-sku catalog sweep. Tiny set: overfitting risk.",
+ "tune": [
+  {
+   "image_id": 277,
+   "sku": "KIMONO-2781",
+   "path": "product/2199/ec0MbvpoGMz7TgWz2dTYffTwMTLFIC6TQUOSeymd.webp",
+   "label": "no",
+   "note": "dense small flowers/fans/temari on blue; tiny white specks only",
+   "cat_1_0_pred": true,
+   "cat_1_1_pred": false,
+   "split": "tune"
+  },
+  {
+   "image_id": 2850,
+   "sku": "KIMONO-3712",
+   "path": "product/5422/4EMFattN1DuU1U8tfeP6Exo0HH7657wHheRWP2Xn.webp",
+   "label": "no",
+   "note": "cranes, pines, clouds, fans; no dots",
+   "cat_1_0_pred": true,
+   "cat_1_1_pred": false,
+   "split": "tune"
+  },
+  {
+   "image_id": 494,
+   "sku": "KIMONO-3095",
+   "path": "product/2456/product_1_1752755434163297.jpg",
+   "label": "no",
+   "note": "hawks + sakura on navy",
+   "cat_1_0_pred": true,
+   "cat_1_1_pred": false,
+   "split": "tune"
+  },
+  {
+   "image_id": 2715,
+   "sku": "temporary-sku-735184",
+   "path": "product/5327/FV-40-A.jpg",
+   "label": "no",
+   "note": "large sakura + shippo/seigaiha panels",
+   "cat_1_0_pred": true,
+   "cat_1_1_pred": false,
+   "split": "tune"
+  },
+  {
+   "image_id": 1131,
+   "sku": "KIMONO-2578",
+   "path": "product/2005/FW-82-A.jpeg",
+   "label": "yes",
+   "note": "pink round pompom/disc motifs repeated with cranes (FW-82-A); borderline dot motif",
+   "cat_1_0_pred": true,
+   "cat_1_1_pred": true,
+   "split": "tune"
+  },
+  {
+   "image_id": 1196,
+   "sku": "KIMONO-2650",
+   "path": "product/2077/FV-89-D.jpeg",
+   "label": "no",
+   "note": "peony/chrysanthemum floral (FV-89-D)",
+   "cat_1_0_pred": true,
+   "cat_1_1_pred": false,
+   "split": "tune"
+  },
+  {
+   "image_id": 1098,
+   "sku": "KIMONO-2543",
+   "path": "product/1970/FV-47-A.jpeg",
+   "label": "no",
+   "note": "peony/floral on black (FV-47-A)",
+   "cat_1_0_pred": true,
+   "cat_1_1_pred": false,
+   "split": "tune"
+  },
+  {
+   "image_id": 84,
+   "sku": "KIMONO-2534",
+   "path": "product/1961/2qi6tAMDDEMQNtNV8IH9lXAnL3gyv1xptBbLuUTx.webp",
+   "label": "no",
+   "note": "dense fans/temari/flowers on red; small white florets read as dots by detector",
+   "cat_1_0_pred": true,
+   "cat_1_1_pred": true,
+   "split": "tune"
+  },
+  {
+   "image_id": 74,
+   "sku": "KIMONO-2524",
+   "path": "product/1951/fvmXdvCuBTVA4hfIe95VVKA0e33GKIaaTHxnc301.webp",
+   "label": "yes",
+   "note": "dense small round temari/mame discs on light blue; disc-dot motif",
+   "cat_1_0_pred": true,
+   "cat_1_1_pred": true,
+   "split": "tune"
+  },
+  {
+   "image_id": 142,
+   "sku": "KIMONO-2592",
+   "path": "product/2019/NKFlPmIU2eVZh0LvEkP5uS0OD1VEYATKRsDeuygX.webp",
+   "label": "no",
+   "note": "dense small sakura florets on red",
+   "cat_1_0_pred": true,
+   "cat_1_1_pred": false,
+   "split": "tune"
+  },
+  {
+   "image_id": 73,
+   "sku": "KIMONO-2523",
+   "path": "product/1950/FV-32-D.jpg",
+   "label": "no",
+   "note": "Mt Fuji, crane, chrysanthemum (FV-32-D)",
+   "cat_1_0_pred": false,
+   "cat_1_1_pred": false,
+   "split": "tune"
+  },
+  {
+   "image_id": 213,
+   "sku": "KIMONO-2663",
+   "path": "product/2090/9XEfGMyWFpgAS9ZLGh7eFXyasvT7tBopGivESmZf.webp",
+   "label": "no",
+   "note": "cranes, pagoda, gold disc clusters (stylised hills) - not dots",
+   "cat_1_0_pred": false,
+   "cat_1_1_pred": false,
+   "split": "tune"
+  },
+  {
+   "image_id": 1149,
+   "sku": "KIMONO-2596",
+   "path": "product/2023/FV-83-D.jpeg",
+   "label": "no",
+   "note": "peony floral, hexagon kikko patch (FV-83-D)",
+   "cat_1_0_pred": false,
+   "cat_1_1_pred": false,
+   "split": "tune"
+  },
+  {
+   "image_id": 2868,
+   "sku": "KIMONO-3730",
+   "path": "product/5440/WoVAGq77ZCjys2Aoam9SdJyNaViES4szoEZxYIAO.webp",
+   "label": "no",
+   "note": "cranes, pine, chrysanthemum",
+   "cat_1_0_pred": false,
+   "cat_1_1_pred": false,
+   "split": "tune"
+  },
+  {
+   "image_id": 2757,
+   "sku": "FK-18A",
+   "path": "product/5368/N2ESJJWzIYm11Cd8tCtWDLZHomfDzG3bXwfB7g6d.webp",
+   "label": "no",
+   "note": "fans + florals on seigaiha (FK-18A)",
+   "cat_1_0_pred": false,
+   "cat_1_1_pred": false,
+   "split": "tune"
+  },
+  {
+   "image_id": 2688,
+   "sku": "FK-11A",
+   "path": "product/5289/p1FoN5Uy9DD4cnmDoJzWml1dxrgCmR40J1eaDvzw.webp",
+   "label": "no",
+   "note": "cranes over kikko hexagons, gold squares",
+   "cat_1_0_pred": false,
+   "cat_1_1_pred": false,
+   "split": "tune"
+  },
+  {
+   "image_id": 1140,
+   "sku": "KIMONO-2587",
+   "path": "product/2014/FB-52902H-2B.jpeg",
+   "label": "no",
+   "note": "geisha + chrysanthemum (Cosmo 52902H)",
+   "cat_1_0_pred": false,
+   "cat_1_1_pred": false,
+   "split": "tune"
+  },
+  {
+   "image_id": 525,
+   "sku": "KIMONO-3126",
+   "path": "product/2486/product_1_1754486291187571.jpg",
+   "label": "no",
+   "note": "goldfish + sakura on black",
+   "cat_1_0_pred": false,
+   "cat_1_1_pred": false,
+   "split": "tune"
+  },
+  {
+   "image_id": 512,
+   "sku": "KIMONO-3114",
+   "path": "product/2474/product_1_1754485423925284.jpg",
+   "label": "no",
+   "note": "peony + chrysanthemum floral",
+   "cat_1_0_pred": false,
+   "cat_1_1_pred": false,
+   "split": "tune"
+  },
+  {
+   "image_id": 214,
+   "sku": "KIMONO-2664",
+   "path": "product/2091/TSyf8xUnQZ05WMaqKiYWzsCQe6x248M7g7mvfPRI.webp",
+   "label": "yes",
+   "note": "dense small round temari/mame discs on pink; disc-dot motif (missed by both)",
+   "cat_1_0_pred": false,
+   "cat_1_1_pred": false,
+   "split": "tune"
+  }
+ ],
+ "holdout": [
+  {
+   "image_id": 451,
+   "sku": "KIMONO-3047",
+   "path": "product/2420/8StxqmN7YJU6tkq5MacbDkjA07ekYgqP0wLSChaC.webp",
+   "label": "unclear",
+   "note": "temari balls + plum blossom; circular motifs but not polka",
+   "cat_1_0_pred": true,
+   "cat_1_1_pred": true,
+   "split": "holdout"
+  },
+  {
+   "image_id": 179,
+   "sku": "KIMONO-2629",
+   "path": "product/2056/XnotC7HXMCnRjMk3Ndb4heIEfiMk1nsJXffFn80O.webp",
+   "label": "no",
+   "note": "pink sakura clusters on ochre",
+   "cat_1_0_pred": true,
+   "cat_1_1_pred": false,
+   "split": "holdout"
+  },
+  {
+   "image_id": 2796,
+   "sku": "KIMONO-2783",
+   "path": "product/2201/GiQvTc0Q2UTaPZkFRC5EE7l72TQ0vOhcYOJMqf5d.webp",
+   "label": "no",
+   "note": "teal sakura clusters with tiny buds",
+   "cat_1_0_pred": true,
+   "cat_1_1_pred": false,
+   "split": "holdout"
+  },
+  {
+   "image_id": 281,
+   "sku": "KIMONO-2785",
+   "path": "product/2203/FB-45103-1E.jpg",
+   "label": "no",
+   "note": "camellia + rabbits, tiny squares (Cosmo 45103)",
+   "cat_1_0_pred": false,
+   "cat_1_1_pred": false,
+   "split": "holdout"
+  },
+  {
+   "image_id": 503,
+   "sku": "KIMONO-3104",
+   "path": "product/2465/0ZbXXxB73M6FnaVIULkA7uMmJfjv2yUSPBka4BJm.webp",
+   "label": "no",
+   "note": "purple sakura + water swirls",
+   "cat_1_0_pred": false,
+   "cat_1_1_pred": false,
+   "split": "holdout"
+  }
+ ]
+}

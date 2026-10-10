@@ -16,7 +16,7 @@ import sys
 import cv2
 import numpy as np
 
-VERSION = "cat-1.0"
+VERSION = "cat-1.1"
 MAX_SIDE = 800  # analysis resolution (keeps sharpness comparable across photos)
 
 cv2.setRNGSeed(1234)
@@ -167,7 +167,7 @@ def crop_fabric(gray, mask):
 
 
 def f_dots(crop, scale):
-    m = "SimpleBlobDetector(circ>=0.75,conv>=0.85,inertia>=0.5) dark+light on fabric crop"
+    m = "SimpleBlobDetector(circ>=0.75,conv>=0.85,inertia>=0.5) dark+light on fabric crop; dot if n>=30,size_cv<0.45,nn_cv<0.35"
     if crop is None:
         return unknown(m, "no fabric crop >=96px")
     area_px = crop.shape[0] * crop.shape[1]
@@ -206,8 +206,13 @@ def f_dots(crop, scale):
         nn_cv = float(nn.std() / nn.mean())
     else:
         nn_cv = 1.0
-    is_dot = n >= 30 and cv < 0.45 and nn_cv < 0.6
-    conf = max(0.0, 1 - (cv + nn_cv) / 2) if is_dot else 0.6
+    # cat-1.1: spacing regularity tightened 0.6 -> 0.35. On a 20-image hand-labelled
+    # set (bin/intel/dots_labelled_set.json) cat-1.0 flagged 8/17 negatives
+    # (sakura/temari florets pass the blob shape filters); nn-spacing CV was the
+    # only feature that separated them. Threshold is fragile (one FP sits at 0.350)
+    # and tuned on 3 positives: confidence is capped at 0.5 accordingly.
+    is_dot = n >= 30 and cv < 0.45 and nn_cv < 0.35
+    conf = min(0.5, max(0.0, 1 - (cv + nn_cv) / 2)) if is_dot else 0.6
     return measured(m, {"dots_detected": bool(is_dot), "dot_polarity": colour, "count": n,
                         "per_100x100px": round(density, 2),
                         "median_diameter_px_orig": round(float(np.median(sizes)) * scale, 1),
