@@ -106,4 +106,17 @@ return [
         'min_sharpness'        => (float) env('FUJIBA_INTEL_MIN_SHARPNESS', 100.0),
         'min_fabric_visibility' => (float) env('FUJIBA_INTEL_MIN_FABRIC_VIS', 0.60),
     ],
+
+    /*
+    | Product evidence research (ProductResearchService). Supplier rows are
+    | internal-only (secret supplier codes). Social networks are hard-blocked
+    | in PoliteFetcher regardless of this list.
+    */
+    'research' => [
+        'cache_dir'            => env('FUJIBA_INTEL_RESEARCH_CACHE', storage_path('app/intel/research-cache')),
+        'min_interval_seconds' => 5,
+        'allowed_hosts'        => ['naka-trading.jp', 'ja.wikipedia.org', 'en.wikipedia.org'],
+        'naka_base'            => 'https://naka-trading.jp',
+        'cosmo_codes'          => ['AP42901', 'AP45103', 'AP52902H'],
+    ],
 ];

@@ -45,6 +45,8 @@ class AutoPosterServiceProvider extends ServiceProvider
                 // Intelligence layer (shadow-only; cannot publish).
                 \Fujiba\AutoPoster\Console\Commands\Intel\PhotoAuditCommand::class,
                 \Fujiba\AutoPoster\Console\Commands\Intel\ExplainCommand::class,
+                \Fujiba\AutoPoster\Console\Commands\Intel\CatalogCommand::class,
+                \Fujiba\AutoPoster\Console\Commands\Intel\ResearchCommand::class,
             ]);
         }
     }

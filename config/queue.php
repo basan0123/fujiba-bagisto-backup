@@ -63,6 +63,17 @@ return [
             'after_commit' => false,
         ],
 
+        // Intelligence-layer heavy jobs: long retry_after so a job running for
+        // minutes is never handed to a second worker (default redis is 90s).
+        'redis-intel' => [
+            'driver' => 'redis',
+            'connection' => env('REDIS_QUEUE_CONNECTION', 'default'),
+            'queue' => 'intel-heavy',
+            'retry_after' => 1000,
+            'block_for' => null,
+            'after_commit' => true,
+        ],
+
         'redis' => [
             'driver' => 'redis',
             'connection' => env('REDIS_QUEUE_CONNECTION', 'default'),
