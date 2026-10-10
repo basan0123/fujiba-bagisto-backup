@@ -6,6 +6,7 @@ use Fujiba\AutoPoster\Models\AutoPosterQueue;
 use Fujiba\AutoPoster\Services\ChatpionPostClient;
 use Illuminate\Console\Command;
 use Illuminate\Support\Carbon;
+use Illuminate\Support\Facades\Schema;
 use Illuminate\Support\Str;
 use Throwable;
 
@@ -35,6 +36,12 @@ class PublishInstagramCommand extends Command
                     $this->error("channel {$channel}: ".$e->getMessage());
                 }
             }
+
+            return self::SUCCESS;
+        }
+
+        if (! Schema::hasTable('autoposter_queue') || ! Schema::hasColumn('autoposter_queue', 'instagram_status')) {
+            $this->line('skipped: instagram schema absent');
 
             return self::SUCCESS;
         }
