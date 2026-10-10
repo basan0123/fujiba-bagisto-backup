@@ -279,12 +279,43 @@ details p{margin:10px 0 0;color:var(--muted)}
 .spark{position:absolute;font-size:22px;animation:twinkle 1.8s ease-in-out infinite}.s1{left:18%;top:22%}.s2{right:18%;bottom:24%;animation-delay:.9s;font-size:16px}
 @keyframes twinkle{50%{transform:scale(1.5) rotate(20deg);opacity:.5}}
 @media(prefers-reduced-motion:reduce){.art *{animation:none!important;opacity:1!important;width:auto}}
+/* animated logo */
+.brand{display:flex;align-items:center;gap:9px}
+.mark{display:block;width:38px;height:38px;border-radius:12px;box-shadow:0 6px 16px rgba(220,73,133,.35);animation:markin .8s cubic-bezier(.3,1.6,.5,1) both}
+.mark svg{display:block}
+.bag{transform-origin:20px 13px;animation:swing 3.2s ease-in-out 1s infinite}
+.spk{transform-origin:31px 9px;animation:twinkle2 2.4s ease-in-out infinite}
+.brand:hover .bag{animation-duration:.8s}
+.word b{background:linear-gradient(90deg,#dc4985,#a866d1,#4354e2,#f18da2,#dc4985);background-size:300% 100%;-webkit-background-clip:text;background-clip:text;color:transparent;animation:flowtxt 6s linear infinite}
+@keyframes markin{from{transform:scale(.3) rotate(-25deg);opacity:0}}
+@keyframes swing{0%,60%,100%{transform:rotate(0)}70%{transform:rotate(-9deg)}80%{transform:rotate(7deg)}90%{transform:rotate(-3deg)}}
+@keyframes twinkle2{0%,100%{transform:scale(.6);opacity:.5}50%{transform:scale(1.15) rotate(45deg);opacity:1}}
+@keyframes flowtxt{to{background-position:300% 0}}
+.langs a{white-space:nowrap}
+@media(max-width:420px){.top .wrap{gap:8px}.brand{gap:6px;font-size:19px}.mark,.mark svg{width:30px;height:30px}.mark{border-radius:9px}.langs{padding:3px}.langs a{padding:4px 7px;font-size:12px}}
+@media(prefers-reduced-motion:reduce){.mark,.bag,.spk,.word b{animation:none!important}}
 footer{padding:36px 0;color:var(--muted);font-size:14px;text-align:center}
 </style>
 </head>
 <body>
 <header class="top"><div class="wrap">
-  <a class="brand" href="?lang={{ $locale }}">sns<b>sale</b></a>
+  <a class="brand" href="?lang={{ $locale }}" aria-label="snssale">
+    <span class="mark" aria-hidden="true">
+      <svg viewBox="0 0 40 40" width="38" height="38">
+        <defs><linearGradient id="lg" x1="0" y1="0" x2="1" y2="1">
+          <stop offset="0" stop-color="#dc4985"><animate attributeName="stop-color" values="#dc4985;#a866d1;#4354e2;#dc4985" dur="6s" repeatCount="indefinite"/></stop>
+          <stop offset="1" stop-color="#f18da2"><animate attributeName="stop-color" values="#f18da2;#f9a4d7;#6ca3f3;#f18da2" dur="6s" repeatCount="indefinite"/></stop>
+        </linearGradient></defs>
+        <rect width="40" height="40" rx="12" fill="url(#lg)"/>
+        <g class="bag" fill="none" stroke="#fff" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round">
+          <path d="M11 15h18l-1.6 15a2 2 0 0 1-2 1.8H14.6a2 2 0 0 1-2-1.8z"/>
+          <path d="M15.5 15v-2.5a4.5 4.5 0 0 1 9 0V15"/>
+        </g>
+        <path class="spk" d="M31 5l1.2 3 3 1.2-3 1.2L31 13.4l-1.2-3-3-1.2 3-1.2z" fill="#fff"/>
+      </svg>
+    </span>
+    <span class="word">sns<b>sale</b></span>
+  </a>
   <nav class="menu">
     <a href="#pos">{{ $t['nav']['pos'] }}</a><a href="#features">{{ $t['nav']['features'] }}</a><a href="#demo">{{ $t['nav']['flow'] }}</a><a href="#how">{{ $t['nav']['how'] }}</a>
     <a href="#pricing">{{ $t['nav']['pricing'] }}</a><a href="#faq">{{ $t['nav']['faq'] }}</a>
