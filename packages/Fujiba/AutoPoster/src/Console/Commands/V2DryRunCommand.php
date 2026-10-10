@@ -11,8 +11,10 @@ use Illuminate\Support\Facades\DB;
  *
  * Renders 3 images (H colour set, J folded stack, B pattern story) and 2 reels
  * (dragon_story, gift_to_mum) from the pattern-knowledge records, runs the
- * quality gate (max 2 retries), logs each asset to autoposter_creative_log
- * (dry_run=1) and writes storage/app/autoposter/preview/<date>/.
+ * fabric gate on the LOSSLESS master (bin/intel/fabric_gate.py --master, max 2
+ * retries), derives the JPEG/MP4 delivery file only after a pass (bin/v2/deliver.py),
+ * logs each asset to autoposter_creative_log (dry_run=1) and writes
+ * storage/app/autoposter/preview/<date>/.
  * NOTHING is queued or posted. Runs inside a tenant context (tenants:run).
  */
 class V2DryRunCommand extends Command
@@ -51,7 +53,7 @@ class V2DryRunCommand extends Command
                     'जापानमा सारस दीर्घायु र सौभाग्यको प्रतीक हो'],
                 'grade' => 'B']]],
             'R1_dragon_story_FV-59' => ['video', 'dragon_story', ['products' => [$this->p($k['FV-59-A'])], 'set' => $this->colourways('FV-59')]],
-            'R2_gift_to_mum_FV-73-C' => ['video', 'gift_to_mum', ['products' => [$this->p($k['FV-73-C'])], 'stack_image' => "{$this->dir}/J_stack_five.jpg"]],
+            'R2_gift_to_mum_FV-73-C' => ['video', 'gift_to_mum', ['products' => [$this->p($k['FV-73-C'])], 'stack_image' => "{$this->dir}/J_stack_five.png"]],
         ];
         $only = array_filter(explode(',', (string) $this->option('only')));
         $rows = [];
@@ -60,20 +62,21 @@ class V2DryRunCommand extends Command
             if ($only && ! in_array($key, $only, true)) {
                 continue;
             }
-            $out = "{$this->dir}/{$key}.".($kind === 'image' ? 'jpg' : 'mp4');
+            $master = "{$this->dir}/{$key}.".($kind === 'image' ? 'png' : 'mkv');   // lossless — the only thing the gate trusts
+            $out = "{$this->dir}/{$key}.".($kind === 'image' ? 'jpg' : 'mp4');       // delivery, derived after a pass
             $mf = "{$this->dir}/{$key}.manifest.json";
             file_put_contents($mf, json_encode($manifest, JSON_UNESCAPED_UNICODE | JSON_PRETTY_PRINT));
 
             $gate = null;
             for ($try = 1; $try <= 3; $try++) {          // first render + max 2 retries
                 $t0 = microtime(true);
-                exec($this->py($kind === 'image' ? 'compose.py' : 'reel.py', [$mf, $tpl, $out]).' 2>&1', $o, $rc);
+                exec($this->py($kind === 'image' ? 'compose.py' : 'reel.py', [$mf, $tpl, $master]).' 2>&1', $o, $rc);
                 if ($rc !== 0) {
                     $gate = ['passed' => false, 'checks' => [['check' => 'render', 'pass' => false, 'value' => implode("\n", array_slice($o, -5))]]];
 
                     continue;
                 }
-                $g = shell_exec($this->py('gate.py', [$out]));
+                $g = shell_exec($this->py('../intel/fabric_gate.py', ['--master', $master, '--mask-out', "{$this->dir}/{$key}.gatemask.png"]));
                 $gate = json_decode((string) $g, true) ?: ['passed' => false, 'checks' => [['check' => 'gate', 'pass' => false]]];
                 $gate['render_seconds'] = round(microtime(true) - $t0, 1);
                 $gate['attempt'] = $try;
@@ -81,7 +84,17 @@ class V2DryRunCommand extends Command
                     break;
                 }
             }
-            $side = json_decode((string) @file_get_contents("{$out}.json"), true) ?: [];
+            if ($gate['passed']) {
+                file_put_contents("{$this->dir}/{$key}.gate.json", json_encode($gate, JSON_UNESCAPED_UNICODE));
+                $d = json_decode((string) shell_exec($this->py('deliver.py', [$master, "{$this->dir}/{$key}.gate.json", $out])), true);
+                if (! ($d['delivered'] ?? false)) {
+                    $gate['passed'] = false;
+                    $gate['checks'][] = ['check' => 'deliver', 'pass' => false, 'value' => $d['error'] ?? 'delivery failed'];
+                } else {
+                    $gate['delivery_drift_deltaE00'] = $d['delivery_drift_deltaE00'];
+                }
+            }
+            $side = json_decode((string) @file_get_contents("{$master}.json"), true) ?: [];
             $combo = $side['combo'] ?? ['layout' => $tpl];
             DB::table('autoposter_creative_log')->insert([
                 'queue_id' => null, 'product_ids' => json_encode(array_values(array_unique(array_merge(
@@ -92,11 +105,12 @@ class V2DryRunCommand extends Command
                 'file' => $gate['passed'] ? $out : null, 'cost_jpy' => 0, 'dry_run' => true, 'created_at' => now(), 'updated_at' => now(),
             ]);
             if (! $gate['passed']) {
-                @rename($out, "{$out}.FAILED");      // never leave a failed asset where it could be posted
+                @rename($master, "{$master}.FAILED");      // a failed master never gets a delivery file
+                @unlink($out);
             }
             $rows[] = [$key, $gate['passed'] ? 'PASS' : 'FAIL', $gate['attempt'] ?? '-', $this->worst($gate)];
         }
-        $this->table(['asset', 'gate', 'try', 'worst fabric region (ΔE / pHash / SSIM)'], $rows);
+        $this->table(['asset', 'gate', 'try', 'worst fabric region (ΔE00 / SSIM / ORB inliers)'], $rows);
         $this->line("preview: {$this->dir}");
 
         return 0;
@@ -140,8 +154,8 @@ class V2DryRunCommand extends Command
 
     private function worst(array $gate): string
     {
-        $f = collect($gate['checks'] ?? [])->filter(fn ($c) => isset($c['deltaE']));
+        $s = $gate['summary'] ?? null;
 
-        return $f->isEmpty() ? '-' : sprintf('%.2f / %d / %.3f  (%d regions)', $f->max('deltaE'), $f->max('phash'), $f->min('ssim'), $f->count());
+        return ! $s || ! $s['regions'] ? '-' : sprintf('%.2f / %.3f / %.2f  (%d regions)', $s['worst_deltaE00_mean'], $s['min_ssim'], $s['min_orb_inliers'] ?? 0, $s['regions']);
     }
 }

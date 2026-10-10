@@ -155,3 +155,10 @@ def cta_bar(canvas, y, h, accent):
 def save_sidecar(out, data):
     with open(out + '.json', 'w') as f:
         json.dump(data, f, ensure_ascii=False, indent=1)
+
+
+def save_master(img, out):
+    """Lossless master — the only file the fabric gate trusts. Delivery JPEG comes later."""
+    if not out.lower().endswith('.png'):
+        raise SystemExit(f'master must be .png (got {out}); JPEG is derived by deliver.py after the gate')
+    img.save(out, format='PNG', compress_level=6)

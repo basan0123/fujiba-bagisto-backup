@@ -3,6 +3,7 @@
 use Fujiba\AutoPoster\Http\Controllers\Admin\DashboardController;
 use Fujiba\AutoPoster\Http\Controllers\Admin\MobileController;
 use Fujiba\AutoPoster\Http\Controllers\Admin\PostController;
+use Fujiba\AutoPoster\Http\Controllers\Admin\PreviewApprovalController;
 use Fujiba\AutoPoster\Http\Controllers\Admin\SettingsController;
 use Fujiba\AutoPoster\Http\Controllers\Admin\TemplateController;
 use Fujiba\AutoPoster\Http\Controllers\Admin\TikTokController;
@@ -26,6 +27,11 @@ Route::middleware(['web', 'admin', 'auth:admin'])
         Route::post('/preflight', [DashboardController::class, 'preflight'])->name('preflight');
         Route::post('/toggle',    [DashboardController::class, 'toggle'])->name('toggle');
         Route::post('/plan-now',  [DashboardController::class, 'planNow'])->name('plan');
+
+        // v2 preview owner approval — records the decision only (approvals.json), never posts/queues.
+        Route::get('/previews',                      [PreviewApprovalController::class, 'index'])->name('previews');
+        Route::get('/previews/{dir}/media/{file}',   [PreviewApprovalController::class, 'media'])->name('previews.media');
+        Route::post('/previews/{dir}/{key}/decide',  [PreviewApprovalController::class, 'decide'])->name('previews.decide');
 
         Route::get('/settings',  [SettingsController::class, 'index'])->name('settings');
         Route::post('/settings', [SettingsController::class, 'save'])->name('settings.save');

@@ -3,9 +3,13 @@
 Content Engine v2 still images. IMAGE LOCK: fabric pixels are only cropped,
 scaled (never upscaled > 1.25x), placed, perspective-warped or fold-shaded —
 never redrawn. Every unaltered placement is listed in <out>.json
-`fabric_regions` so gate.py can verify it against the source.
+`fabric_regions` (+ the overlays drawn on top, `exclude`) so
+bin/intel/fabric_gate.py --master can verify it against the source.
 
-    compose.py <manifest.json> <template H|J|B> <out.jpg>
+Output is a LOSSLESS PNG master; the JPEG is derived by deliver.py only after
+the gate passes.
+
+    compose.py <manifest.json> <template H|J|B> <master.png>
 """
 import json
 import math
@@ -15,7 +19,7 @@ import numpy as np
 from PIL import Image, ImageDraw, ImageFilter
 
 from common import (CREAM, GOLD, INK, crop_box, cover, cta_bar, darken, draw_text, fit, gradient, line_h, load,
-                    save_sidecar, shadow)
+                    save_master, save_sidecar, shadow)
 
 W, H = 1080, 1350
 regions = []
@@ -69,7 +73,7 @@ def colour_set(m, out):
     T(d, (W / 2, y), 'အရောင် ၄ မျိုး ၊ ကြိုက်တဲ့အရောင် ရွေးပါ', 34, CREAM, 'my', 'c')
     T(d, (W / 2, y + 56), '४ रङ — आफ्नो मनपर्ने रङ छान्नुहोस्', 32, (235, 225, 205), 'ne', 'c')
     cta_bar(cv, H - 120, 120, darken(ground, 1.6) if sum(ground) < 200 else ground)
-    cv.save(out, quality=95, subsampling=0)   # 4:4:4 — 4:2:0 smears fine gold lines (ΔE≈5)
+    save_master(cv, out)
 
 
 # ---------- J: folded stack ----------
@@ -144,7 +148,7 @@ def stack(m, out):
         y += line_h(txt, size, kind) + 6
     assert y <= H - 124, f'J text overflows into CTA bar (y={y})'
     cta_bar(cv, H - 120, 120, (150, 30, 40))
-    cv.save(out, quality=95, subsampling=0)   # 4:4:4 — 4:2:0 smears fine gold lines (ΔE≈5)
+    save_master(cv, out)
 
 
 # ---------- B: pattern story / motif zoom ----------
@@ -182,7 +186,7 @@ def motif(m, out):
     # declared overlays on the background (ring, leader line, zoom disc) — the gate skips these pixels
     rx, ry = fw * s / 2 + 6, fh * s / 2 + 6
     bg_region['exclude'] = [[int(cx_bg - rx), int(cy_bg - ry), int(2 * rx), int(2 * ry)],
-                            [zx - R - 40, zy - R - 40, 2 * R + 80, 2 * R + 80]] + [
+                            [zx - R - 64, zy - R - 64, 2 * R + 128, 2 * R + 128]] + [   # disc + gold rim + drop shadow; leader line
         [int(cx_bg + (zx - cx_bg) * u) - 8, int(cy_bg + (zy - cy_bg) * u) - 8, 16, 16] for u in [i / 60 for i in range(61)]]
     # register the whole disc exactly as rendered; gate masks the corners outside the circle
     regions.append({'src': p['image'], 'src_box': p['focus'], 'out_box': [zx - R, zy - R, 2 * R, 2 * R], 'mode': 'cover', 'mask': 'circle'})
@@ -197,7 +201,7 @@ def motif(m, out):
         y += line_h(line, size) + 4
     assert y <= H - 124, f'B story text overflows into CTA bar (y={y})'
     cta_bar(cv, H - 120, 120, darken(hexrgb(p['ground']), 1.8))
-    cv.save(out, quality=95, subsampling=0)   # 4:4:4 — 4:2:0 smears fine gold lines (ΔE≈5)
+    save_master(cv, out)
 
 
 def main():

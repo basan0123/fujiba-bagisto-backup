@@ -3,9 +3,13 @@
 Content Engine v2 story reels, 1080x1920 @30fps. Frames are rendered in PIL
 (ffmpeg drawtext cannot shape Burmese/Devanagari) and piped to ffmpeg.
 IMAGE LOCK: fabric frames are crops/scales of our photos only; frames that show
-fabric unaltered are registered in <out>.json for gate.py.
+fabric unaltered are registered in <out>.json (exact frame index n + the
+overlay rects drawn on that frame) for bin/intel/fabric_gate.py --master.
 
-    reel.py <manifest.json> <story> <out.mp4>
+Output is a LOSSLESS RGB master (.mkv, libx264rgb -qp 0); the delivery MP4 is
+derived by deliver.py only after the gate passes.
+
+    reel.py <manifest.json> <story> <master.mkv>
 Stories: dragon_story (15 s, pattern story) · gift_to_mum (30 s, gift story)
 """
 import json
@@ -305,16 +309,16 @@ def main():
     story, out = sys.argv[2], sys.argv[3]
     reel, combo = {'dragon_story': dragon_story, 'gift_to_mum': gift_to_mum}[story](m)
     n = int(round(reel.total * FPS))
+    if not out.lower().endswith('.mkv'):
+        sys.exit(f'master must be .mkv (got {out}); MP4 is derived by deliver.py after the gate')
     ff = subprocess.Popen(['ffmpeg', '-v', 'error', '-y', '-f', 'rawvideo', '-pix_fmt', 'rgb24', '-s', f'{W}x{H}', '-r', str(FPS), '-i', '-',
-                           '-f', 'lavfi', '-t', f'{reel.total:.2f}', '-i', 'anullsrc=r=44100:cl=stereo',
-                           '-map', '0:v', '-map', '1:a', '-c:v', 'libx264', '-preset', 'medium', '-crf', '19', '-pix_fmt', 'yuv420p',
-                           '-c:a', 'aac', '-shortest', '-movflags', '+faststart', out], stdin=subprocess.PIPE)
+                           '-c:v', 'libx264rgb', '-qp', '0', '-preset', 'veryfast', '-pix_fmt', 'rgb24', out], stdin=subprocess.PIPE)
     for i in range(n):
         ff.stdin.write(reel.frame(i).tobytes())
     ff.stdin.close()
     if ff.wait():
         sys.exit('ffmpeg failed')
-    save_sidecar(out, {'template': story, 'size': [W, H], 'combo': combo, 'fabric_regions': regions,
+    save_sidecar(out, {'template': story, 'size': [W, H], 'fps': FPS, 'frames': n, 'combo': combo, 'fabric_regions': regions,
                        'min_text_px': min((t['size'] for t in texts), default=None)})
     print(out)
 

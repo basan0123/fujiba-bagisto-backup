@@ -2,9 +2,9 @@
 """
 Fabric Integrity Gate — Fujiba Intelligence Agent, Phase 1.
 
-Stricter than bin/v2/gate.py (which stays untouched: it is another effort's
-file and uses CIE76 ΔE ≤ 3.0 / SSIM ≥ 0.80). This gate implements the master
-specification:
+Single fabric gate for every renderer (it replaced bin/v2/gate.py, which used
+CIE76 ΔE ≤ 3.0 / SSIM ≥ 0.80 on the lossy JPEG/MP4). This gate implements the
+master specification:
 
   Colour     CIEDE2000  mean ≤ 2.0 and p95 ≤ 5.0, inside the fabric mask,
              excluding any declared shadow region.
@@ -18,6 +18,20 @@ Any failing check ⇒ the asset is rejected and can never be published.
     fabric_gate.py --source orig.jpg --candidate out.jpg [--mask m.png]
                    [--shadow s.png] [--planned-coverage 0.42] [--json]
 
+  Master mode (Content Engine v2 renderers):
+
+    fabric_gate.py --master out.png [--mask-out out.gatemask.png]
+
+  The renderer writes a LOSSLESS master (PNG, or a lossless RGB .mkv for
+  reels) plus <master>.json declaring every fabric region (source photo +
+  crop + placement) and, per region/frame, the overlays it drew on top
+  (`exclude` rects, `mask: circle`). Expected pixels are rebuilt from the
+  source with the renderers' own crop/scale code, so ONLY declared overlays
+  are skipped; any other change inside a fabric region is measured and
+  rejected. Video frames are pulled by exact index (select=eq(n,K)) from the
+  lossless master. JPEG/MP4 delivery files are derived only after a pass
+  (bin/v2/deliver.py).
+
 Prints JSON {passed, checks[]}. Exit 0 = pass, 2 = fail, 3 = usage/IO error.
 
 Thresholds mirror config/fujiba_intel.php `fabric_gate`; pass --config-json to
@@ -25,7 +39,10 @@ override so PHP stays the single source of truth.
 """
 import argparse
 import json
+import os
+import subprocess
 import sys
+import tempfile
 
 import cv2
 import numpy as np
@@ -170,10 +187,151 @@ def edge_diff(src_gray, cand_gray):
 
 
 # --------------------------------------------------------------------------
+# Master mode
+# --------------------------------------------------------------------------
+V2 = os.path.join(os.path.dirname(os.path.dirname(os.path.abspath(__file__))), 'v2')
+MASTER_DEFAULTS = {'max_excluded_share': 0.5, 'min_exact_share': 0.15, 'min_text_px': 26, 'blur_sigma': 1.5}
+
+
+def _region_mask(r, w, h):
+    """True = fabric pixel to verify. Declared overlays and circle corners are False."""
+    m = np.ones((h, w), dtype=np.uint8)
+    if r.get('mask') == 'circle':
+        m[:] = 0
+        cv2.ellipse(m, (w // 2, h // 2), (w // 2 - 3, h // 2 - 3), 0, 0, 360, 1, -1)
+    x, y = r['out_box'][:2]
+    for ex, ey, ew, eh in r.get('exclude') or []:
+        x0, y0 = max(0, int(ex - x)), max(0, int(ey - y))
+        x1, y1 = min(w, int(ex - x + ew) + 1), min(h, int(ey - y + eh) + 1)
+        if x1 > x0 and y1 > y0:
+            m[y0:y1, x0:x1] = 0
+    return m.astype(bool)
+
+
+def _master_frame(master, n):
+    """Exact frame n of a lossless master video, as BGR."""
+    with tempfile.TemporaryDirectory() as td:
+        out = os.path.join(td, 'f.png')
+        subprocess.run(['ffmpeg', '-v', 'error', '-y', '-i', master, '-vf', f'select=eq(n\\,{int(n)})',
+                        '-vsync', '0', '-frames:v', '1', out], check=True)
+        img = cv2.imread(out, cv2.IMREAD_COLOR)
+    if img is None:
+        raise IOError(f'frame {n} not found in {master}')
+    return img
+
+
+def measure_region(exp, got, mask, cfg, sigma):
+    """All fabric metrics for one region. exp/got BGR uint8 same size; mask bool."""
+    got = got.copy()
+    got[~mask] = exp[~mask]            # overlays never bleed into the blurred colour measure
+    raw = ciede2000(to_lab(exp), to_lab(got))[mask]
+    be = cv2.GaussianBlur(exp, (0, 0), sigma)
+    bg = cv2.GaussianBlur(got, (0, 0), sigma)
+    de = ciede2000(to_lab(be), to_lab(bg))[mask]
+    g1 = cv2.cvtColor(exp, cv2.COLOR_BGR2GRAY)
+    g2 = cv2.cvtColor(got, cv2.COLOR_BGR2GRAY)
+    ss = float(ssim_map(g1, g2)[mask].mean())
+    maxdiff = int(np.abs(exp.astype(int) - got.astype(int))[mask].max())
+    ratio, note = orb_inlier_ratio(g1, g2)
+    if ratio is None and maxdiff <= 2:
+        ratio, note = 1.0, 'pixel-identical (too few keypoints, identity proves pattern)'
+    ed = edge_diff(g1, g2)
+    res = {
+        'deltaE00_mean': round(float(de.mean()), 3), 'deltaE00_p95': round(float(np.percentile(de, 95)), 3),
+        'deltaE00_raw_mean': round(float(raw.mean()), 3), 'ssim': round(ss, 4),
+        'orb_inliers': None if ratio is None else round(ratio, 3), 'edge_diff': round(ed, 4), 'max_abs_diff': maxdiff,
+    }
+    if note:
+        res['orb_note'] = note
+    fails = []
+    if res['deltaE00_mean'] > cfg['ciede2000_mean_max'] or res['deltaE00_p95'] > cfg['ciede2000_p95_max']:
+        fails.append('colour')
+    if ss < cfg['ssim_min']:
+        fails.append('structure')
+    if ratio is None or ratio < cfg['pattern_inlier_min']:
+        fails.append('pattern_orb')
+    if ed > cfg['edge_diff_max']:
+        fails.append('pattern_edges')
+    res['fails'] = fails
+    return res
+
+
+def gate_master(master, cfg, mask_out=None):
+    sys.path.insert(0, V2)
+    from common import cover, crop_box, load          # the renderers' own crop/scale code
+    from PIL import Image
+
+    meta = json.load(open(master + '.json'))
+    W, H = meta['size']
+    regions = meta.get('fabric_regions') or []
+    checks, srcs, frames = [], {}, {}
+    still = None
+    canvas_mask = np.zeros((H, W), np.uint8)
+    covered = 0
+    for i, r in enumerate(regions):
+        x, y, w, h = r['out_box']
+        if 'n' in r:
+            if r['n'] not in frames:
+                frames[r['n']] = _master_frame(master, r['n'])
+            out = frames[r['n']]
+        elif 't' in r:
+            checks.append({'check': f'fabric[{i}]', 'pass': False, 'detail': 'video region without exact frame index n'})
+            continue
+        else:
+            if still is None:
+                still = cv2.imread(master, cv2.IMREAD_COLOR)
+            out = still
+        if r['src'] not in srcs:
+            srcs[r['src']] = load(r['src'])
+        exp = cover(crop_box(srcs[r['src']], r['src_box']), w, h)
+        exp = cv2.cvtColor(np.asarray(exp), cv2.COLOR_RGB2BGR)
+        got = out[y:y + h, x:x + w]
+        if got.shape[:2] != (h, w):
+            checks.append({'check': f'fabric[{i}]', 'pass': False, 'detail': 'region outside canvas'})
+            continue
+        mask = _region_mask(r, w, h)
+        full = np.ones_like(mask) if r.get('mask') != 'circle' else _region_mask({'out_box': r['out_box'], 'mask': 'circle'}, w, h)
+        excluded = 1 - mask.sum() / max(1, full.sum())
+        name = f'fabric[{i}]' + (f"@n{r['n']}" if 'n' in r else '')
+        if mask.sum() == 0:
+            checks.append({'check': name, 'pass': False, 'detail': 'declared overlays cover the whole region'})
+            continue
+        m = measure_region(exp, got, mask, cfg, cfg['blur_sigma'])
+        if excluded > cfg['max_excluded_share']:
+            m['fails'].append('excluded_share')
+        checks.append({'check': name, 'excluded': round(float(excluded), 3), **m, 'pass': not m['fails']})
+        if 'n' not in r:
+            canvas_mask[y:y + h, x:x + w][mask] = 255
+            covered += int(mask.sum())
+    if not any('n' in r for r in regions) and regions:
+        share = float((canvas_mask > 0).sum()) / (W * H)
+        need = meta.get('min_exact_share', cfg['min_exact_share'])
+        checks.append({'check': 'exact_fabric_share', 'value': round(share, 3), 'min': need, 'pass': share >= need})
+    if meta.get('min_text_px') is not None:
+        checks.append({'check': 'min_text_px', 'value': meta['min_text_px'], 'min': cfg['min_text_px'],
+                       'pass': meta['min_text_px'] >= cfg['min_text_px']})
+    if mask_out and still is not None:
+        cv2.imwrite(mask_out, canvas_mask)
+    checks.append({'check': 'vision (motif/kanji/faces)', 'value': 'manual — owner review', 'pass': None})
+    passed = bool(regions) and all(c['pass'] is not False for c in checks)
+    fab = [c for c in checks if 'deltaE00_mean' in c]
+    summary = {
+        'regions': len(fab),
+        'worst_deltaE00_mean': max((c['deltaE00_mean'] for c in fab), default=None),
+        'worst_deltaE00_p95': max((c['deltaE00_p95'] for c in fab), default=None),
+        'min_ssim': min((c['ssim'] for c in fab), default=None),
+        'min_orb_inliers': min((c['orb_inliers'] for c in fab if c['orb_inliers'] is not None), default=None),
+        'max_edge_diff': max((c['edge_diff'] for c in fab), default=None),
+    }
+    return {'passed': passed, 'mode': 'master', 'master': master, 'summary': summary, 'checks': checks}
+
+
 def main():
     ap = argparse.ArgumentParser()
-    ap.add_argument('--source', required=True, help='original fabric photo (truth)')
-    ap.add_argument('--candidate', required=True, help='rendered asset to verify')
+    ap.add_argument('--master', help='lossless master (PNG / lossless mkv) with <master>.json sidecar')
+    ap.add_argument('--mask-out', help='master mode: write the verified-fabric mask PNG here')
+    ap.add_argument('--source', help='original fabric photo (truth)')
+    ap.add_argument('--candidate', help='rendered asset to verify')
     ap.add_argument('--mask', help='white = fabric region to check')
     ap.add_argument('--shadow', help='white = declared shadow layer, excluded from ΔE')
     ap.add_argument('--planned-coverage', type=float, default=None)
@@ -187,6 +345,17 @@ def main():
         except ValueError as exc:
             print(json.dumps({'passed': False, 'error': f'bad --config-json: {exc}'}))
             return 3
+
+    if args.master:
+        try:
+            res = gate_master(args.master, {**MASTER_DEFAULTS, **cfg}, args.mask_out)
+        except (IOError, OSError, ValueError, KeyError, subprocess.CalledProcessError) as exc:
+            print(json.dumps({'passed': False, 'error': f'{type(exc).__name__}: {exc}'}))
+            return 3
+        print(json.dumps(res, ensure_ascii=False))
+        return 0 if res['passed'] else 2
+    if not (args.source and args.candidate):
+        ap.error('--source and --candidate are required (or use --master)')
 
     src = cv2.imread(args.source, cv2.IMREAD_COLOR)
     cand = cv2.imread(args.candidate, cv2.IMREAD_COLOR)

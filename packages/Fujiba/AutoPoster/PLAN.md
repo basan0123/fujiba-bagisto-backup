@@ -30,7 +30,7 @@ v1 (live)                                v2 additions (same package)
 CollectionPostBuilder.fill() ───────────► ContentPlanner picks template+scenario+product (calendar, rotation, festival boost)
 bin/post_photo.py                        bin/v2/compose.py   template renderers (real fabric pixels only)
 bin/post_reel.py                         bin/v2/reel.py      story/motion engine (varied transitions, music bed)
-                                         bin/v2/gate.py      quality gate (fabric-region match + checks)
+                                         bin/intel/fabric_gate.py --master  gate on lossless masters; bin/v2/deliver.py derives JPEG/MP4 after a pass
 PostPublisher (unchanged) ◄──────────── queue rows carry caption_meta.v2 = {template, scenario, combo, gate}
 ```
 
@@ -59,7 +59,7 @@ Confidence grades: **A** = seen/measured in our photo; **B** = reliable publishe
 | 3 Templates | 10 renderers A–J. The first run has 3: **H colour set**, **J folded stack**, **B/G motif zoom + meaning callout**. | Devanagari font for Nepali text on images |
 | 4 Video engine | Story beats (hook → reveal → story → brand → CTA), 15/30/45 s, a pool of motion/transition/text styles, a combo log. The first run has 2 reels. | Music: licensed library or generator (see §4) |
 | 5 Calendar | ContentPlanner: 10/day mix, festival boost T−14 days (Thingyan, Thadingyut, Tazaungdaing, Dashain, Tihar, Teej, JP New Year…), Asia/Tokyo slots. Festival dates are stored per year, never computed by guess (lunar calendars). | — |
-| 6 Quality gate | `gate.py`: fabric-region pHash + mean ΔE00 vs the source crop, sharpness, text-in-safe-area, mobile legibility. A vision check (motif unchanged, no fake kanji, hands/faces) needs a vision model. Max 2 retries, then skip + log. | `ANTHROPIC_API_KEY` for the vision part |
+| 6 Quality gate | `bin/intel/fabric_gate.py --master` (was `gate.py`; now CIEDE2000/SSIM/ORB on lossless masters): fabric-region pHash + mean ΔE00 vs the source crop, sharpness, text-in-safe-area, mobile legibility. A vision check (motif unchanged, no fake kanji, hands/faces) needs a vision model. Max 2 retries, then skip + log. | `ANTHROPIC_API_KEY` for the vision part |
 | 7 Feedback | `autoposter:insights` daily via the ChatPion page token (already has `read_insights`); a weekly re-weighting report. | ChatPion endpoint for insights (small addition) |
 
 ## 4. APIs: what we have and what to add
