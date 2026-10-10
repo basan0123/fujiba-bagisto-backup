@@ -131,6 +131,7 @@ class InitializeTenancyForSubdomains
             // (global middleware runs before route matching). See
             // packages/Fujiba/AuthGateway/routes/api.php.
             'api/auth',
+            'saas',                   // public SaaS marketing pages (App\Saas)
             'superadmin',
             'storage',
             'language',

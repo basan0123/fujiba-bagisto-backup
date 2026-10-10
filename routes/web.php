@@ -124,6 +124,10 @@ Route::middleware(['web', 'admin', 'auth:admin'])
 // Route::fallback(), so these win on the apex without touching any package.
 foreach (['snssale.com', 'www.snssale.com'] as $centralHost) {
     Route::domain($centralHost)->middleware('web')->group(function () {
+        // SaaS marketing preview (moves to "/" only at an approved cutover).
+        Route::get('/saas', \App\Saas\Http\LandingController::class)
+            ->name('saas.landing');
+
         // Bare apex → operational destination (SaaS control panel login).
         Route::get('/', fn () => redirect('/superadmin/login'))
             ->name('central.apex.home');
