@@ -227,6 +227,58 @@ details p{margin:10px 0 0;color:var(--muted)}
   .tab{grid-template-columns:1.1fr 1fr;font-size:11px}.hub{grid-template-columns:repeat(5,minmax(0,1fr));gap:10px 4px;padding:8px}.chn:before{display:none}
   .chn{padding:5px 2px}.chn b{font-size:9.5px}.chn small{font-size:8.5px}.core{padding:6px 14px}.core b{font-size:14px}.hubcap{font-size:11px;text-align:center}}
 @media(prefers-reduced-motion:reduce){.posdemo *{animation:none!important;transition:none!important}}
+/* feature cards: 3 columns with animated art */
+.feats{grid-template-columns:repeat(3,minmax(0,1fr))}
+@media(max-width:1000px){.feats{grid-template-columns:repeat(2,minmax(0,1fr))}}
+@media(max-width:640px){.feats{grid-template-columns:1fr}}
+.feats .feat{padding:0;overflow:hidden}
+.art{position:relative;height:170px;overflow:hidden;display:grid;place-items:center;color:#fff}
+.art:after{content:"";position:absolute;inset:0;background:radial-gradient(circle at 20% 0,rgba(255,255,255,.35),transparent 55%);pointer-events:none}
+.fbody{padding:22px 24px 26px}
+.ficon{display:inline-grid;place-items:center;width:38px;height:38px;border-radius:11px;color:#fff;margin-bottom:10px}.ficon svg{width:20px;height:20px}
+/* 0 store window */
+.win{width:72%;background:#fff;border-radius:10px;box-shadow:0 10px 25px rgba(0,0,0,.18);overflow:hidden}
+.url{font:700 10px/1 ui-monospace,monospace;color:#5c607e;background:#f1f1f6;padding:6px 8px;white-space:nowrap;overflow:hidden;width:0;animation:typeurl 4s steps(20) infinite}
+@keyframes typeurl{0%{width:0}45%,100%{width:100%}}
+.prods{display:grid;grid-template-columns:repeat(3,1fr);gap:6px;padding:8px}
+.prods i{aspect-ratio:3/4;border-radius:6px;background:#f0e6f2 center/cover;opacity:0;animation:popin 4s infinite}
+.prods i:nth-child(2){background:#e2e8fb;animation-delay:.3s}.prods i:nth-child(3){background:#dff6ec;animation-delay:.6s}
+@keyframes popin{0%,30%{opacity:0;transform:translateY(8px)}45%,92%{opacity:1;transform:none}100%{opacity:0}}
+/* 1 pos scanner */
+.mini-tab{position:relative;width:62%;height:96px;background:#fff;border-radius:12px;border:6px solid #2d2f4a;display:grid;place-items:center}
+.bars{font-size:22px;letter-spacing:-2px;color:#2d2f4a}
+.beam2{position:absolute;left:8%;right:8%;height:2px;background:#ff2d55;box-shadow:0 0 12px 4px rgba(255,45,85,.6);animation:sweep 1.6s ease-in-out infinite}
+@keyframes sweep{0%,100%{top:18%}50%{top:78%}}
+.beep{position:absolute;right:12%;top:16%;background:#fff;color:#2d2f4a;font-weight:800;font-size:13px;padding:3px 10px;border-radius:99px;animation:popin 3.2s infinite}
+/* 2 payment */
+.card3{width:132px;height:84px;border-radius:12px;background:linear-gradient(135deg,#2d2f4a,#5a5f8f);padding:12px;display:flex;flex-direction:column;justify-content:space-between;box-shadow:0 10px 25px rgba(0,0,0,.25);animation:tilt 4s ease-in-out infinite}
+.card3 .chip{width:24px;height:18px;border-radius:4px;background:linear-gradient(135deg,#f6d365,#fda085)}.card3 span{font:700 11px ui-monospace,monospace}
+@keyframes tilt{0%,100%{transform:rotate(-8deg) translateX(-30px)}50%{transform:rotate(-2deg) translateX(-18px)}}
+.paypay{position:absolute;right:16%;bottom:26%;background:#ff0033;font-weight:800;font-size:13px;padding:6px 12px;border-radius:8px;box-shadow:0 8px 18px rgba(0,0,0,.2)}
+.tick{position:absolute;right:13%;top:18%;width:36px;height:36px;border-radius:50%;background:#2cc590;display:grid;place-items:center;font-weight:800;animation:popin 3s infinite}
+/* 3 delivery */
+.road{position:absolute;left:8%;right:8%;bottom:46px;height:4px;border-radius:4px;background:repeating-linear-gradient(90deg,rgba(255,255,255,.9) 0 14px,transparent 14px 24px)}
+.truck{position:absolute;bottom:4px;left:0;animation:drive 4s linear infinite}.truck svg{width:44px;height:44px}
+@keyframes drive{from{left:-10%}to{left:85%}}
+.pin{position:absolute;right:0;bottom:8px;width:16px;height:16px;border-radius:50% 50% 50% 0;background:#fff;transform:rotate(-45deg)}
+.track{position:absolute;top:26px;background:#fff;color:#2d2f4a;font:800 11px ui-monospace,monospace;padding:4px 10px;border-radius:99px}
+/* 4 social */
+.nets{display:flex;gap:12px}
+.n{width:46px;height:46px;border-radius:14px;display:grid;place-items:center;font-weight:800;font-size:16px;box-shadow:0 8px 18px rgba(0,0,0,.2);animation:bob 2.4s ease-in-out infinite}
+.n.f{background:#1877f2}.n.ig{background:linear-gradient(135deg,#f58529,#dd2a7b,#8134af);animation-delay:.3s}.n.tt{background:#111;animation-delay:.6s}
+@keyframes bob{50%{transform:translateY(-8px)}}
+.heart{position:absolute;bottom:20px;font-style:normal;font-size:18px;color:#fff;opacity:0;animation:float 3s ease-out infinite}
+.h1{left:30%}.h2{left:50%;animation-delay:1s}.h3{left:68%;animation-delay:2s}
+@keyframes float{0%{opacity:0;transform:translateY(0)}20%{opacity:1}100%{opacity:0;transform:translateY(-110px) scale(1.4)}}
+/* 5 ai */
+.doc{width:56%;background:#fff;border-radius:10px;padding:14px;box-shadow:0 10px 25px rgba(0,0,0,.18)}
+.doc i{display:block;height:8px;border-radius:4px;margin:7px 0;background:linear-gradient(90deg,#a866d1,#f9a4d7);width:0;animation:write 4s infinite}
+.doc i:nth-child(2){animation-delay:.5s}.doc i:nth-child(3){animation-delay:1s}.doc i:nth-child(4){animation-delay:1.5s}
+@keyframes write{0%{width:0}30%,90%{width:var(--w,90%)}100%{width:0}}
+.doc i:nth-child(4){--w:55%}
+.spark{position:absolute;font-size:22px;animation:twinkle 1.8s ease-in-out infinite}.s1{left:18%;top:22%}.s2{right:18%;bottom:24%;animation-delay:.9s;font-size:16px}
+@keyframes twinkle{50%{transform:scale(1.5) rotate(20deg);opacity:.5}}
+@media(prefers-reduced-motion:reduce){.art *{animation:none!important;opacity:1!important;width:auto}}
 footer{padding:36px 0;color:var(--muted);font-size:14px;text-align:center}
 </style>
 </head>
@@ -367,9 +419,32 @@ footer{padding:36px 0;color:var(--muted);font-size:14px;text-align:center}
 
 <section id="features"><div class="wrap">
   <div class="title"><h2>{{ $t['features_h'] }}</h2></div>
-  <div class="grid">
+  <div class="grid feats">
     @foreach ($t['features'] as $i => [$h, $p])
-      <div class="feat"><div class="icon {{ $tiles[$i % 6] }}">{!! $icon($featureIcons[$i % 6]) !!}</div><h3>{{ $h }}</h3><p>{{ $p }}</p></div>
+      <div class="feat">
+        <div class="art art{{ $i }} {{ $tiles[$i % 6] }}" aria-hidden="true">
+          @switch($i)
+            @case(0)
+              <div class="win"><div class="url">yourname.snssale.com</div><div class="prods"><i style="background-image:url(/saas/demo-fabric.webp)"></i><i></i><i></i></div></div>
+              @break
+            @case(1)
+              <div class="mini-tab"><b class="bars">▮▯▮▮▯▮▯▮▮▯▮</b><i class="beam2"></i></div><div class="beep">¥3,190</div>
+              @break
+            @case(2)
+              <div class="card3"><i class="chip"></i><span>•••• 4242</span></div><div class="paypay">PayPay</div><div class="tick">✓</div>
+              @break
+            @case(3)
+              <div class="road"><div class="truck">{!! $icon('truck') !!}</div><i class="pin"></i></div><div class="track">SGW 1234 5678</div>
+              @break
+            @case(4)
+              <div class="nets"><span class="n f">f</span><span class="n ig">ig</span><span class="n tt">tt</span></div><i class="heart h1">♥</i><i class="heart h2">♥</i><i class="heart h3">♥</i>
+              @break
+            @default
+              <div class="doc"><i></i><i></i><i></i><i></i></div><b class="spark s1">✦</b><b class="spark s2">✦</b>
+          @endswitch
+        </div>
+        <div class="fbody"><span class="ficon {{ $tiles[$i % 6] }}">{!! $icon($featureIcons[$i % 6]) !!}</span><h3>{{ $h }}</h3><p>{{ $p }}</p></div>
+      </div>
     @endforeach
   </div>
 </div></section>
