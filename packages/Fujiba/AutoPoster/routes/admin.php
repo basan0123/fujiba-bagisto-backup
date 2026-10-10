@@ -4,6 +4,7 @@ use Fujiba\AutoPoster\Http\Controllers\Admin\DashboardController;
 use Fujiba\AutoPoster\Http\Controllers\Admin\PostController;
 use Fujiba\AutoPoster\Http\Controllers\Admin\SettingsController;
 use Fujiba\AutoPoster\Http\Controllers\Admin\TemplateController;
+use Fujiba\AutoPoster\Http\Controllers\Admin\TikTokController;
 use Illuminate\Support\Facades\Route;
 
 Route::middleware(['web', 'admin', 'auth:admin'])
@@ -21,6 +22,13 @@ Route::middleware(['web', 'admin', 'auth:admin'])
         Route::get('/templates',            [TemplateController::class, 'index'])->name('templates');
         Route::post('/templates',           [TemplateController::class, 'save'])->name('templates.save');
         Route::delete('/templates/{id}',    [TemplateController::class, 'destroy'])->name('templates.destroy');
+
+        Route::get('/tiktok',                [TikTokController::class, 'index'])->name('tiktok');
+        Route::get('/tiktok/connect',        [TikTokController::class, 'connect'])->name('tiktok.connect');
+        Route::post('/tiktok/disconnect',    [TikTokController::class, 'disconnect'])->name('tiktok.disconnect');
+        Route::get('/tiktok/post/{id}',      [TikTokController::class, 'compose'])->name('tiktok.compose');
+        Route::post('/tiktok/post/{id}',     [TikTokController::class, 'publish'])->name('tiktok.publish');
+        Route::get('/tiktok/status/{id}',    [TikTokController::class, 'status'])->name('tiktok.status');
 
         Route::get('/queue',   [PostController::class, 'queue'])->name('queue');
         Route::get('/history', [PostController::class, 'history'])->name('history');
@@ -43,3 +51,8 @@ Route::middleware(['web', 'admin', 'auth:admin'])
         Route::post('/posts/{id}/duplicate',        [PostController::class, 'duplicate'])->name('posts.duplicate');
         Route::delete('/posts/{id}',                [PostController::class, 'destroy'])->name('posts.destroy');
     });
+
+// TikTok OAuth redirect URI registered in the developer portal: /admin/tiktok/callback
+Route::middleware(['web', 'admin', 'auth:admin'])
+    ->get(config('app.admin_url').'/tiktok/callback', [TikTokController::class, 'callback'])
+    ->name('admin.autoposter.tiktok.callback');

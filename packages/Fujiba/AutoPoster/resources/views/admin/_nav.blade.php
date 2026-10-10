@@ -8,6 +8,7 @@
             'admin.autoposter.posts.create' => 'Manual Post',
             'admin.autoposter.bulk'         => 'Bulk Schedule',
             'admin.autoposter.templates'    => 'Templates',
+            'admin.autoposter.tiktok'       => 'TikTok',
             'admin.autoposter.settings'     => 'Settings',
         ])
 
