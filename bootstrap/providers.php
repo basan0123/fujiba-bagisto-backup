@@ -69,10 +69,15 @@ return [
     Fujiba\Accounting\Providers\AccountingServiceProvider::class,
     Fujiba\AuthGateway\Providers\AuthGatewayServiceProvider::class,
     Fujiba\CustomerRanks\Providers\CustomerRanksServiceProvider::class,
+    Fujiba\BuyAgain\Providers\BuyAgainServiceProvider::class,
+    Fujiba\SupplierImageSync\Providers\SupplierImageSyncServiceProvider::class,
+    Fujiba\SupplierFinder\Providers\SupplierFinderServiceProvider::class,
     // KimonoPromo: tiered cart_fixed override — UNREGISTERED. The real promo lives
     // in bulk_bonus_rules (collect.totals.after), not cart rules, so this override
     // is the wrong layer and stays off. Package left on disk, inert.
     // Fujiba\KimonoPromo\Providers\KimonoPromoServiceProvider::class,
     Webkul\Waste\Providers\WasteServiceProvider::class,
+    // Intelligence ops: health/heartbeat, load guard, insights importer (read-only).
+    Fujiba\AutoPoster\Ops\IntelOpsServiceProvider::class,
 
 ];

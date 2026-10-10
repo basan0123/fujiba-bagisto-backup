@@ -21,8 +21,18 @@ return Application::configure(basePath: dirname(__DIR__))
     ->withMiddleware(function (Middleware $middleware) {
         // MOVE THIS TO THE TOP: Global middleware runs before Group middleware
         $middleware->use([
+            // InitializeTenancyForSubdomains is the single source of truth for
+            // per-tenant session cookie / session path / cache prefix. It keys
+            // everything off the resolved tenant ID, so it works for custom
+            // domains (fujiba.co.jp) as well as *.snssale.com subdomains.
+            //
+            // SetTenantSessionConfig used to run right after it and re-derived
+            // the same settings from the URL *subdomain*, OVERWRITING the
+            // tenant-ID-based values. It was inert only because app.base_domain
+            // is unset (it fell back to a stale nip.io host and never matched);
+            // setting app.base_domain would have re-armed it and collapsed
+            // isolation. Removed rather than left as a latent footgun. 2026-08-29.
             \App\Http\Middleware\InitializeTenancyForSubdomains::class,
-            \App\Http\Middleware\SetTenantSessionConfig::class,
             \App\Http\Middleware\SetTenantStorageDisk::class,
             \App\Http\Middleware\TenantAdminSecurity::class,
         ]);
@@ -111,6 +121,22 @@ return Application::configure(basePath: dirname(__DIR__))
             ->name('reindex-catalog-rule-prices')
             ->withoutOverlapping();
 
+        // product_ordered_inventories (the "reserved" pool) lives in tenant DBs and
+        // is only ever decremented by invoice/shipment/refund. Any order that
+        // leaves an open state by another route — a manual status flip to
+        // completed, a line completed without a full invoice — strands its
+        // reservation forever, and salable = physical - reserved, so stranded
+        // units silently vanish from sale (197 units / 45 kimono on fujiba,
+        // 2026-08-27). The cancel-path leak is fixed at source in
+        // OrderItemRepository; this nightly pass is the backstop for the paths
+        // that bypass the repositories entirely. It only ever writes the value
+        // recomputed from still-open orders, so it is safe to re-run.
+        $schedule->command('tenants:run', ['fujiba:inventory-reconcile-reservations'])
+            ->dailyAt('03:20')
+            ->onOneServer()
+            ->name('reconcile-inventory-reservations')
+            ->withoutOverlapping();
+
         // === TikTok Shop schedules ===
         // Per master prompt §6: each closure sweeps tenants via chunkById(50)
         // and dispatches one job per tenant. NEVER iterate tenants inside a
@@ -134,6 +160,33 @@ return Application::configure(basePath: dirname(__DIR__))
             });
         })->everyThirtyMinutes()->name('tiktok-refresh-tokens')->withoutOverlapping();
 
+        // === KK ASIA FOOD STORE sales digests ===
+        // Scoped to the kkmart tenant on purpose: the report subject/branding is
+        // KK-specific and the recipient is the shop owner, so this must not fan
+        // out to every tenant. Weekly lands Monday morning, monthly on the 1st.
+        // Options must use tenants:run's --option=key=value form (see Run.php:40).
+        $kkmart = 'fe78e214-1360-4290-9523-ab7fa0782cba';
+
+        $schedule->command('tenants:run', [
+                'sales:report',
+                "--tenants={$kkmart}",
+                '--option=period=weekly',
+            ])
+            ->weeklyOn(1, '08:00')
+            ->onOneServer()
+            ->name('kkmart-weekly-sales-report')
+            ->withoutOverlapping();
+
+        $schedule->command('tenants:run', [
+                'sales:report',
+                "--tenants={$kkmart}",
+                '--option=period=monthly',
+            ])
+            ->monthlyOn(1, '08:10')
+            ->onOneServer()
+            ->name('kkmart-monthly-sales-report')
+            ->withoutOverlapping();
+
         // === Facebook Auto Poster (Fujiba\AutoPoster) ===
         // Gated on config('autoposter.schedule_enabled'), default FALSE. The
         // per-channel autoposter_settings.auto_posting_enabled flag is the
@@ -144,10 +197,12 @@ return Application::configure(basePath: dirname(__DIR__))
         // Wrapped in tenants:run because the scheduler itself runs on the
         // CENTRAL database — the queue and settings tables are tenant-only.
         if (config('autoposter.schedule_enabled')) {
-            // Plan: top up today's remaining slots. Idempotent per slot, so an
-            // hourly cadence just fills gaps rather than stacking duplicates.
-            $schedule->command('tenants:run', ['autoposter:plan'])
-                ->hourly()
+            // Plan: keep a week of posts (with caption + cover) ready ahead so
+            // admins can review/edit them on the phone screen. Idempotent per
+            // slot and per-day quota, so re-runs never stack duplicates.
+            $schedule->command('tenants:run', ['autoposter:plan', '--option=days='.config('autoposter.plan_days_ahead', 7)])
+                ->dailyAt('00:30')
+                ->timezone('Asia/Tokyo')
                 ->onOneServer()
                 ->name('autoposter-plan')
                 ->withoutOverlapping(30)
@@ -164,7 +219,82 @@ return Application::configure(basePath: dirname(__DIR__))
                 ->withoutOverlapping(10)
                 ->runInBackground()
                 ->appendOutputTo(storage_path('logs/autoposter-dispatch.log'));
+
+            // Instagram cross-post of whatever just went live on Facebook.
+            // No-op unless AUTOPOSTER_INSTAGRAM_ENABLED=true.
+            $schedule->command('tenants:run', ['autoposter:instagram'])
+                ->everyFiveMinutes()
+                ->onOneServer()
+                ->name('autoposter-instagram')
+                ->withoutOverlapping(20)
+                ->runInBackground()
+                ->appendOutputTo(storage_path('logs/autoposter-instagram.log'));
         }
+
+        // === Intelligence ops (Fujiba\AutoPoster\Ops) — read-only, never posts ===
+        $schedule->command('fujiba:intel:health --heartbeat')
+            ->everyFiveMinutes()
+            ->withoutOverlapping()
+            ->runInBackground()
+            ->name('fujiba-intel-heartbeat');
+        $schedule->command('fujiba:intel:health --daily')
+            ->dailyAt('07:00')
+            ->timezone('Asia/Tokyo')
+            ->name('fujiba-intel-daily');
+        // Exits blocked:no_token until FUJIBA_INTEL_META_INSIGHTS_TOKEN is set.
+        $schedule->command('tenants:run', ['fujiba:intel:insights', '--option=queue=1', '--tenants=1bd1181f-fcd5-4238-a12d-a207d6ea4006'])
+            ->dailyAt('06:30')
+            ->timezone('Asia/Tokyo')
+            ->name('fujiba-intel-insights');
+
+        // === Supplier image sync (Fujiba\SupplierImageSync) — kimono tenant only ===
+        // Sunday 03:00 JST: always a dry-run first (kept as a reviewable report).
+        // Nothing is applied until the owner has approved a report; after that,
+        // only high-confidence rows of THIS dry-run whose product↔code pairing
+        // was approved before, and whose supplier image is new or changed, are
+        // applied. Never --replace-all; rollbacks, manual image changes and the
+        // config hold list are respected. Pinned to the kimono tenant by the
+        // command itself (no tenants:run). Summary → owner Messenger.
+        // Disabled 2026-09-27 at owner's request — run supplier-images:sync manually.
+        // $schedule->command('supplier-images:sync', ['--auto', '--notify'])
+        //     ->weeklyOn(0, '03:00')
+        //     ->timezone('Asia/Tokyo')
+        //     ->onOneServer()
+        //     ->name('supplier-images-weekly')
+        //     ->withoutOverlapping(180)
+        //     ->runInBackground()
+        //     ->appendOutputTo(storage_path('logs/supplier-images.log'));
+
+        // Supplier Finder (Fujiba\SupplierFinder): crawl every enabled fabric shop
+        // politely (robots.txt, 3 s/domain; blocked shops are skipped + reported),
+        // regroup + rematch, then Messenger the owner ONLY when there are new
+        // Japanese-pattern items, price changes or a newly blocked shop.
+        // Pinned to the kimono tenant by the command itself.
+        // Owner (2026-10-10): run every day for one year, restart by itself if a
+        // run stops, only report never-seen designs. Ends 2027-10-10 JST.
+        $supplierFinderActive = fn () => now('Asia/Tokyo')->lt('2027-10-10 00:00:00');
+        $schedule->command('supplier-finder:daily', ['--notify'])
+            ->dailyAt('04:00')
+            ->timezone('Asia/Tokyo')
+            ->when($supplierFinderActive)
+            ->onOneServer()
+            ->name('supplier-finder-daily')
+            ->withoutOverlapping(360)
+            ->runInBackground()
+            ->appendOutputTo(storage_path('logs/supplier-finder.log'));
+        // Watchdog / auto-restart: hourly, re-crawls only shops that did not
+        // finish successfully today (crash, kill, error). No-op when all done;
+        // a cache lock in the command prevents overlap with the 04:00 run.
+        $schedule->command('supplier-finder:daily', ['--resume', '--notify'])
+            ->hourlyAt(30)
+            ->timezone('Asia/Tokyo')
+            ->between('05:00', '23:59')
+            ->when($supplierFinderActive)
+            ->onOneServer()
+            ->name('supplier-finder-resume')
+            ->withoutOverlapping(360)
+            ->runInBackground()
+            ->appendOutputTo(storage_path('logs/supplier-finder.log'));
 
         // SSL auto-renew: daily refresh of cert status + renew anything < 30 days to expiry.
         // Runs in central context (no tenants:run wrapper) since it walks the
@@ -227,6 +357,57 @@ return Application::configure(basePath: dirname(__DIR__))
                 });
             });
         })->everyMinute()->name('sweep-pending-notifications')->onOneServer()->withoutOverlapping();
+
+        // Weekly longyi/lungi SEO refresh (owner 2026-10-10): category + home
+        // meta rebuilt from live prices/counts, Messenger summary to owner.
+        $schedule->command('tenants:run', [
+                'fujiba:kimono-seo-weekly',
+                '--tenants=1bd1181f-fcd5-4238-a12d-a207d6ea4006',
+                '--option=notify=1',
+            ])
+            ->weeklyOn(1, '06:00')
+            ->timezone('Asia/Tokyo')
+            ->onOneServer()
+            ->name('kimono-seo-weekly')
+            ->withoutOverlapping()
+            ->appendOutputTo(storage_path('logs/kimono-seo-weekly.log'));
+
+        // Kimono storefront status follows physical stock: out of stock ->
+        // disabled, in stock -> enabled. Kimono tenant, `default` channel only
+        // (mmfood/wholesale have their own visibility rules). Runs before the
+        // 05:00 Facebook catalog sync so the catalog archives what was hidden.
+        $schedule->command('tenants:run', [
+                'fujiba:catalog-sync-status-from-stock',
+                '--tenants=1bd1181f-fcd5-4238-a12d-a207d6ea4006',
+            ])
+            ->dailyAt('04:30')
+            ->timezone('Asia/Tokyo')
+            ->onOneServer()
+            ->name('kimono-status-from-stock')
+            ->withoutOverlapping();
+
+        // Facebook catalog: daily full push of stock / price / photo for every
+        // approved product. In stock -> active; out of stock or disabled ->
+        // archived (hidden from ads). Kimono tenant only — the one with a
+        // catalog configured. Runs synchronously so the result is logged here.
+        $schedule->call(function () {
+            $tenant = \App\Models\Tenant::find('1bd1181f-fcd5-4238-a12d-a207d6ea4006');
+            if (! $tenant) {
+                return;
+            }
+            tenancy()->initialize($tenant);
+            try {
+                $channels = \Fujiba\FacebookCatalog\Models\FacebookCatalogSetting::where('is_active', true)->pluck('channel_id');
+                foreach ($channels as $channelId) {
+                    $result = app(\Fujiba\FacebookCatalog\Services\BatchSyncService::class)->syncChannel((int) $channelId);
+                    \Illuminate\Support\Facades\Log::info('[FacebookCatalog] daily sync', ['channel_id' => $channelId, 'result' => $result]);
+                }
+            } catch (\Throwable $e) {
+                \Illuminate\Support\Facades\Log::error('[FacebookCatalog] daily sync failed', ['error' => $e->getMessage()]);
+            } finally {
+                tenancy()->end();
+            }
+        })->dailyAt('05:00')->timezone('Asia/Tokyo')->name('facebook-catalog-daily-sync')->onOneServer()->withoutOverlapping();
     })
     ->withExceptions(function (Exceptions $exceptions) {
         // Super-admin AuthenticationException routing is handled by
