@@ -36,8 +36,9 @@ $wanted = array_values(array_filter(array_map('trim', explode(',', (string) gete
 if (! $outDir || ! is_dir($outDir) || ! $wanted) {
     throw new RuntimeException('set GAP_SERIES and an existing GAP_OUT directory');
 }
-// JA wording for catalog "Fabric:" values. Hosonuno is the romanised reading of 細布.
-$materialJa = ['Hosonuno (100% cotton)' => '細布(綿100%)'];
+// JA wording for catalog "Fabric:" values. Owner 2026-10-12: do NOT use 細布 until the
+// catalog term is confirmed — show the fibre content only.
+$materialJa = ['Hosonuno (100% cotton)' => '綿100%'];
 $guard = app(DuplicateImageGuard::class);
 $blockedAll = $guard->blocked();
 $codeRx = '/^(F[A-Z]-\d+[A-Z]?)-?([A-Z])$/';
