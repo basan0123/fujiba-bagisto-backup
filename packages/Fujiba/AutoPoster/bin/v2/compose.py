@@ -71,10 +71,10 @@ def colour_set(m, out):
     T(d, (W / 2, 40), 'F U J I B A   K I M O N O', 28, GOLD, 'serif', 'c')
     T(d, (W / 2, 82), m['set_title'], 58, CREAM, 'serif', 'c')
     T(d, (W / 2, 160), m['set_title_ja'], 34, (230, 220, 200), 'ja', 'c')
-    tile, gap = 430, 40
+    tile, gap, row = 350, 40, 66          # sized so the Burmese + Nepali lines clear the CTA bar
     x0 = (W - 2 * tile - gap) // 2
     for i, it in enumerate(items[:4]):
-        x, y = x0 + (i % 2) * (tile + gap), 230 + (i // 2) * (tile + 74)
+        x, y = x0 + (i % 2) * (tile + gap), 230 + (i // 2) * (tile + row)
         shadow(cv, (x, y, x + tile, y + tile), 18, (0, 10), 140)
         d = ImageDraw.Draw(cv)
         d.rectangle((x - 8, y - 8, x + tile + 8, y + tile + 8), fill=GOLD)
@@ -85,9 +85,12 @@ def colour_set(m, out):
         d = ImageDraw.Draw(cv)
         T(d, (x + tile / 2, y + tile + 16), f"{it['letter']} · {it['colour']}", 32, CREAM, 'serif', 'c')
     d = ImageDraw.Draw(cv)
-    y = 230 + 2 * (tile + 74) + 6
-    T(d, (W / 2, y), 'အရောင် ၄ မျိုး ၊ ကြိုက်တဲ့အရောင် ရွေးပါ', 34, CREAM, 'my', 'c')
-    T(d, (W / 2, y + 56), '४ रङ — आफ्नो मनपर्ने रङ छान्नुहोस्', 32, (235, 225, 205), 'ne', 'c')
+    y = 230 + 2 * (tile + row) + 4
+    for txt, size, kind, col in [('အရောင် ၄ မျိုး ၊ ကြိုက်တဲ့အရောင် ရွေးပါ', 34, 'my', CREAM),
+                                 ('४ रङ — आफ्नो मनपर्ने रङ छान्नुहोस्', 32, 'ne', (235, 225, 205))]:
+        T(d, (W / 2, y), txt, size, col, kind, 'c')
+        y += line_h(txt, size, kind) + 4
+    assert y <= H - 124, f'H text overflows into CTA bar (y={y})'
     cta_bar(cv, H - 120, 120, darken(ground, 1.6) if sum(ground) < 200 else ground)
     save_master(cv, out)
 
@@ -240,7 +243,8 @@ def test_card(m, out):
     shadow(cv, (zx - R, zy - R, zx + R, zy + R), 24, (0, 12), 160)
     d = ImageDraw.Draw(cv)
     # focus ring only when the focus is a real sub-area of the background (not the whole photo)
-    ring = fw * s < W * 0.8 and fh * s < bgh * 0.8
+    pc = m.get('style') == 'price_code'       # optional on-image code badge + big price
+    ring = fw * s < W * 0.8 and fh * s < bgh * 0.8 and not pc   # price_code drops the ring to keep overlay share low
     excl = [[zx - R - 64, zy - R - 64, 2 * R + 128, 2 * R + 128]]          # disc + gold rim + drop shadow
     if ring:
         rx, ry = fw * s / 2 + 6, fh * s / 2 + 6
@@ -258,6 +262,27 @@ def test_card(m, out):
     d.rounded_rectangle((32, 32, 32 + lw, 32 + 62), 12, fill=(200, 20, 30))
     T(d, (32 + lw / 2, 44), lab, 34, (255, 255, 255), 'sans', 'c')
     excl.append([28, 28, lw + 8, 70])
+    if pc:
+        # code badge: OUR public product_flat name only (never supplier codes)
+        code = p['name']
+        cw = int(text_w(code, 52, 'sans')) + 48
+        bx0, by0 = 32, 110
+        d.rounded_rectangle((bx0, by0, bx0 + cw, by0 + 84), 14, fill=(255, 255, 255))
+        T(d, (bx0 + cw / 2, by0 + 14), code, 52, INK, 'sans', 'c')
+        excl.append([bx0 - 4, by0 - 4, cw + 8, 92])
+        # big price, bottom-left of the photo, on a dark pill for legibility
+        price = f"¥{int(p['price']):,}"
+        pw = int(text_w(price, 96, 'serif')) + 56
+        px0, py0 = 32, bgh - 170
+        d.rounded_rectangle((px0, py0, px0 + pw, py0 + 136), 20, fill=(14, 12, 18))
+        T(d, (px0 + pw / 2, py0 + 10), price, 96, GOLD, 'serif', 'c')
+        excl.append([px0 - 4, py0 - 4, pw + 8, 144])
+    # overlay share self-check (gate rejects > max_excluded_share 0.5); keep margin
+    em = np.zeros((bgh, W), bool)
+    for ex, ey, ew, eh in excl:
+        em[max(0, ey):max(0, ey + eh), max(0, ex):max(0, ex + ew)] = True
+    share = float(em.mean())
+    assert share <= 0.45, f'T overlays cover {share:.2f} of the photo (> 0.45)'
     bg_region['exclude'] = excl
     regions.append({'src': p['image'], 'src_box': p['focus'], 'out_box': [zx - R, zy - R, 2 * R, 2 * R], 'mode': 'cover', 'mask': 'circle'})
     d = ImageDraw.Draw(cv)
