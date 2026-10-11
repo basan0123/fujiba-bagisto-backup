@@ -4,6 +4,7 @@ namespace App\Exceptions;
 use Illuminate\Auth\AuthenticationException;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Log;
+use Symfony\Component\HttpKernel\Exception\HttpException;
 use Throwable;
 use Webkul\RestApi\Exceptions\Handler as RestApiHandler;
 
@@ -58,6 +59,20 @@ class Handler extends RestApiHandler
                 $payload['type'] = get_class($e);
             }
             return response()->json($payload, 500);
+        });
+
+        // Webkul/RestApi renders shop/admin error pages without a status code,
+        // so every 404 went out as HTTP 200 (soft 404 → Google keeps indexing
+        // hidden/out-of-stock products). Re-render HTML errors with the real code.
+        $this->renderable(function (HttpException $exception, Request $request) {
+            if ($request->wantsJson() || $request->is('graphql') || $request->is('graphql/*')) {
+                return null;
+            }
+            $namespace = $request->is(config('app.admin_url').'/*') ? 'admin' : 'shop';
+            $errorCode = in_array($exception->getStatusCode(), [401, 403, 404, 503]) ? $exception->getStatusCode() : 500;
+            $view = view()->exists("{$namespace}::errors.{$errorCode}") ? "{$namespace}::errors.{$errorCode}" : "{$namespace}::errors.index";
+
+            return response()->view($view, compact('errorCode'), $errorCode);
         });
 
         parent::register();

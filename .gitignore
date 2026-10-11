@@ -60,3 +60,4 @@ yarn-error.log
 # Deployment backups taken before pushing ChatPion-side PHP changes
 # to the onamae host. Operational artifacts, not source.
 /storage/chatpion-deploy/
+*.bak*
