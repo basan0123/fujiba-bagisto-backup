@@ -1,0 +1,410 @@
+{
+ "FV-67": {
+  "checked_at": "2026-10-11T23:23:31+09:00",
+  "tenant": "1bd1181f-fcd5-4238-a12d-a207d6ea4006",
+  "series": "FV-67",
+  "pass": true,
+  "fail": [],
+  "tiles": 3,
+  "complete_series": true,
+  "material": {
+   "en": "Hosonuno (100% cotton)",
+   "ja": "細布(綿100%)"
+  },
+  "material_note": "every shown member states \"Fabric: Hosonuno (100% cotton)\"",
+  "members": [
+   {
+    "product_id": 2097,
+    "sku": "KIMONO-2671",
+    "name": "FV-67-A",
+    "letter": "A",
+    "status_en": 1,
+    "status_ja": 1,
+    "visible_individually": 1,
+    "price": 1595,
+    "price_ja": 1595,
+    "special_price": 0,
+    "qty": 1,
+    "reserved": 0,
+    "available": 1,
+    "image": {
+     "path": "/var/www/bagisto/storage/app/public/tenants/1/1bd1181f-fcd5-4238-a12d-a207d6ea4006/product/2097/S7eTbX4LkxBoq7jcxzx3mu7wG08DcmKqUp3aNIJV.webp",
+     "rel": "product/2097/S7eTbX4LkxBoq7jcxzx3mu7wG08DcmKqUp3aNIJV.webp",
+     "sha256": "dd2b7ffbe4b4e5eb46a9eb22983262dfaf662d4581fdd607c7a7a35150030918",
+     "width": 1496,
+     "height": 2000,
+     "fi_catalog_images": {
+      "sha256_match": true,
+      "exact_dup_of": null,
+      "near_dup_of": null,
+      "analysis_status": "done"
+     }
+    },
+    "duplicate_guard": "clear",
+    "fabric_text": "Hosonuno (100% cotton)",
+    "fail": [],
+    "shown": true
+   },
+   {
+    "product_id": 1963,
+    "sku": "KIMONO-2536",
+    "name": "FV-67-B",
+    "letter": "B",
+    "status_en": 1,
+    "status_ja": 1,
+    "visible_individually": 1,
+    "price": 1595,
+    "price_ja": 1595,
+    "special_price": 0,
+    "qty": 3,
+    "reserved": 0,
+    "available": 3,
+    "image": {
+     "path": "/var/www/bagisto/storage/app/public/tenants/1/1bd1181f-fcd5-4238-a12d-a207d6ea4006/product/1963/VrjJx4cGgyollitLjy4xoS5imSh2U30hFxdJuCwK.webp",
+     "rel": "product/1963/VrjJx4cGgyollitLjy4xoS5imSh2U30hFxdJuCwK.webp",
+     "sha256": "99c65cf1ee2f52d3ee3f8140b031e8f7c56fe716b6967437bb47ecbce9fcc938",
+     "width": 1496,
+     "height": 2000,
+     "fi_catalog_images": {
+      "sha256_match": true,
+      "exact_dup_of": null,
+      "near_dup_of": null,
+      "analysis_status": "done"
+     }
+    },
+    "duplicate_guard": "clear",
+    "fabric_text": "Hosonuno (100% cotton)",
+    "fail": [],
+    "shown": true
+   },
+   {
+    "product_id": 1987,
+    "sku": "KIMONO-2560",
+    "name": "FV-67-C",
+    "letter": "C",
+    "status_en": 1,
+    "status_ja": 1,
+    "visible_individually": 1,
+    "price": 1595,
+    "price_ja": 1595,
+    "special_price": 0,
+    "qty": 3,
+    "reserved": 0,
+    "available": 3,
+    "image": {
+     "path": "/var/www/bagisto/storage/app/public/tenants/1/1bd1181f-fcd5-4238-a12d-a207d6ea4006/product/1987/nXohKC26IzEjefWQr0mn43WWcfa3B2qI4oyYeOcD.webp",
+     "rel": "product/1987/nXohKC26IzEjefWQr0mn43WWcfa3B2qI4oyYeOcD.webp",
+     "sha256": "49b1a38be3e4fa88a6549f9eec322b23f1ca1465fe3500bc6917b98a640e528a",
+     "width": 1496,
+     "height": 2000,
+     "fi_catalog_images": {
+      "sha256_match": true,
+      "exact_dup_of": null,
+      "near_dup_of": null,
+      "analysis_status": "done"
+     }
+    },
+    "duplicate_guard": "clear",
+    "fabric_text": "Hosonuno (100% cotton)",
+    "fail": [],
+    "shown": true
+   }
+  ]
+ },
+ "FV-89": {
+  "checked_at": "2026-10-11T23:23:31+09:00",
+  "tenant": "1bd1181f-fcd5-4238-a12d-a207d6ea4006",
+  "series": "FV-89",
+  "pass": true,
+  "fail": [],
+  "tiles": 3,
+  "complete_series": false,
+  "material": {
+   "en": "Hosonuno (100% cotton)",
+   "ja": "細布(綿100%)"
+  },
+  "material_note": "every shown member states \"Fabric: Hosonuno (100% cotton)\"",
+  "members": [
+   {
+    "product_id": 2046,
+    "sku": "KIMONO-2619",
+    "name": "FV-89-A",
+    "letter": "A",
+    "status_en": 0,
+    "status_ja": 0,
+    "visible_individually": 1,
+    "price": 1595,
+    "price_ja": 1595,
+    "special_price": 0,
+    "qty": 0,
+    "reserved": 0,
+    "available": 0,
+    "image": {
+     "path": "/var/www/bagisto/storage/app/public/tenants/1/1bd1181f-fcd5-4238-a12d-a207d6ea4006/product/2046/nK1AG0WLK51PPiKJus9uKzelLzhK0bc8rYewUdTT.webp",
+     "rel": "product/2046/nK1AG0WLK51PPiKJus9uKzelLzhK0bc8rYewUdTT.webp",
+     "sha256": "35d5b7904c5f4db9d62414b51cf44f4aaad7ff634d506e2c754e6a666978b863",
+     "width": 1496,
+     "height": 2000,
+     "fi_catalog_images": {
+      "sha256_match": true,
+      "exact_dup_of": null,
+      "near_dup_of": null,
+      "analysis_status": "done"
+     }
+    },
+    "duplicate_guard": "clear",
+    "fabric_text": "Hosonuno (100% cotton)",
+    "fail": [
+     "en status 0",
+     "ja status 0",
+     "available 0 (qty 0, reserved 0)"
+    ],
+    "shown": false
+   },
+   {
+    "product_id": 2075,
+    "sku": "KIMONO-2648",
+    "name": "FV-89-B",
+    "letter": "B",
+    "status_en": 1,
+    "status_ja": 1,
+    "visible_individually": 1,
+    "price": 1595,
+    "price_ja": 1595,
+    "special_price": 0,
+    "qty": 2,
+    "reserved": 0,
+    "available": 2,
+    "image": {
+     "path": "/var/www/bagisto/storage/app/public/tenants/1/1bd1181f-fcd5-4238-a12d-a207d6ea4006/product/2075/xLYzUXSvilWfJzpNxHA5mQdgYaOskVvgvjZaXQiA.webp",
+     "rel": "product/2075/xLYzUXSvilWfJzpNxHA5mQdgYaOskVvgvjZaXQiA.webp",
+     "sha256": "0cf1591f289193c56467d31d2e142e3c72f24d948b6eb2c49e466440bc79df32",
+     "width": 1496,
+     "height": 2000,
+     "fi_catalog_images": {
+      "sha256_match": true,
+      "exact_dup_of": null,
+      "near_dup_of": null,
+      "analysis_status": "done"
+     }
+    },
+    "duplicate_guard": "clear",
+    "fabric_text": "Hosonuno (100% cotton)",
+    "fail": [],
+    "shown": true
+   },
+   {
+    "product_id": 2108,
+    "sku": "KIMONO-2682",
+    "name": "FV-89-C",
+    "letter": "C",
+    "status_en": 1,
+    "status_ja": 1,
+    "visible_individually": 1,
+    "price": 1595,
+    "price_ja": 1595,
+    "special_price": 0,
+    "qty": 3,
+    "reserved": 0,
+    "available": 3,
+    "image": {
+     "path": "/var/www/bagisto/storage/app/public/tenants/1/1bd1181f-fcd5-4238-a12d-a207d6ea4006/product/2108/NMF28lu63X05FlHIbHwlMmaTpl1IehPBEWlunaN8.webp",
+     "rel": "product/2108/NMF28lu63X05FlHIbHwlMmaTpl1IehPBEWlunaN8.webp",
+     "sha256": "3624f4f63ff1072568bc7e8fd2e5ebdcc9955d84bf04b538aa49ba9abb1a8b83",
+     "width": 1496,
+     "height": 2000,
+     "fi_catalog_images": {
+      "sha256_match": true,
+      "exact_dup_of": null,
+      "near_dup_of": null,
+      "analysis_status": "done"
+     }
+    },
+    "duplicate_guard": "clear",
+    "fabric_text": "Hosonuno (100% cotton)",
+    "fail": [],
+    "shown": true
+   },
+   {
+    "product_id": 2077,
+    "sku": "KIMONO-2650",
+    "name": "FV-89-D",
+    "letter": "D",
+    "status_en": 1,
+    "status_ja": 1,
+    "visible_individually": 1,
+    "price": 1595,
+    "price_ja": 1595,
+    "special_price": 0,
+    "qty": 7,
+    "reserved": 0,
+    "available": 7,
+    "image": {
+     "path": "/var/www/bagisto/storage/app/public/tenants/1/1bd1181f-fcd5-4238-a12d-a207d6ea4006/product/2077/6FfKJ8Nm2tbjxEjgEW85jKMlTHP7CyeDf8QeAqAR.webp",
+     "rel": "product/2077/6FfKJ8Nm2tbjxEjgEW85jKMlTHP7CyeDf8QeAqAR.webp",
+     "sha256": "7c24594998ed9a68dfeee7cfe14f2303e4d3c2fe598eb4cb6254a42151bb5915",
+     "width": 1496,
+     "height": 2000,
+     "fi_catalog_images": {
+      "sha256_match": true,
+      "exact_dup_of": null,
+      "near_dup_of": null,
+      "analysis_status": "done"
+     }
+    },
+    "duplicate_guard": "clear",
+    "fabric_text": "Hosonuno (100% cotton)",
+    "fail": [],
+    "shown": true
+   }
+  ]
+ },
+ "FV-75": {
+  "checked_at": "2026-10-11T23:23:31+09:00",
+  "tenant": "1bd1181f-fcd5-4238-a12d-a207d6ea4006",
+  "series": "FV-75",
+  "pass": true,
+  "fail": [],
+  "tiles": 3,
+  "complete_series": false,
+  "material": {
+   "en": "Hosonuno (100% cotton)",
+   "ja": "細布(綿100%)"
+  },
+  "material_note": "every shown member states \"Fabric: Hosonuno (100% cotton)\"",
+  "members": [
+   {
+    "product_id": 5452,
+    "sku": "KIMONO-3742",
+    "name": "FV-75-A",
+    "letter": "A",
+    "status_en": 0,
+    "status_ja": 0,
+    "visible_individually": 1,
+    "price": 1595,
+    "price_ja": 1595,
+    "special_price": 0,
+    "qty": 0,
+    "reserved": 0,
+    "available": 0,
+    "image": {
+     "path": "/var/www/bagisto/storage/app/public/tenants/1/1bd1181f-fcd5-4238-a12d-a207d6ea4006/product/5452/3By3pesbTHLcLDbbWeozzoVf5sRopR4LvpE3tO0Y.webp",
+     "rel": "product/5452/3By3pesbTHLcLDbbWeozzoVf5sRopR4LvpE3tO0Y.webp",
+     "sha256": "ff4bf2af1cac6b7d8476afb737eaaf108a12e9f7dcf24b84fc15ffebb6c0281a",
+     "width": 1496,
+     "height": 2000,
+     "fi_catalog_images": {
+      "sha256_match": true,
+      "exact_dup_of": null,
+      "near_dup_of": null,
+      "analysis_status": "done"
+     }
+    },
+    "duplicate_guard": "clear",
+    "fabric_text": "",
+    "fail": [
+     "en status 0",
+     "ja status 0",
+     "available 0 (qty 0, reserved 0)"
+    ],
+    "shown": false
+   },
+   {
+    "product_id": 2072,
+    "sku": "KIMONO-2645",
+    "name": "FV-75-B",
+    "letter": "B",
+    "status_en": 1,
+    "status_ja": 1,
+    "visible_individually": 1,
+    "price": 1595,
+    "price_ja": 1595,
+    "special_price": 0,
+    "qty": 3,
+    "reserved": 0,
+    "available": 3,
+    "image": {
+     "path": "/var/www/bagisto/storage/app/public/tenants/1/1bd1181f-fcd5-4238-a12d-a207d6ea4006/product/2072/QQ13T3LQoI7xT8EMKLHOHNGNdvB9IQwubxT7FWA7.webp",
+     "rel": "product/2072/QQ13T3LQoI7xT8EMKLHOHNGNdvB9IQwubxT7FWA7.webp",
+     "sha256": "6c229fad813c65917f2c674f911807473a7422ecf7e355d98ed77ddffbc8db6f",
+     "width": 1496,
+     "height": 2000,
+     "fi_catalog_images": {
+      "sha256_match": true,
+      "exact_dup_of": null,
+      "near_dup_of": null,
+      "analysis_status": "done"
+     }
+    },
+    "duplicate_guard": "clear",
+    "fabric_text": "Hosonuno (100% cotton)",
+    "fail": [],
+    "shown": true
+   },
+   {
+    "product_id": 2035,
+    "sku": "KIMONO-2608",
+    "name": "FV-75-C",
+    "letter": "C",
+    "status_en": 1,
+    "status_ja": 1,
+    "visible_individually": 1,
+    "price": 1595,
+    "price_ja": 1595,
+    "special_price": 0,
+    "qty": 5,
+    "reserved": 0,
+    "available": 5,
+    "image": {
+     "path": "/var/www/bagisto/storage/app/public/tenants/1/1bd1181f-fcd5-4238-a12d-a207d6ea4006/product/2035/vPTo475mxHz40kjcQ9FhtA5tsIuyRGp5ggnq90ln.webp",
+     "rel": "product/2035/vPTo475mxHz40kjcQ9FhtA5tsIuyRGp5ggnq90ln.webp",
+     "sha256": "0387d380c933ec207f4590e12bd0937c9fc6c68eb65985d1917b358ac8f86645",
+     "width": 1496,
+     "height": 2000,
+     "fi_catalog_images": {
+      "sha256_match": true,
+      "exact_dup_of": null,
+      "near_dup_of": null,
+      "analysis_status": "done"
+     }
+    },
+    "duplicate_guard": "clear",
+    "fabric_text": "Hosonuno (100% cotton)",
+    "fail": [],
+    "shown": true
+   },
+   {
+    "product_id": 2080,
+    "sku": "KIMONO-2653",
+    "name": "FV-75-D",
+    "letter": "D",
+    "status_en": 1,
+    "status_ja": 1,
+    "visible_individually": 1,
+    "price": 1595,
+    "price_ja": 1595,
+    "special_price": 0,
+    "qty": 2,
+    "reserved": 0,
+    "available": 2,
+    "image": {
+     "path": "/var/www/bagisto/storage/app/public/tenants/1/1bd1181f-fcd5-4238-a12d-a207d6ea4006/product/2080/yr580GSBLDRmAoq1LtuZQEXe6wSuExrMF5Pk6ZuH.webp",
+     "rel": "product/2080/yr580GSBLDRmAoq1LtuZQEXe6wSuExrMF5Pk6ZuH.webp",
+     "sha256": "3209619ce273d3d8c7b6020961f81af4be14b28950ec84a6073bc7ee3e65c210",
+     "width": 1496,
+     "height": 2000,
+     "fi_catalog_images": {
+      "sha256_match": true,
+      "exact_dup_of": null,
+      "near_dup_of": null,
+      "analysis_status": "done"
+     }
+    },
+    "duplicate_guard": "clear",
+    "fabric_text": "Hosonuno (100% cotton)",
+    "fail": [],
+    "shown": true
+   }
+  ]
+ }
+}

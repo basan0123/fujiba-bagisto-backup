@@ -62,36 +62,106 @@ def catalog_text(d, tx, y, p, max_w):
     return y + line_h(price, 56, 'serif') + 8
 
 
-# ---------- H: colour set ----------
+MY_DIGITS = '\u1040\u1041\u1042\u1043\u1044\u1045\u1046\u1047\u1048\u1049'   # Burmese ၀-၉
+NE_DIGITS = '\u0966\u0967\u0968\u0969\u096a\u096b\u096c\u096d\u096e\u096f'   # Devanagari ०-९
+
+
+def local_digits(n, digits):
+    return ''.join(digits[int(c)] for c in str(int(n)))
+
+
+def lum(rgb):
+    return 0.299 * rgb[0] + 0.587 * rgb[1] + 0.114 * rgb[2]
+
+
+def cta_accent(g):
+    """ORDER pill colour derived from the ground, kept legible (white text) on the white CTA bar."""
+    lv = lum(g)
+    return tuple(min(255, int(c * 1.8)) for c in g) if lv < 60 else darken(g, max(0.2, 70 / max(lv, 1)))
+
+
+def measured_ground(path):
+    """Median colour of a product photo — a measurement for the card background only (fabric untouched)."""
+    a = np.asarray(load(path).reduce(8)).reshape(-1, 3)
+    return tuple(int(v) for v in np.median(a, axis=0))
+
+
+# ---------- H: colour set (3-6 colourways of one print) ----------
 def colour_set(m, out):
     items = m['set']
-    ground = hexrgb(m['products'][0]['ground'])
-    cv = gradient(W, H, darken(ground, 0.9), (10, 10, 16))
+    n = len(items)
+    assert 3 <= n <= 6, f'H needs 3-6 colourways (got {n})'
+    g0 = m['products'][0].get('ground')
+    ground = hexrgb(g0) if g0 else measured_ground(items[0]['image'])
+    top_rgb = darken(ground, min(0.9, 70 / max(lum(ground), 1)))     # dark enough for cream/gold text
+    cv = gradient(W, H, top_rgb, (10, 10, 16))
     d = ImageDraw.Draw(cv)
+    # title: series code + ACTUAL tile count (never a hardcoded number)
+    title = f"V2 TEST · {m['series']}" if m.get('series') else m['set_title']
+    title_ja = f'同じ柄・{n}色' if m.get('series') else m['set_title_ja']
     T(d, (W / 2, 40), 'F U J I B A   K I M O N O', 28, GOLD, 'serif', 'c')
-    T(d, (W / 2, 82), m['set_title'], 58, CREAM, 'serif', 'c')
-    T(d, (W / 2, 160), m['set_title_ja'], 34, (230, 220, 200), 'ja', 'c')
-    tile, gap, row = 350, 40, 66          # sized so the Burmese + Nepali lines clear the CTA bar
-    x0 = (W - 2 * tile - gap) // 2
-    for i, it in enumerate(items[:4]):
-        x, y = x0 + (i % 2) * (tile + gap), 230 + (i // 2) * (tile + row)
-        shadow(cv, (x, y, x + tile, y + tile), 18, (0, 10), 140)
-        d = ImageDraw.Draw(cv)
-        d.rectangle((x - 8, y - 8, x + tile + 8, y + tile + 8), fill=GOLD)
-        # square centre crop of the close-up: no stretching
-        bx, by, bw, bh = it['box']
-        s = min(bw, bh)
-        place(cv, it['image'], [bx + (bw - s) // 2, by + (bh - s) // 2, s, s], [x, y, tile, tile])
-        d = ImageDraw.Draw(cv)
-        T(d, (x + tile / 2, y + tile + 16), f"{it['letter']} · {it['colour']}", 32, CREAM, 'serif', 'c')
+    T(d, (W / 2, 82), title, fit(title, W - 120, 58, 'serif', 40), CREAM, 'serif', 'c')
+    T(d, (W / 2, 160), title_ja, 34, (230, 220, 200), 'ja', 'c')
+
+    cols = 2 if n == 4 else 3
+    rows = -(-n // cols)
+    portrait = rows == 1              # one row: show each WHOLE photo (its own aspect, no crop)
+    big = 6 if portrait else 0        # a single row leaves room: larger, more legible text
+
+    # bottom text block, measured first so the grid can be sized to leave room for it
+    lines = []
+    mat = m.get('material')            # only passed when EVERY tile's catalog description states it
+    if mat and mat.get('en'):
+        lines.append((mat['en'] + (f"  ·  {mat['ja']}" if mat.get('ja') else ''), 30 + big // 3, 'serif', (240, 226, 190)))
+    lines += [(f'အရောင် {local_digits(n, MY_DIGITS)} မျိုး ၊ ကြိုက်တဲ့အရောင် ရွေးပါ', 34 + big // 2, 'my', CREAM),
+              (f'{local_digits(n, NE_DIGITS)} रङ — आफ्नो मनपर्ने रङ छान्नुहोस्', 32 + big // 2, 'ne', (235, 225, 205))]
+    lines = [(t, fit(t, W - 80, s, k, 28), k, c) for t, s, k, c in lines]
+    block_h = sum(line_h(t, s, k) + 4 for t, s, k, _ in lines)
+    label_size = 32 + big
+    side, gap, row_gap, label_h, pad = (36, 28, 24, 66, 22) if portrait else (48, 32, 24, 58, 18)
+    top, limit = 222, H - 124
+    tw_max = (W - 2 * side - (cols - 1) * gap) // cols
+    th_max = (limit - top - block_h - pad - rows * label_h - (rows - 1) * row_gap) // rows
+    if portrait:
+        bx, by, bw, bh = items[0]['box']
+        ar = bw / bh
+        tw = min(tw_max, int(th_max * ar))
+        th = round(tw / ar)
+    else:
+        tw = th = min(tw_max, th_max)
+    grid_h = rows * (th + label_h) + (rows - 1) * row_gap
+    y0 = top + max(0, (limit - top - grid_h - pad - block_h) // 2)     # centre grid + text block
+    pos = []
+    for i in range(n):
+        r, c = divmod(i, cols)
+        in_row = min(cols, n - r * cols)
+        pos.append(((W - in_row * tw - (in_row - 1) * gap) // 2 + c * (tw + gap), y0 + r * (th + label_h + row_gap)))
+    # ALL shadows + frames first: a neighbour's blurred shadow must never land on placed fabric
+    for x, y in pos:
+        shadow(cv, (x, y, x + tw, y + th), 18, (0, 10), 140)
     d = ImageDraw.Draw(cv)
-    y = 230 + 2 * (tile + row) + 4
-    for txt, size, kind, col in [('အရောင် ၄ မျိုး ၊ ကြိုက်တဲ့အရောင် ရွေးပါ', 34, 'my', CREAM),
-                                 ('४ रङ — आफ्नो मनपर्ने रङ छान्नुहोस्', 32, 'ne', (235, 225, 205))]:
+    for x, y in pos:
+        d.rectangle((x - 7, y - 7, x + tw + 7, y + th + 7), fill=GOLD)
+    for it, (x, y) in zip(items, pos):
+        bx, by, bw, bh = it['box']
+        if portrait:                  # centred crop to the tile aspect (whole photo when aspects match)
+            cw, ch = (min(bw, round(bh * tw / th)), min(bh, round(bw * th / tw)))
+        else:                         # square centre crop of the photo: no stretching
+            cw = ch = min(bw, bh)
+        place(cv, it['image'], [bx + (bw - cw) // 2, by + (bh - ch) // 2, cw, ch], [x, y, tw, th])
+        d = ImageDraw.Draw(cv)
+        # tile label = OUR public code + that product's own price (product_flat); legacy: letter · colour
+        label = f"{it['name']} · ¥{int(it['price']):,}" if 'price' in it else f"{it['letter']} · {it['colour']}"
+        size = fit(label, tw + gap - 10, label_size, 'serif', 28)
+        assert text_w(label, size, 'serif') <= tw + gap - 10, f'H tile label too wide: {label}'
+        T(d, (x + tw / 2, y + th + 14), label, size, CREAM, 'serif', 'c')
+    d = ImageDraw.Draw(cv)
+    y = y0 + grid_h + pad
+    for txt, size, kind, col in lines:
         T(d, (W / 2, y), txt, size, col, kind, 'c')
         y += line_h(txt, size, kind) + 4
     assert y <= H - 124, f'H text overflows into CTA bar (y={y})'
-    cta_bar(cv, H - 120, 120, darken(ground, 1.6) if sum(ground) < 200 else ground)
+    cta_bar(cv, H - 120, 120, cta_accent(ground))
     save_master(cv, out)
 
 
@@ -288,9 +358,7 @@ def test_card(m, out):
     d = ImageDraw.Draw(cv)
     y = catalog_text(d, 56, bgh + 140, p, zx - R - 56 - 20)
     assert y <= H - 124, f'T text overflows into CTA bar (y={y})'
-    g = hexrgb(p['ground'])                       # ORDER pill must stay legible on the white bar
-    lum = 0.299 * g[0] + 0.587 * g[1] + 0.114 * g[2]
-    cta_bar(cv, H - 120, 120, tuple(min(255, int(c * 1.8)) for c in g) if lum < 60 else darken(g, max(0.2, 70 / max(lum, 1))))
+    cta_bar(cv, H - 120, 120, cta_accent(hexrgb(p['ground'])))   # ORDER pill must stay legible on the white bar
     save_master(cv, out)
 
 

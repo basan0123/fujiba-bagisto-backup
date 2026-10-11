@@ -42,8 +42,9 @@ class V2DryRunCommand extends Command
             return 1;
         }
         $assets = [
+            // title + 同じ柄・N色 + Burmese/Nepali counts are derived from the actual tiles (no hardcoded N)
             'H_colourset_FV-59' => ['image', 'H', ['products' => [$this->p($k['FV-59-A'])], 'set' => $this->colourways('FV-59'),
-                'set_title' => 'Rising Dragon · 4 colours', 'set_title_ja' => '荒波に昇龍 — 全4色']],
+                'series' => 'FV-59']],
             'J_stack_five' => ['image', 'J', ['products' => array_map(fn ($n) => $this->p($k[$n]), ['FV-61-C', 'FV-10-A', 'FV-81-A', 'FV-59-A', 'FV-73-C'])]],
             'B_story_FV-73-C' => ['image', 'B', ['products' => [$this->p($k['FV-73-C'])], 'story' => [
                 'title' => '鶴  The Crane',
@@ -142,7 +143,7 @@ class V2DryRunCommand extends Command
             ->where('channel', 'default')->where('locale', 'en')->value('price'));
     }
 
-    /** In-stock colourways of a pattern (FV-59-A…D), full first photo of each. */
+    /** Enabled colourways of a pattern with available stock (qty - reserved > 0), full first photo + own price. */
     private function colourways(string $pattern): array
     {
         $root = storage_path('app/public/tenants/1/'.tenancy()->tenant->getTenantKey());
@@ -150,7 +151,9 @@ class V2DryRunCommand extends Command
             ->where('name', 'like', "{$pattern}-_")->orderBy('name')->get(['product_id', 'name', 'description']);
         $out = [];
         foreach ($rows as $r) {
-            if ((int) DB::table('product_inventories')->where('product_id', $r->product_id)->sum('qty') < 1) {
+            $available = (int) DB::table('product_inventories')->where('product_id', $r->product_id)->sum('qty')
+                - (int) DB::table('product_ordered_inventories')->where('product_id', $r->product_id)->sum('qty');
+            if ($available < 1) {
                 continue;
             }
             $path = DB::table('product_images')->where('product_id', $r->product_id)->orderBy('position')->value('path');
@@ -159,7 +162,8 @@ class V2DryRunCommand extends Command
             $f = is_file($jpg) ? $jpg : $f;
             [$w, $h] = getimagesize($f);
             preg_match('/Color:\s*\w+\s*\(([^)]+)\)/', strip_tags((string) $r->description), $c);
-            $out[] = ['id' => $r->product_id, 'name' => $r->name, 'letter' => substr($r->name, -1), 'colour' => $c[1] ?? '', 'image' => $f, 'box' => [0, 0, $w, $h]];
+            $out[] = ['id' => $r->product_id, 'name' => $r->name, 'letter' => substr($r->name, -1), 'colour' => $c[1] ?? '',
+                'price' => $this->price($r->product_id), 'image' => $f, 'box' => [0, 0, $w, $h]];
         }
 
         return $out;
