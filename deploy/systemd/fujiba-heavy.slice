@@ -1,0 +1,10 @@
+[Unit]
+Description=Fujiba heavy intel/image jobs (one at a time via flock, memory-capped)
+
+[Slice]
+# Hard cap, no swap: a runaway job is OOM-killed inside this slice at 3G
+# instead of paging the whole box into swap (tested 2026-10-11).
+MemoryMax=3G
+MemorySwapMax=0
+CPUWeight=20
+IOWeight=20

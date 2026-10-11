@@ -441,4 +441,5 @@ def main():
 
 
 if __name__ == '__main__':
+    import os as _o, sys as _s; _s.path.insert(0, _o.path.dirname(_o.path.abspath(__file__))); __import__('heavy_guard').acquire('fabric_gate')  # one heavy job at a time + memory cap
     sys.exit(main())
