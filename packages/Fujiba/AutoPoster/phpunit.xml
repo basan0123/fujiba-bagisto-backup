@@ -5,6 +5,9 @@
         <testsuite name="AutoPoster Ops Unit">
             <directory suffix="Test.php">tests/Unit/Ops</directory>
         </testsuite>
+        <testsuite name="AutoPoster Intel Unit">
+            <directory suffix="Test.php">tests/Unit/Intel</directory>
+        </testsuite>
     </testsuites>
     <php>
         <env name="APP_ENV" value="testing"/>

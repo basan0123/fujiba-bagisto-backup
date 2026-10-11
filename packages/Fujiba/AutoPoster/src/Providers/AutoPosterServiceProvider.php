@@ -47,6 +47,12 @@ class AutoPosterServiceProvider extends ServiceProvider
                 \Fujiba\AutoPoster\Console\Commands\Intel\ExplainCommand::class,
                 \Fujiba\AutoPoster\Console\Commands\Intel\CatalogCommand::class,
                 \Fujiba\AutoPoster\Console\Commands\Intel\ResearchCommand::class,
+                // WS-J staging-only intel (restock shortlist, catalog issues, owner sheets).
+                \Fujiba\AutoPoster\Console\Commands\Intel\RestockCandidatesCommand::class,
+                \Fujiba\AutoPoster\Console\Commands\Intel\CatalogIssuesCommand::class,
+                \Fujiba\AutoPoster\Console\Commands\Intel\WidthLengthSheetCommand::class,
+                \Fujiba\AutoPoster\Console\Commands\Intel\WidthLengthImportCommand::class,
+                \Fujiba\AutoPoster\Console\Commands\Intel\CompetitorMetricsCommand::class,
             ]);
         }
     }
