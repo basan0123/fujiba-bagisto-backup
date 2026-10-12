@@ -73,7 +73,7 @@ SHARP_MIN = 150.0
 CAST_MAX = 6.0
 EVEN_MIN = 0.60
 
-DETECT_MAX_SIDE = 768      # lattice search resolution (FFT size stays bounded)
+DETECT_MAX_SIDE = 640      # lattice search resolution (FFT size stays bounded); vectors refined at full res
 WORK_MAX_SIDE = 2400       # tile extraction resolution cap (12 MP phone photos are downscaled)
 MIN_TILE_PX = 24
 
@@ -204,50 +204,58 @@ def _gauss_reduce(b1, b2):
     return b1, b2
 
 
-def ncc_at(bgr, mask, v):
-    """Direct multichannel NCC of the region vs itself shifted by v=(dx,dy) (float, bilinear)."""
-    h, w = mask.shape
-    dx, dy = float(v[0]), float(v[1])
-    M = np.float32([[1, 0, dx], [0, 1, dy]])
-    shifted = cv2.warpAffine(bgr, M, (w, h), flags=cv2.INTER_LINEAR | cv2.WARP_INVERSE_MAP,
-                             borderMode=cv2.BORDER_CONSTANT, borderValue=0)
-    smask = cv2.warpAffine(mask.astype(np.uint8), M, (w, h), flags=cv2.INTER_NEAREST | cv2.WARP_INVERSE_MAP,
-                           borderMode=cv2.BORDER_CONSTANT, borderValue=0)
-    both = (mask > 0) & (smask > 0)
-    if both.sum() < 256:
-        return None, 0
-    a, b = lab32(bgr), lab32(shifted)
-    num = d1 = d2 = 0.0
-    for c in range(3):
-        x = a[..., c][both].astype(np.float64)
-        y = b[..., c][both].astype(np.float64)
-        x -= x.mean()
-        y -= y.mean()
-        num += (x * y).sum()
-        d1 += (x * x).sum()
-        d2 += (y * y).sum()
-    if d1 <= 0 or d2 <= 0:
-        return None, int(both.sum())
-    return float(num / np.sqrt(d1 * d2)), int(both.sum())
+def _ncc_int(lab, mask, dx, dy, stride=2):
+    """Multichannel zero-mean NCC of lab vs lab shifted by integer (dx,dy), over the masked overlap."""
+    H, W = mask.shape
+    xa0, xa1 = max(0, -dx), min(W, W - dx)
+    ya0, ya1 = max(0, -dy), min(H, H - dy)
+    if xa1 - xa0 < 16 or ya1 - ya0 < 16:
+        return None
+    A = lab[ya0:ya1:stride, xa0:xa1:stride]
+    B = lab[ya0 + dy:ya1 + dy:stride, xa0 + dx:xa1 + dx:stride]
+    m = (mask[ya0:ya1:stride, xa0:xa1:stride] > 0) & (mask[ya0 + dy:ya1 + dy:stride, xa0 + dx:xa1 + dx:stride] > 0)
+    if m.sum() < 256:
+        return None
+    x = A[m].astype(np.float64)
+    y = B[m].astype(np.float64)
+    x -= x.mean(0)
+    y -= y.mean(0)
+    den = np.sqrt((x * x).sum() * (y * y).sum())
+    return float((x * y).sum() / den) if den > 1e-9 else None
 
 
-def refine_vector(bgr, mask, v, radius=2.0, step=0.5):
-    """Sub-pixel refinement of a lattice vector by direct NCC search (deterministic grid)."""
-    best = (ncc_at(bgr, mask, v)[0] or -1, np.array(v, float))
-    for _ in range(2):
-        cx, cy = best[1]
-        for dy in np.arange(-radius, radius + 1e-9, step):
-            for dx in np.arange(-radius, radius + 1e-9, step):
-                if dx == 0 and dy == 0:
-                    continue
-                c, _ = ncc_at(bgr, mask, (cx + dx, cy + dy))
-                if c is not None and c > best[0]:
-                    best = (c, np.array([cx + dx, cy + dy]))
-        radius, step = step, step / 2.5
-    return best[1], best[0]
+def ncc_at(bgr, mask, v, lab=None):
+    """NCC of the region vs itself shifted by the (rounded) vector v=(dx,dy)."""
+    lab = lab32(bgr) if lab is None else lab
+    return _ncc_int(lab, mask, int(round(v[0])), int(round(v[1]))), None
 
 
-def detect_lattice(bgr, mask=None, min_overlap=0.30):
+def refine_vector(bgr, mask, v, radius=None, lab=None, coarse_px=1.0):
+    """Integer search around v (radius ~ detection quantum), then parabolic sub-pixel peak."""
+    lab = lab32(bgr) if lab is None else lab
+    r = int(radius if radius is not None else max(2, int(np.ceil(coarse_px)) + 1))
+    cx, cy = int(round(v[0])), int(round(v[1]))
+    grid = {}
+    for dy in range(-r, r + 1):
+        for dx in range(-r, r + 1):
+            c = _ncc_int(lab, mask, cx + dx, cy + dy)
+            if c is not None:
+                grid[(dx, dy)] = c
+    if not grid:
+        return np.array(v, float), -1.0
+    (bx, by), bc = max(grid.items(), key=lambda kv: kv[1])
+    # if the max sits on the window edge, walk once more
+    if abs(bx) == r or abs(by) == r:
+        return refine_vector(bgr, mask, (cx + bx, cy + by), r, lab)
+    def para(m1, c0, p1):
+        d = m1 - 2 * c0 + p1
+        return 0.0 if abs(d) < 1e-9 else float(np.clip(0.5 * (m1 - p1) / d, -0.5, 0.5))
+    sx = para(grid.get((bx - 1, by), bc), bc, grid.get((bx + 1, by), bc))
+    sy = para(grid.get((bx, by - 1), bc), bc, grid.get((bx, by + 1), bc))
+    return np.array([cx + bx + sx, cy + by + sy], float), float(bc)
+
+
+def detect_lattice(bgr, mask=None, min_overlap=0.15):
     """Find the print repeat lattice of a region.
 
     Returns dict(found, b1, b2 (px, region coords, (dx,dy)), ncc1, ncc2, peaks, reason).
@@ -288,11 +296,18 @@ def detect_lattice(bgr, mask=None, min_overlap=0.30):
     order = np.argsort(-vals)[:60]
     peaks = [((float(px[i] - cx)) / s, (float(py[i] - cy)) / s, float(vals[i])) for i in order]
     best = peaks[0][2]
-    strong = [p for p in peaks if p[2] >= max(0.5, 0.85 * best)]
+    if best < 0.45:
+        return {'found': False, 'reason': f'only weak periodicity (best autocorrelation peak {best:.2f} < 0.45)',
+                'best_peak': round(best, 3), 'peaks': [[round(a, 1), round(b, 1), round(c, 3)] for a, b, c in peaks[:8]]}
+    labr = lab32(bgr)
+    # shortest vector within 5 % of the best peak: sub-periods (same motif shape, different colour)
+    # score clearly lower; multiples of the true period score about the same but are longer
+    strong = [p for p in peaks if p[2] >= 0.95 * best]
     strong.sort(key=lambda p: np.hypot(p[0], p[1]))
     v1 = strong[0]
     v2 = None
-    for p in strong[1:]:
+    second = sorted([p for p in peaks if p[2] >= 0.90 * best], key=lambda p: np.hypot(p[0], p[1]))
+    for p in second:
         cosang = abs(p[0] * v1[0] + p[1] * v1[1]) / (np.hypot(*p[:2]) * np.hypot(*v1[:2]) + 1e-9)
         if cosang <= np.cos(np.radians(20)):
             v2 = p
@@ -303,7 +318,7 @@ def detect_lattice(bgr, mask=None, min_overlap=0.30):
         # 1-D periodic: stripes along v1-perp are constant if NCC stays high along the perpendicular
         perp = np.array([-v1[1], v1[0]]) / (np.hypot(v1[0], v1[1]) + 1e-9)
         L = 0.25 * min(H0, W0)
-        c, _ = ncc_at(bgr, mask, perp * L)
+        c, _ = ncc_at(bgr, mask, perp * L, lab=labr)
         if c is not None and c >= 0.9:
             v2 = (perp[0] * L, perp[1] * L, c)
             res['stripe'] = True
@@ -313,8 +328,8 @@ def detect_lattice(bgr, mask=None, min_overlap=0.30):
             res['ncc1'] = round(v1[2], 3)
             return res
     b1, b2 = _gauss_reduce(v1[:2], v2[:2])
-    b1, n1 = refine_vector(bgr, mask, b1)
-    b2, n2 = refine_vector(bgr, mask, b2)
+    b1, n1 = refine_vector(bgr, mask, b1, lab=labr, coarse_px=1.0 / s)
+    b2, n2 = refine_vector(bgr, mask, b2, lab=labr, coarse_px=1.0 / s)
     res.update(b1=[round(float(b1[0]), 3), round(float(b1[1]), 3)],
                b2=[round(float(b2[0]), 3), round(float(b2[1]), 3)],
                ncc1=round(float(n1), 4), ncc2=round(float(n2), 4))
@@ -441,31 +456,43 @@ def seam_check(img, mask, origin, u, w, nu, nw, band=None):
 
 
 def artefact_check(img, mask, origin, u, w, nu, nw, tile):
-    """Tile vs every lattice copy fully inside the clean mask (source px)."""
-    copies = []
+    """Tile vs its lattice copies in the same photo (source px).
+
+    A tile pixel is an artefact when it differs by more than ARTEFACT_DE00 from EVERY copy that
+    covers it (non-periodic content: watermark, sticker, glare, crease). Copies may be partial;
+    >= 90 % of tile pixels must be covered by at least one copy, otherwise 'unverifiable'.
+    """
+    dmin = np.full(tile.shape[:2], np.inf, np.float64)
+    stats = []
     for m in range(-2, 3):
         for n in range(-2, 3):
             if m == 0 and n == 0:
                 continue
             o = (origin[0] + m * u[0] + n * w[0], origin[1] + m * u[1] + n * w[1])
             mx, my = grid_maps(o, u, w, nu, nw)
-            if inside(mask, mx, my).mean() < 0.97:
+            ins = inside(mask, mx, my)
+            if ins.mean() < 0.25:
                 continue
-            copies.append(((m, n), sample(img, mx, my)))
-    if not copies:
-        return {'copies': 0, 'pass': False, 'reason': 'no lattice copy inside the clean region'}
-    dmin = None
-    stats = []
-    for (m, n), cp in copies[:8]:
-        d = de00(tile, cp)
-        dmin = d if dmin is None else np.minimum(dmin, d)
-        c = ncc(lab32(tile)[..., 0], lab32(cp)[..., 0])
-        stats.append({'mn': [m, n], 'de_mean': round(float(d.mean()), 3), 'ncc': None if c is None else round(c, 4)})
-    share = float((dmin > ARTEFACT_DE00).mean())
-    return {'copies': len(copies), 'artefact_share': round(share, 5), 'pass': share <= ARTEFACT_SHARE_MAX,
-            'copy_stats': stats[:6],
-            'copy_de_mean': round(float(np.mean([s['de_mean'] for s in stats])), 3),
-            'copy_ncc_mean': round(float(np.mean([s['ncc'] for s in stats if s['ncc'] is not None] or [0])), 4)}
+            cp = sample(img, mx, my)
+            d = de00(tile, cp)
+            d = np.where(ins, d, np.inf)
+            dmin = np.minimum(dmin, d)
+            fin = np.isfinite(d)
+            c = ncc(lab32(tile)[..., 0], lab32(cp)[..., 0], fin)
+            stats.append({'mn': [m, n], 'covered': round(float(ins.mean()), 3),
+                          'de_mean': round(float(d[fin].mean()), 3), 'ncc': None if c is None else round(c, 4)})
+    covered = np.isfinite(dmin)
+    cov = float(covered.mean())
+    if not stats or cov < 0.90:
+        return {'copies': len(stats), 'verified_share': round(cov, 3), 'pass': False,
+                'reason': f'unverifiable: only {cov:.0%} of tile pixels have a lattice copy in the clean region'}
+    share = float((dmin[covered] > ARTEFACT_DE00).mean())
+    full = [x for x in stats if x['covered'] >= 0.97]
+    ref = full or stats
+    return {'copies': len(stats), 'full_copies': len(full), 'verified_share': round(cov, 3),
+            'artefact_share': round(share, 5), 'pass': share <= ARTEFACT_SHARE_MAX, 'copy_stats': stats[:6],
+            'copy_de_mean': round(float(np.mean([x['de_mean'] for x in ref])), 3),
+            'copy_ncc_mean': round(float(np.mean([x['ncc'] for x in ref if x['ncc'] is not None] or [0])), 4)}
 
 
 # ------------------------------------------------------------- illumination field

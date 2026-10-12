@@ -53,6 +53,9 @@ class AutoPosterServiceProvider extends ServiceProvider
                 \Fujiba\AutoPoster\Console\Commands\Intel\WidthLengthSheetCommand::class,
                 \Fujiba\AutoPoster\Console\Commands\Intel\WidthLengthImportCommand::class,
                 \Fujiba\AutoPoster\Console\Commands\Intel\CompetitorMetricsCommand::class,
+                // WS-L fabric twin readiness (staging only).
+                \Fujiba\AutoPoster\Console\Commands\Intel\TwinAuditCommand::class,
+                \Fujiba\AutoPoster\Console\Commands\Intel\TwinIngestCommand::class,
             ]);
         }
     }
