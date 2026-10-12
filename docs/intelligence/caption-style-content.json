@@ -1,0 +1,759 @@
+{
+ "version": "cs-1.0",
+ "note": "Hand-written by WS-K. Openings/CTAs/drafts are fresh text; every item is copy-guarded and fact-guarded by bin/intel/caption_style.py analyse. model_knowledge bullets are NOT measured.",
+ "scores_notes": {
+  "human": "The Burmese block is the most human part of every v1 post: spoken endings with ရှင့်, the diminutive လေး, natural English code-mixing (Page, Messenger, PayPay) and the page's own past-post phrases (colloquial spelling ပီး). Its problems are mechanical rather than \"AI\": the same footer in every post, the Messenger CTA sentence twice in some pattern posts, and an em dash + Japanese gloss (再入荷待ち) in the sold-out line."
+ },
+ "languages": {
+  "en": {
+   "name": "English",
+   "source_note": "All English human samples are TikTok captions by Nepali-audience sellers in Japan (official oEmbed); no English Facebook/Instagram shop captions collected yet.",
+   "model_knowledge": {
+    "register_tone": [
+     "Small shops on Facebook/Instagram write plain first-person English (\"we\", \"you\"), short lines and contractions: it reads like a message, not an ad."
+    ],
+    "hooks": [
+     "First line = what it is + why now (code, colour, \"back in stock\", price), because Facebook folds everything after about three lines behind \"See more\"."
+    ],
+    "price_cta": [
+     "Price as a number (\"¥1,595\"); CTA as one verb + one channel (\"Message us to order\"). \"DM for price\" annoys buyers."
+    ],
+    "delivery_stock": [
+     "Delivery and stock in plain words: \"we ship anywhere in Japan\", \"back in stock\", \"only 2 left\" (only when true)."
+    ],
+    "emoji_hashtags": [
+     "0-3 emoji used as signposts (🌸 👉); Facebook needs few or no hashtags, Instagram/TikTok 3-10."
+    ],
+    "ai_tells": [
+     "Readers spot AI by em dashes, \"elevate / timeless / stunning / whether you're\", three-adjective chains, ✨ on every line, title-case banners and \"Looking for...?\" openers."
+    ]
+   },
+   "do": [
+    {
+     "text": "Put code, colour and price in the first line: it is all people see before \"See more\".",
+     "basis": "measured (n={n}): product named in the first line + model_knowledge"
+    },
+    {
+     "text": "Keep it short: one idea per line, 2-5 lines on Facebook, 1-2 on TikTok.",
+     "basis": "measured (n={n}): single short lines"
+    },
+    {
+     "text": "Plain verbs: \"message us\", \"order on Messenger\", \"we ship anywhere in Japan\".",
+     "basis": "measured (n={n}): CTA/delivery wording + model_knowledge"
+    },
+    {
+     "text": "0-2 emoji as signposts (🌸 👉), never one per line.",
+     "basis": "measured (n={n}): emoji are rare"
+    },
+    {
+     "text": "2-5 hashtags at the end: product word + shop + one Nepali/Burmese keyword.",
+     "basis": "measured (n={n}): hashtag counts"
+    },
+    {
+     "text": "Only catalog facts: code, colour, \"Hosonuno (100% cotton)\", ¥1,595.",
+     "basis": "owner rule"
+    },
+    {
+     "text": "Sound like a person: \"we\", \"you\", one small human aside.",
+     "basis": "model_knowledge"
+    }
+   ],
+   "dont": [
+    {
+     "text": "No em dashes, no \" · \" chains, no title-case banners framed by emoji.",
+     "basis": "measured (n={n}): none in human captions; v1 EN block uses them"
+    },
+    {
+     "text": "No praise filler: stunning, timeless, elevate, \"perfect for\", \"rich colours\".",
+     "basis": "model_knowledge"
+    },
+    {
+     "text": "No \"Looking for...?\" openers.",
+     "basis": "model_knowledge"
+    },
+    {
+     "text": "No 🇯🇵/🇬🇧 translated twins of the same sentence.",
+     "basis": "measured contrast with v1"
+    },
+    {
+     "text": "No fancy Unicode fonts (𝒩𝐸𝒲): search and screen readers cannot read them.",
+     "basis": "measured (n={n}): 0 use them + model_knowledge"
+    },
+    {
+     "text": "Never width/length, supplier codes or \"best quality\" claims.",
+     "basis": "owner rule"
+    },
+    {
+     "text": "Never reuse a competitor sentence (copy guard enforces it).",
+     "basis": "owner rule"
+    }
+   ],
+   "openings": [
+    "Three colours of the same flower print, ¥1,595 each.",
+    "FV-67-C is the brown and red one. ¥1,595.",
+    "All three FV-67 colours side by side today.",
+    "Still in stock: FV-67-A, B and C.",
+    "Ochre and grey flowers, Hosonuno (100% cotton), ¥1,595.",
+    "[restock only] Back in stock: FV-73-A, the black flower print.",
+    "Quick one: FV-67-B and C, ¥1,595 each.",
+    "Our blooming-flower print comes in celadon, ochre or brown.",
+    "[restock only] The black flower print is back on the shelf.",
+    "Japanese kimono fabric for lungi or sewing, ¥1,595 a piece."
+   ],
+   "ctas": [
+    "Message us to order 👉 https://m.me/103196179075087",
+    "Send the code (like FV-67-B) on Messenger: https://m.me/103196179075087",
+    "Order on Messenger, cash on delivery is fine 👉 https://m.me/103196179075087",
+    "Not sure about a colour? Ask us on Messenger: https://m.me/103196179075087",
+    "Tap the link and tell us which one you want: https://m.me/103196179075087",
+    "Pay by PayPay, card or bank transfer. Order here: https://m.me/103196179075087",
+    "We ship anywhere in Japan. Message us: https://m.me/103196179075087",
+    "Comment the letter you like, then message us to order: https://m.me/103196179075087",
+    "Ready to order? Just send the code to https://m.me/103196179075087",
+    "Want a closer photo first? Ask on Messenger 👉 https://m.me/103196179075087"
+   ],
+   "drafts": {
+    "FV-67": [
+     "Blooming-flower print in three colours 🌸\nA: Celadon + Indigo grey\nB: Yellow ochre + Grey\nC: Brown + Red\nFV-67-A / B / C, ¥1,595 each. Hosonuno (100% cotton).\nMessage us to order 👉 https://m.me/103196179075087",
+     "FV-67-C is the brown and red one.\nSame flower print as A and B, ¥1,595.\nOrder on Messenger, cash on delivery is fine 👉 https://m.me/103196179075087",
+     "Still in stock: FV-67-A, B and C.\nHosonuno (100% cotton), ¥1,595 a piece.\nWe ship anywhere in Japan. Send us the code on Messenger: https://m.me/103196179075087",
+     "Ochre and grey flowers, Hosonuno (100% cotton). FV-67-B, ¥1,595.\nTap here to order: https://m.me/103196179075087",
+     "Calm colours or warm ones? FV-67-A is celadon + indigo grey; B and C go ochre and brown-red.\nAll ¥1,595, Hosonuno (100% cotton).\nAsk us anything on Messenger 👉 https://m.me/103196179075087"
+    ],
+    "FV-73-A": [
+     "[DO NOT POST until restocked]\nBack in stock: FV-73-A, the black flower print 🖤\nHosonuno (100% cotton), ¥1,595.\nMessage us to order 👉 https://m.me/103196179075087",
+     "[DO NOT POST until restocked]\nFV-73-A is back. Black, blooming-flower print, ¥1,595.\nSend us the code on Messenger: https://m.me/103196179075087",
+     "[DO NOT POST until restocked]\nThe black one sold out last time. It's here again 🌸 FV-73-A\nHosonuno (100% cotton), ¥1,595\nWe ship anywhere in Japan 👉 https://m.me/103196179075087",
+     "[DO NOT POST until restocked]\nRestocked! FV-73-A (black, flower print) ¥1,595.\nPay by PayPay, card, bank transfer or cash on delivery. Order: https://m.me/103196179075087",
+     "[DO NOT POST until restocked]\nIf you missed FV-73-A, it's back now.\nBlack with blooming flowers, Hosonuno (100% cotton), ¥1,595.\nOrder on Messenger 👉 https://m.me/103196179075087"
+    ],
+    "FV-83-A": [
+     "[DO NOT POST until restocked]\nFV-83-A is back in stock 🖤🌸\nBlack blooming-flower print, Hosonuno (100% cotton), ¥1,595.\nMessage us to order: https://m.me/103196179075087",
+     "[DO NOT POST until restocked]\nRestocked: FV-83-A. Black, flowers, ¥1,595.\nTap to order 👉 https://m.me/103196179075087",
+     "[DO NOT POST until restocked]\nGood news if you like black prints: FV-83-A is here again.\n¥1,595, Hosonuno (100% cotton).\nSend the code on Messenger: https://m.me/103196179075087",
+     "[DO NOT POST until restocked]\nFV-83-A was sold out. Now it's back 🌸\nBlack flower print, ¥1,595.\nCash on delivery OK. Order on Messenger 👉 https://m.me/103196179075087",
+     "[DO NOT POST until restocked]\nBack on the shelf: FV-83-A, black with blooming flowers.\nHosonuno (100% cotton), ¥1,595 a piece.\nAsk us on Messenger 👉 https://m.me/103196179075087"
+    ]
+   }
+  },
+  "ja": {
+   "name": "Japanese",
+   "source_note": "No Japanese human captions collected yet (0 samples): every point is model knowledge until owner screenshots arrive.",
+   "model_knowledge": {
+    "register_tone": [
+     "Small Japanese shops write です・ます with soft friendly endings (〜です♪ / 〜ました！ / 〜ですね). Stacked keigo (させていただきます ×3) feels stiff; noun-stacks joined by ・ read like a catalog."
+    ],
+    "hooks": [
+     "The first line says what the news is (入荷 / 再入荷 / 色違い / price); many shops add a short seasonal remark (朝晩涼しくなってきましたね)."
+    ],
+    "price_cta": [
+     "Price as 「1,595円（税込）」 (consumer prices must be shown tax-inclusive). CTA like 「ご注文・ご質問はDM／Messengerからお気軽にどうぞ」."
+    ],
+    "delivery_stock": [
+     "Short set phrases: 全国発送 / 代金引換OK / 残りわずか / 完売しました / 再入荷のお知らせ / 数量限定."
+    ],
+    "emoji_hashtags": [
+     "1-3 emoji or symbols (✨🌸♪); on Instagram 5-15 Japanese hashtags at the end (#和柄 #生地 #ハンドメイド #綿100)."
+    ],
+    "ai_tells": [
+     "AI tells: 唯一無二 / 洗練された / 「〜があなたの毎日を彩ります」, dashes (—), translated-English phrasing, an emoji at the start of every line."
+    ]
+   },
+   "do": [
+    {
+     "text": "です・ます + one soft ending (♪ / ！ / ね) per post.",
+     "basis": "model_knowledge"
+    },
+    {
+     "text": "Line 1 = the news (入荷 / 再入荷 / 色違い); one idea per line, blank line between blocks.",
+     "basis": "model_knowledge"
+    },
+    {
+     "text": "Price 「1,595円（税込）」; material only 「綿100%」.",
+     "basis": "owner rule + model_knowledge"
+    },
+    {
+     "text": "Colours in Japanese words: 青磁色×藍鼠 / 黄土色×グレー / 茶×赤 / 黒.",
+     "basis": "catalog colours, translated"
+    },
+    {
+     "text": "CTA as a friendly invitation: 「Messengerからお気軽にどうぞ」.",
+     "basis": "model_knowledge"
+    },
+    {
+     "text": "Instagram: 5-15 Japanese hashtags at the end; Facebook: 0-3.",
+     "basis": "model_knowledge"
+    },
+    {
+     "text": "Write Japanese as its own post, not a line-by-line translation of the English.",
+     "basis": "measured contrast with v1"
+    }
+   ],
+   "dont": [
+    {
+     "text": "No 体言止め chains like 「同じ柄・2色・税込・…」 (catalog/robot voice).",
+     "basis": "measured contrast: v1 JA block does this in every post"
+    },
+    {
+     "text": "No 🇯🇵/🇬🇧 flag-labelled translation lines.",
+     "basis": "measured contrast with v1"
+    },
+    {
+     "text": "No stacked keigo (させていただきます ×3, 誠に…).",
+     "basis": "model_knowledge"
+    },
+    {
+     "text": "No AI praise: 唯一無二, 洗練された, 上質な, 「毎日を彩ります」.",
+     "basis": "model_knowledge"
+    },
+    {
+     "text": "No dashes (—), no English-style quotes or colons in sentences.",
+     "basis": "model_knowledge"
+    },
+    {
+     "text": "Never 細布, never width/length, never supplier codes.",
+     "basis": "owner rule"
+    },
+    {
+     "text": "Never copy another shop's wording (copy guard: 12 Japanese characters).",
+     "basis": "owner rule"
+    }
+   ],
+   "openings": [
+    "花柄の生地、3色そろっています。",
+    "FV-67、色違いで並べてみました。",
+    "青磁色と藍鼠の花柄です。",
+    "黄土色とグレーの組み合わせ、FV-67-Bです。",
+    "茶と赤の花柄、FV-67-Cもあります。",
+    "[restock only] 黒地の花柄が再入荷しました！",
+    "[restock only] お待たせしました、FV-73-Aが戻ってきました。",
+    "今日は花柄の3色をご紹介します♪",
+    "綿100%の和柄生地、1枚1,595円（税込）です。",
+    "ハンドメイドにも使いやすい花柄です。"
+   ],
+   "ctas": [
+    "ご注文はMessengerからどうぞ👉 https://m.me/103196179075087",
+    "気になる色があれば、品番をMessengerで送ってください。https://m.me/103196179075087",
+    "ご質問だけでもお気軽にメッセージくださいね。https://m.me/103196179075087",
+    "代金引換・PayPay・カード・銀行振込に対応しています。ご注文はこちら→ https://m.me/103196179075087",
+    "全国発送しています。Messengerでご連絡ください。https://m.me/103196179075087",
+    "A・B・Cのどれにするか、Messengerで教えてください♪ https://m.me/103196179075087",
+    "在庫の確認もMessengerでどうぞ。https://m.me/103196179075087",
+    "写真をもっと見たい方はメッセージでどうぞ。https://m.me/103196179075087",
+    "ご注文の際は品番（例：FV-67-A）をお知らせください。https://m.me/103196179075087",
+    "店頭受取（東京）もできます。Messengerでご相談ください。https://m.me/103196179075087"
+   ],
+   "drafts": {
+    "FV-67": [
+     "花柄の生地、3色そろっています🌸\n\nA：青磁色×藍鼠\nB：黄土色×グレー\nC：茶×赤\n\nFV-67-A / B / C\n1枚 1,595円（税込）\n素材：綿100%\n\nご注文・ご質問はMessengerからお気軽にどうぞ。\n👉 https://m.me/103196179075087\n\n#和柄 #和柄生地 #花柄 #綿100 #ハンドメイド #Fujiba",
+     "同じ花柄で、色ちがいが3つあります。\n\n落ち着いた色ならA（青磁色×藍鼠）、\nあたたかみのある色ならB（黄土色×グレー）かC（茶×赤）。\n\nどれも1枚1,595円（税込）、綿100%です。\n品番を添えてMessengerでご注文くださいね♪\nhttps://m.me/103196179075087",
+     "FV-67-B、黄土色とグレーの花柄です。\n1,595円（税込）。\nご注文はMessengerで👉 https://m.me/103196179075087",
+     "＼ 花柄 3色 ／\nFV-67シリーズ、在庫あります。\n\n・A 青磁色×藍鼠\n・B 黄土色×グレー\n・C 茶×赤\n\n各1,595円（税込）／綿100%\n全国発送しています。代金引換もできます。\n\nご注文はMessengerへ\nhttps://m.me/103196179075087\n\n#和柄生地 #花柄生地 #着物生地 #ハンドメイド好きな人と繋がりたい #Fujiba",
+     "花柄の生地 FV-67、A・B・Cの3色です。\n色味が気になる方は、Messengerで気軽に聞いてくださいね。\n1枚1,595円（税込）、綿100%。\nhttps://m.me/103196179075087"
+    ],
+    "FV-73-A": [
+     "[DO NOT POST until restocked]\n黒地の花柄、FV-73-Aが再入荷しました！\n1枚1,595円（税込）、綿100%です。\nご注文はMessengerからどうぞ👉 https://m.me/103196179075087",
+     "[DO NOT POST until restocked]\nお待たせしました。黒の花柄 FV-73-A、また入荷しました。\n綿100%、1枚1,595円（税込）です。\n気になる方はMessengerでお声がけください。\nhttps://m.me/103196179075087",
+     "[DO NOT POST until restocked]\nFV-73-A（黒×花柄）再入荷のお知らせです🌸\n数に限りがありますので、お早めにどうぞ。\n1,595円（税込）／綿100%\nご注文：https://m.me/103196179075087",
+     "[DO NOT POST until restocked]\n黒の花柄、戻ってきました！ FV-73-A 1,595円（税込）\nMessengerで品番を送ってください→ https://m.me/103196179075087",
+     "[DO NOT POST until restocked]\n＼ 再入荷 ／\n黒地に花が咲く柄、FV-73-Aです。\n綿100%、1枚1,595円（税込）\n全国発送しています。\nご注文はMessengerへ👉 https://m.me/103196179075087\n#和柄生地 #黒地 #花柄 #再入荷 #ハンドメイド #Fujiba"
+    ],
+    "FV-83-A": [
+     "[DO NOT POST until restocked]\nFV-83-A、黒の花柄が再入荷しました。\n綿100%、1,595円（税込）です。\nMessengerからご注文いただけます👉 https://m.me/103196179075087",
+     "[DO NOT POST until restocked]\n売り切れていたFV-83-A、再入荷です！\n黒地に花柄。1枚1,595円（税込）。\nご質問もお気軽にどうぞ。https://m.me/103196179075087",
+     "[DO NOT POST until restocked]\n＼ FV-83-A 再入荷 ／\n黒×花柄の生地です（綿100%）。\n価格：1,595円（税込）\n代金引換・PayPay・カード・銀行振込に対応しています。\nhttps://m.me/103196179075087",
+     "[DO NOT POST until restocked]\nFV-83-A（黒・花柄）また入りました。\n欲しかった方はお早めに♪ 1,595円（税込）\nhttps://m.me/103196179075087",
+     "[DO NOT POST until restocked]\n黒地の花柄 FV-83-A、再入荷しました。\n綿100% ／ 1枚1,595円（税込）\nご注文・お問い合わせはMessengerまで\nhttps://m.me/103196179075087\n#和柄 #黒い生地 #花柄生地 #着物生地 #Fujiba"
+    ]
+   }
+  },
+  "my": {
+   "name": "Burmese",
+   "source_note": "No competitor Burmese caption could be collected (Facebook scraping is forbidden and no owner screenshots yet); the only measured Burmese is our own page's human phrases (1 seller).",
+   "model_knowledge": {
+    "register_tone": [
+     "Myanmar Facebook sellers write spoken Burmese (…ပါတယ် / …နော် / …မယ်), not literary Burmese (…သည် / ၏ / ၍ / …ပါသည်), which reads like a news report or a machine translation. Women sellers end lines with ရှင့်/ရှင်, men with ခင်ဗျာ/ဗျ."
+    ],
+    "address": [
+     "Customers are addressed warmly: Customer လေးတို့, အစ်မတို့, ညီမလေးတို့; the diminutive လေး (အထည်လေး, အရောင်လေး) is everywhere and sounds friendly."
+    ],
+    "hooks": [
+     "Typical first lines: New Arrival, Instock ပြန်ရပါပြီ, ရောက်ပါပြီနော်, ဈေးလျှော့; fancy-font headers (𝐍𝐞𝐰 𝐀𝐫𝐫𝐢𝐯𝐚𝐥) are common but invisible to search."
+    ],
+    "price_cta": [
+     "Price as \"¥1,595\" or \"1595 ယန်း\"; CTA via Inbox / Page Messenger, \"Comment မှာ code ရေးပေးပါ\", phone/Viber. Hiding the price (\"ဈေးနှုန်း inbox\") is common but loses buyers."
+    ],
+    "delivery_stock": [
+     "Delivery/payment lines: အိမ်ရောက်ငွေချေ (COD), ဂျပန်တစ်နိုင်ငံလုံး ပို့ပေးပါတယ်, ပို့ခ; stock: Stock နည်းနည်းပဲ ကျန်တော့တယ်, ပြတ်သွားပါပြီ, ပြန်ရောက်ပါပြီ."
+    ],
+    "script": [
+     "Since Myanmar's 2019 switch most new posts are Unicode, but Zawgyi still appears from older phones/fonts (Facebook converts some on display). Always publish Unicode."
+    ],
+    "ai_tells": [
+     "AI tells in Burmese: literary endings (သည်/၏), flawless formal grammar with no particles, word-for-word English idioms, long praise lists, em dashes."
+    ]
+   },
+   "do": [
+    {
+     "text": "Spoken endings …ပါတယ် / …ပါမယ် / …နော် with the page voice ရှင့်/ရှင်.",
+     "basis": "measured (n={n}, own page) + model_knowledge"
+    },
+    {
+     "text": "Code + price in the first 2-3 lines (before \"See more\").",
+     "basis": "model_knowledge"
+    },
+    {
+     "text": "Mix English shop words in Latin letters: New arrival, Instock, Sold out, Order, COD.",
+     "basis": "measured (n={n}, own page)"
+    },
+    {
+     "text": "Warm address: Customer လေးတို့ / အစ်မတို့; diminutive လေး.",
+     "basis": "model_knowledge"
+    },
+    {
+     "text": "Clear price \"¥1,595\"; COD + delivery-in-Japan line.",
+     "basis": "measured (n={n}, own page) + model_knowledge"
+    },
+    {
+     "text": "2-5 emoji, hearts are fine (🥰💕✨🌸).",
+     "basis": "measured (n={n}, own page) + model_knowledge"
+    },
+    {
+     "text": "Unicode only (checked by the Zawgyi heuristic before anything is saved).",
+     "basis": "owner rule"
+    }
+   ],
+   "dont": [
+    {
+     "text": "No literary register (သည် / ၏ / ၍ / မည် / ပါသည်).",
+     "basis": "model_knowledge"
+    },
+    {
+     "text": "No em dashes or Japanese glosses (再入荷待ち) inside Burmese lines.",
+     "basis": "measured contrast with v1 sold-out line"
+    },
+    {
+     "text": "Don't repeat the same CTA sentence twice in one post.",
+     "basis": "measured contrast with v1"
+    },
+    {
+     "text": "Don't hide the price behind \"inbox\".",
+     "basis": "model_knowledge"
+    },
+    {
+     "text": "No Zawgyi, no mixed encodings.",
+     "basis": "owner rule"
+    },
+    {
+     "text": "Never length/width (မီတာ) or supplier codes.",
+     "basis": "owner rule"
+    },
+    {
+     "text": "Never copy another seller's sentences (copy guard: 20 Burmese characters).",
+     "basis": "owner rule"
+    }
+   ],
+   "openings": [
+    "ပန်းပွင့်အဆင်လေး အရောင် ၃ မျိုး ရှိပါတယ်ရှင့် 🌸",
+    "[restock only] အနက်ရောင် ပန်းပွင့်လေး ပြန်ရောက်ပါပြီနော် 🥰",
+    "ဒီနေ့ FV-67 လေး ၃ ရောင်လုံး တင်ပေးလိုက်ပါတယ်ရှင့်",
+    "အစ်မတို့ရေ ✨ ပန်းပွင့်လေးတွေ ပွင့်နေတဲ့ အဆင်လေးပါ",
+    "Instock ရှိပါတယ်ရှင့် 👉 FV-67-A / B / C",
+    "အညိုနဲ့ အနီ တွဲထားတဲ့ ပန်းပွင့်လေး FV-67-C ပါရှင့်",
+    "100% cotton ကီမိုနိုအထည်လေး တစ်ထည် ¥1,595 ပါရှင့်",
+    "[restock only] Sold out ဖြစ်သွားတဲ့ FV-73-A လေး ပြန်ရောက်လာပါပြီရှင့်",
+    "Yellow ochre နဲ့ မီးခိုးရောင် တွဲထားတဲ့ အဆင်လေး ချစ်စရာလေးပါ 💕",
+    "မင်္ဂလာပါရှင့် 🙏 ဒီနေ့တော့ ပန်းပွင့်အဆင်လေးတွေ ပြပေးမယ်နော်"
+   ],
+   "ctas": [
+    "မှာချင်ရင် Messenger ကနေ code လေး ပို့ပေးပါနော် 👉 https://m.me/103196179075087",
+    "Messenger မှာ FV-67-B လို့ ရိုက်ပို့ရုံပါပဲရှင့် 👉 https://m.me/103196179075087",
+    "အရောင်လေး ရွေးပြီးရင် Page Messenger ကို စာပို့ပါရှင့် 📩 https://m.me/103196179075087",
+    "အိမ်ရောက်မှ ငွေချေလို့ ရပါတယ်ရှင့် (COD) 👉 https://m.me/103196179075087",
+    "PayPay၊ Card၊ ဘဏ်လွှဲ ကြိုက်တာနဲ့ ပေးချေလို့ရပါတယ် 📩 https://m.me/103196179075087",
+    "ဂျပန်နိုင်ငံ ဘယ်နေရာပဲ နေနေ ပို့ပေးပါတယ်ရှင့် 🚚 မှာရန် 👉 https://m.me/103196179075087",
+    "သိချင်တာရှိရင် Messenger မှာ မေးလို့ရပါတယ်နော် 💬 https://m.me/103196179075087",
+    "Comment မှာ ကြိုက်တဲ့ အရောင်လေး ရေးခဲ့ပါနော်၊ မှာမယ်ဆို Messenger ကို စာပို့ပါရှင့် https://m.me/103196179075087",
+    "ပုံထပ်ကြည့်ချင်ရင်လည်း Messenger မှာ ပြောပါရှင့် 📸 https://m.me/103196179075087",
+    "ကြိုက်ရင် စောစောလေး မှာထားနော်၊ ပြတ်သွားရင် ပြန်စောင့်ရမှာမို့ပါ 🛍️ https://m.me/103196179075087"
+   ],
+   "drafts": {
+    "FV-67": [
+     "ပန်းပွင့်အဆင်လေး FV-67 မှာ အရောင် ၃ မျိုး ရှိပါတယ်ရှင့် 🌸\n\nA - Celadon + Indigo grey\nB - Yellow ochre + မီးခိုးရောင်\nC - အညိုရောင် + အနီရောင်\n\nတစ်ထည် ¥1,595 ပါ (100% cotton)\nမှာချင်ရင် Messenger ကနေ code လေး ပို့ပေးပါနော် 👉 https://m.me/103196179075087",
+     "အစ်မတို့ရေ ✨\nFV-67-C လေးက အညိုနဲ့ အနီ ပေါင်းထားတဲ့ ပန်းပွင့်အဆင်လေးပါ 💕\n¥1,595 ပဲ ပေးရပါတယ်ရှင့်\nအိမ်ရောက်မှ ငွေချေလို့ရပါတယ် (COD)\nMessenger 👉 https://m.me/103196179075087",
+     "Instock ရှိပါတယ်ရှင့် 🛍️\nFV-67-A / FV-67-B / FV-67-C\nပန်းပွင့်လေးတွေ ပွင့်နေတဲ့ ဒီဇိုင်းလေး၊ 100% cotton\nတစ်ထည် ¥1,595\nဂျပန်နိုင်ငံ ဘယ်နေရာပဲ နေနေ ပို့ပေးပါတယ် 🚚\nMessenger မှာ စာပို့ပြီး မှာလို့ရပါတယ် 👉 https://m.me/103196179075087",
+     "Yellow ochre နဲ့ မီးခိုးရောင် ✨ FV-67-B\n¥1,595 | 100% cotton\nမှာရန် 👉 https://m.me/103196179075087",
+     "ဂျပန်ကနေ အိမ်ပြန်လက်ဆောင်ပေးဖို့ ကီမိုနိုအထည်လေးတွေ 🎁\nFV-67 ပန်းပွင့်အဆင် A / B / C ရှိပါတယ်ရှင့်\nတစ်ထည် ¥1,595 (100% cotton)\nPayPay၊ Card၊ ဘဏ်လွှဲ၊ COD အကုန်ရပါတယ်\nMessenger 👉 https://m.me/103196179075087"
+    ],
+    "FV-73-A": [
+     "[DO NOT POST until restocked]\nSold out ဖြစ်သွားတဲ့ FV-73-A လေး ပြန်ရောက်ပါပြီရှင့် 🥰\nအနက်ရောင်ပေါ်မှာ ပန်းပွင့်လေးတွေ ပွင့်နေတဲ့ အဆင်လေးပါ\nတစ်ထည် ¥1,595 (100% cotton)\nမှာချင်ရင် Messenger ကို code လေး ပို့ပေးပါနော် 👉 https://m.me/103196179075087",
+     "[DO NOT POST until restocked]\nအနက်ရောင် ပန်းပွင့်လေး ပြန်ရလာပြီနော် ✨ FV-73-A\n¥1,595 | 100% cotton\nအိမ်ရောက်မှ ငွေချေလို့ရပါတယ်ရှင့်\n👉 https://m.me/103196179075087",
+     "[DO NOT POST until restocked]\nစောင့်ပေးခဲ့တဲ့ Customer လေးတို့ ကျေးဇူးပါရှင့် 🙏\nFV-73-A (အနက်ရောင် + ပန်းပွင့်) Instock ပြန်ဖြည့်ပြီးပါပြီ\nတစ်ထည် ¥1,595\nMessenger 👉 https://m.me/103196179075087",
+     "[DO NOT POST until restocked]\nFV-73-A ပြန်ရောက်ပါပြီ 🖤🌸\nအနက်ခံ ပန်းပွင့်အဆင်၊ 100% cotton၊ ¥1,595\nဂျပန်တစ်နိုင်ငံလုံး ပို့ပေးပါတယ်ရှင့်\nMessenger ကနေ မှာပါနော် 👉 https://m.me/103196179075087",
+     "[DO NOT POST until restocked]\nအနက်ရောင် ကြိုက်တဲ့ အစ်မတို့အတွက် ✨\nFV-73-A ပန်းပွင့်အဆင်လေး ပြန်ဖြည့်ထားပါတယ်\n¥1,595 ပဲ ပေးရပါမယ်ရှင့်\nPayPay၊ Card၊ ဘဏ်လွှဲ၊ COD ရပါတယ်\n👉 https://m.me/103196179075087"
+    ],
+    "FV-83-A": [
+     "[DO NOT POST until restocked]\nအနက်ခံ ပန်းပွင့်လေး FV-83-A Instock ပြန်ရပါပြီ ✨\n¥1,595 (100% cotton)\nမှာချင်ရင် Messenger ကနေ ပြောပါနော် 👉 https://m.me/103196179075087",
+     "[DO NOT POST until restocked]\nအစ်မတို့ရေ 🖤 FV-83-A ပြန်ရောက်ပါပြီ\nအနက်ရောင်နဲ့ ပန်းပွင့်လေးတွေ လိုက်ဖက်တဲ့ အဆင်လေးပါ\nတစ်ထည် ¥1,595 ပဲ\nအိမ်ရောက်မှ ငွေချေလို့ရပါတယ်ရှင့် 👉 https://m.me/103196179075087",
+     "[DO NOT POST until restocked]\nSold out ဖြစ်ခဲ့တဲ့ FV-83-A လေး ပြန်ဖြည့်ထားပါတယ်ရှင့်\nပန်းပွင့်အဆင်၊ အနက်ရောင်၊ 100% cotton\n¥1,595\nဂျပန်နိုင်ငံ ဘယ်နေရာမဆို ပို့ပေးပါတယ် 🚚\n👉 https://m.me/103196179075087",
+     "[DO NOT POST until restocked]\nFV-83-A ✨ အနက် + ပန်းပွင့်\n¥1,595 | 100% cotton\nMessenger မှာ code လေး ရိုက်ပို့ပြီး မှာလို့ရပါတယ်နော် 👉 https://m.me/103196179075087",
+     "[DO NOT POST until restocked]\nလက်ဆောင်ပေးဖို့ အနက်ရောင် ကီမိုနိုအထည်လေး ရှာနေတဲ့သူတွေအတွက် 🎁\nFV-83-A ပြန်ရောက်ပါပြီရှင့်\n¥1,595၊ PayPay / Card / ဘဏ်လွှဲ / COD အဆင်ပြေပါတယ်\n👉 https://m.me/103196179075087"
+    ]
+   }
+  },
+  "ne": {
+   "name": "Nepali",
+   "source_note": "Nepali-language samples are romanized-Nepali TikTok captions; script-choice metrics use every caption from Nepali-audience accounts (any body language).",
+   "model_knowledge": {
+    "register_tone": [
+     "Nepali sellers in Japan write like chat: English product words + romanized Nepali glue (ko lagi, cha/xa, garnus, hola) with loose spelling. Devanagari is used more by sellers in Nepal and for keywords."
+    ],
+    "address": [
+     "Polite but friendly: dai / didi / sathi haru, hajur in replies; polite imperatives -nus / -nu hola (order garnus, msg garnu hola)."
+    ],
+    "hooks": [
+     "Openers: \"Naya stock aayo\", \"Japanese lungi available\", price first (\"¥1,600 matra\"), and festival hooks before Dashain/Tihar (koseli = a gift to take home)."
+    ],
+    "price_cta": [
+     "Price plainly with \"matra\" (only) or \"fixed price\"; CTA: inbox / msg garnus, comment, call/Viber; Japanese politeness in romaji (onegaishimasu) also appears."
+    ],
+    "delivery_stock": [
+     "\"Japan bhari delivery\", \"COD (daibiki) milcha\", \"stock limited cha\", \"sold out bhayo\", \"feri aayo\"."
+    ],
+    "ai_tells": [
+     "AI tells: Sanskritized formal Devanagari (प्रियजन, उत्तम, उपलब्ध छ), em dashes, perfectly parallel sentences, rhetorical \"खोज्दै हुनुहुन्छ?\" openers."
+    ]
+   },
+   "do": [
+    {
+     "text": "Write mostly English + romanized Nepali; Devanagari for 1-2 keywords or hashtags (#कोसेली).",
+     "basis": "measured (Nepali-audience n={n_aud}): body English or romanized, Devanagari only in hashtags"
+    },
+    {
+     "text": "Name the product the way buyers search: \"Japanese lungi\".",
+     "basis": "measured (n={n_aud}): \"lungi\" in almost every caption"
+    },
+    {
+     "text": "Price plainly: \"¥1,595 matra\".",
+     "basis": "measured (n={n}): \"matra\" price wording"
+    },
+    {
+     "text": "One-line CTA: \"Messenger ma msg garnus\".",
+     "basis": "measured (n={n}): inbox/DM wording"
+    },
+    {
+     "text": "Dashain/Tihar koseli hooks in season (Oct-Nov).",
+     "basis": "measured (n={n}): festival hook + model_knowledge"
+    },
+    {
+     "text": "1-3 emoji (🙏🎁), short lines.",
+     "basis": "measured (n={n_aud}): emoji rare"
+    },
+    {
+     "text": "Warmth via dai / didi / sathi haru, hajur.",
+     "basis": "model_knowledge"
+    }
+   ],
+   "dont": [
+    {
+     "text": "No formal Sanskritized Devanagari sentences (प्रियजन, उत्तम, उपलब्ध छ).",
+     "basis": "measured (n={n_aud}): 0 Devanagari body text; v1 NE line is formal"
+    },
+    {
+     "text": "No em dashes, no flag-labelled translation lines.",
+     "basis": "measured (n={n_aud}): none"
+    },
+    {
+     "text": "Don't claim \"original/guaranteed\": state facts (100% cotton, price).",
+     "basis": "owner rule"
+    },
+    {
+     "text": "No long paragraphs: competitors use 1 line.",
+     "basis": "measured (n={n_aud})"
+    },
+    {
+     "text": "Never promise delivery to Nepal or prices in रु: not stated anywhere in our data.",
+     "basis": "owner rule"
+    },
+    {
+     "text": "Never width/length or supplier codes.",
+     "basis": "owner rule"
+    },
+    {
+     "text": "Never reuse competitor wording or their shop hashtags.",
+     "basis": "owner rule"
+    }
+   ],
+   "openings": [
+    "Yo phool butta wala Japanese lungi hernus 🌸",
+    "FV-67 ma 3 ota color cha: A, B ra C 🙏",
+    "Dashain Tihar ko koseli ko lagi Japanese kimono cotton 🎁",
+    "[restock only] Kalo phool butta wala lungi feri aayo! 🖤",
+    "Kimono cotton ko lungi, ¥1,595 matra.",
+    "Didi haru, yo brown + red color kasto lagyo? 😍",
+    "Japan bhari delivery hunchha, ghar mai COD 🙏",
+    "Celadon + Indigo grey, ekdam simple ra ramro color 🌿",
+    "Stock ma cha: FV-67-A, B ra C",
+    "Aaja ko pick: FV-67-B, Yellow ochre + Grey ✨"
+   ],
+   "ctas": [
+    "Order garna Messenger ma msg garnus 👉 https://m.me/103196179075087",
+    "Code (jastai FV-67-B) pathaunus, baki hami garchhau 🙏 https://m.me/103196179075087",
+    "Kun color mann paryo? Messenger ma bhannus 👉 https://m.me/103196179075087",
+    "COD, PayPay, card, bank transfer sabai milcha. Msg garnus 👉 https://m.me/103196179075087",
+    "Japan bhari pathauchhau, Messenger ma order garnus 🚚 https://m.me/103196179075087",
+    "Thap photo chahiyo bhane Messenger ma sodhnus 📩 https://m.me/103196179075087",
+    "Comment ma A, B ki C lekhnus, ani Messenger ma order garnus 🙏 https://m.me/103196179075087",
+    "हजुर, अर्डरको लागि Messenger मा म्यासेज गर्नुस् 👉 https://m.me/103196179075087",
+    "Man paryo bhane chito order garnus, sold out bhaye feri parkhanu parcha 🎁 https://m.me/103196179075087",
+    "Sodhna man lagyo bhane pani msg garnus hai 🙏 https://m.me/103196179075087"
+   ],
+   "drafts": {
+    "FV-67": [
+     "Phool butta wala Japanese lungi 🌸 FV-67 ma 3 ota color cha\n\nA - Celadon + Indigo grey\nB - Yellow ochre + Grey\nC - Brown + Red\n\n¥1,595 matra, 100% cotton\nOrder garna Messenger ma msg garnus 👉 https://m.me/103196179075087\n#जापानीलुंगी #कोसेली #japaneselungi",
+     "Dashain Tihar ko koseli khojda yo pani hernus 🎁\nFV-67-C, brown ra red phool butta\n¥1,595 matra\nCOD, PayPay, card, bank transfer sabai milcha\n👉 https://m.me/103196179075087",
+     "Stock ma cha 🙏\nFV-67-A / FV-67-B / FV-67-C\nJapanese kimono cotton (100% cotton), euta ko ¥1,595\nJapan bhari delivery, ghar mai COD\nKun color mann paryo? Messenger ma bhannus 👉 https://m.me/103196179075087",
+     "FV-67-B ✨ Yellow ochre + Grey\n¥1,595 matra | 100% cotton\nMsg garnus 👉 https://m.me/103196179075087",
+     "दिदीबहिनीहरू, फूलको बुट्टा भएको जापानी लुंगी कपडा 🌸\nFV-67 मा A, B, C तीन रङ छन्\nएउटाको ¥1,595 मात्र (100% cotton)\nअर्डरको लागि Messenger मा म्यासेज गर्नुस् 👉 https://m.me/103196179075087"
+    ],
+    "FV-73-A": [
+     "[DO NOT POST until restocked]\nKalo phool butta wala lungi feri aayo! 🖤 FV-73-A\n¥1,595 matra, 100% cotton\nOrder garna Messenger ma msg garnus 👉 https://m.me/103196179075087",
+     "[DO NOT POST until restocked]\nSold out bhayeko FV-73-A feri stock ma cha 🙏\nKalo color ma phool butta, Japanese kimono cotton\n¥1,595\nJapan bhari delivery hunchha 👉 https://m.me/103196179075087",
+     "[DO NOT POST until restocked]\nKalo lungi man parne didi haru ko lagi 🖤 FV-73-A feri aayo\n¥1,595 matra\nCOD, PayPay, card, bank sabai milcha\n👉 https://m.me/103196179075087",
+     "[DO NOT POST until restocked]\nकालो रङमा फूलको बुट्टा, FV-73-A फेरि आयो 🌸\nएउटाको ¥1,595 मात्र (100% cotton)\nअर्डरको लागि Messenger मा म्यासेज गर्नुस् 👉 https://m.me/103196179075087",
+     "[DO NOT POST until restocked]\nKoseli ko lagi kalo Japanese lungi 🎁 FV-73-A\n100% cotton, ¥1,595\nCode pathaunus, baki hami garchhau 🙏 https://m.me/103196179075087"
+    ],
+    "FV-83-A": [
+     "[DO NOT POST until restocked]\nFV-83-A feri stock ma aayo 🖤🌸\nKalo ma phool butta, 100% cotton\n¥1,595 matra\nMessenger ma order garnus 👉 https://m.me/103196179075087",
+     "[DO NOT POST until restocked]\nKalo lungi man parne haru ko lagi khusi ko khabar 🙏 FV-83-A aayo\n¥1,595 | Japan bhari delivery\n👉 https://m.me/103196179075087",
+     "[DO NOT POST until restocked]\nSathi haru, FV-83-A restock bhayo ✨\nJapanese kimono cotton (100% cotton), kalo color\n¥1,595 matra\nCOD pani milcha 👉 https://m.me/103196179075087",
+     "[DO NOT POST until restocked]\nFV-83-A फेरि आयो! कालो रङ, फूलको बुट्टा 🖤\nमूल्य ¥1,595 मात्र\nजापानभरि डेलिभरी हुन्छ\nMessenger मा अर्डर गर्नुस् 👉 https://m.me/103196179075087",
+     "[DO NOT POST until restocked]\nKoseli dina kalo lungi chahiyo bhane FV-83-A ready cha 🎁\n¥1,595 matra, 100% cotton\nKun chahiyo, msg garnus 👉 https://m.me/103196179075087"
+    ]
+   }
+  }
+ },
+ "rewrites": {
+  "en": {
+   "intro_nocodes": {
+    "colour": [
+     "{colour_en} background, {n} different prints:",
+     "All {colour_en_lower} this time:",
+     "{n} prints on {colour_en_lower}:"
+    ],
+    "new": [
+     "New in:",
+     "Just added 🌸",
+     "Fresh on the shelf:"
+    ],
+    "template": [
+     "Today's picks:",
+     "Picked for today:"
+    ]
+   },
+   "intro": {
+    "pattern": [
+     "{pattern} comes in {n} colours: {letters}.",
+     "Same print, {n} colours ({letters}).",
+     "{pattern} in {letters}."
+    ],
+    "colour": [
+     "{colour_en} background, {n} different prints: {codes}.",
+     "All {colour_en_lower} this time: {codes}.",
+     "{n} prints on {colour_en_lower}: {codes}."
+    ],
+    "new": [
+     "New in: {codes}.",
+     "Just added {codes} 🌸",
+     "Fresh on the shelf: {codes}."
+    ],
+    "template": [
+     "Today's picks: {codes}.",
+     "Picked for today: {codes}."
+    ]
+   },
+   "price": {
+    "single": [
+     "{price} each",
+     "{price} a piece"
+    ],
+    "from": "From {price}",
+    "tax": ", tax included",
+    "offer": ". Buy 11, get 1 free.",
+    "end": ".",
+    "multi": [
+     "{price_lines}"
+    ],
+    "tax_multi": "\n(tax included)"
+   },
+   "cta": [
+    "Order on Messenger 👉 {link}",
+    "Send us the code to order: {link}",
+    "Message us 👉 {link}"
+   ],
+   "sold_out": "{so} is sold out for now."
+  },
+  "ja": {
+   "intro_nocodes": {
+    "colour": [
+     "{colour_ja}地の柄を{n}種類集めました。",
+     "今日は{colour_ja}がベースの柄をご紹介します。",
+     "{colour_ja}系の柄、{n}種類です。"
+    ],
+    "new": [
+     "新しい柄が入りました。",
+     "新入荷の柄です✨",
+     "入荷したばかりの柄をご紹介します♪"
+    ],
+    "template": [
+     "本日のおすすめ柄です。",
+     "今日はこちらの柄をご紹介します。"
+    ]
+   },
+   "intro": {
+    "pattern": [
+     "同じ柄で{n}色あります（{letters}）。",
+     "{pattern}の色ちがい、{letters}の{n}色です。",
+     "{pattern}は{n}色からお選びいただけます（{letters}）。"
+    ],
+    "colour": [
+     "{colour_ja}地の柄を{n}種類集めました。\n{codes}",
+     "今日は{colour_ja}がベースの柄をご紹介します。\n{codes}",
+     "{colour_ja}系の柄、{n}種類です。\n{codes}"
+    ],
+    "new": [
+     "新しい柄が入りました。\n{codes}",
+     "新入荷の柄です✨\n{codes}",
+     "入荷したばかりの柄をご紹介します♪\n{codes}"
+    ],
+    "template": [
+     "本日のおすすめ柄です。\n{codes}",
+     "今日はこちらの柄をご紹介します。\n{codes}"
+    ]
+   },
+   "price": {
+    "single": [
+     "1枚{price_ja}",
+     "各{price_ja}"
+    ],
+    "from": "{price_ja}〜",
+    "tax": "（税込）",
+    "offer": "、11枚ごとに1枚分無料です。",
+    "end": "です。",
+    "multi": [
+     "{price_lines_ja}"
+    ],
+    "tax_multi": "\n（いずれも税込）"
+   },
+   "cta": [
+    "ご注文はMessengerからどうぞ👉 {link}",
+    "品番を添えてMessengerでご注文ください。\n{link}",
+    "お問い合わせはMessengerへ👉 {link}"
+   ],
+   "sold_out": "※{so}は現在売り切れです。"
+  },
+  "ne": {
+   "intro_nocodes": {
+    "colour": [
+     "{colour_ne} color ko {n} ota design 🌸",
+     "{colour_ne} man parne haru ko lagi:",
+     "Aaja {colour_ne} color ka design haru:"
+    ],
+    "new": [
+     "Naya design aayo 🌸",
+     "Japanese lungi ko naya stock:",
+     "Bharkhar aayeko design ✨"
+    ],
+    "template": [
+     "Aaja ko pick:",
+     "Yo design haru hernus:"
+    ]
+   },
+   "intro": {
+    "pattern": [
+     "{pattern} ma {n} ota color cha ({letters}) 🌸",
+     "Eutai design, {n} color: {letters} 🙏",
+     "Japanese lungi {pattern} ({letters}) stock ma cha"
+    ],
+    "colour": [
+     "{colour_ne} color ko {n} ota design 🌸\n{codes}",
+     "{colour_ne} man parne haru ko lagi: {codes}",
+     "Aaja {colour_ne} color ka design haru: {codes}"
+    ],
+    "new": [
+     "Naya design aayo 🌸 {codes}",
+     "Japanese lungi ko naya stock: {codes}",
+     "Bharkhar aayeko design: {codes} ✨"
+    ],
+    "template": [
+     "Aaja ko pick: {codes}",
+     "Yo design haru hernus: {codes}"
+    ]
+   },
+   "price": {
+    "single": [
+     "{price} matra",
+     "Euta ko {price}"
+    ],
+    "from": "{price} dekhi",
+    "tax": " (tax sahit)",
+    "offer": ", 11 ota kinda 1 free!",
+    "end": "",
+    "multi": [
+     "{price_lines}"
+    ],
+    "tax_multi": "\n(tax sahit)"
+   },
+   "cta": [
+    "Order garna Messenger ma msg garnus 👉 {link}",
+    "Code pathaunus 👉 {link}",
+    "Msg garnus 👉 {link}"
+   ],
+   "sold_out": "{so} chai sold out bhayo, feri aaye pachi bhanchhau 🙏"
+  },
+  "my": {
+   "intro_nocodes": {
+    "colour": [
+     "အရောင်တူ အဆင် {n} မျိုး စုထားပါတယ်ရှင့်"
+    ],
+    "new": [
+     "အဆင်သစ်လေးတွေ ရောက်ပါပြီနော် ✨"
+    ],
+    "template": [
+     "ဒီနေ့ ရွေးထားတဲ့ အဆင်လေးတွေပါ"
+    ]
+   },
+   "intro": {
+    "pattern": [
+     "{pattern} အဆင်လေး အရောင် {n} မျိုး ရှိပါတယ်ရှင့် ({letters})"
+    ],
+    "colour": [
+     "အရောင်တူ အဆင် {n} မျိုး စုထားပါတယ်ရှင့်\n{codes}"
+    ],
+    "new": [
+     "အဆင်သစ်လေးတွေ ရောက်ပါပြီနော် ✨ {codes}"
+    ],
+    "template": [
+     "ဒီနေ့ ရွေးထားတဲ့ အဆင်လေးတွေပါ {codes}"
+    ]
+   },
+   "price": {
+    "single": [
+     "တစ်ထည် {price}"
+    ],
+    "from": "{price} ကစပြီး",
+    "tax": "",
+    "offer": " (၁၁ ထည်ယူရင် ၁ ထည် free)",
+    "end": "",
+    "multi": [
+     "{price_lines}"
+    ],
+    "tax_multi": ""
+   },
+   "cta": [
+    "မှာချင်ရင် Messenger ကို code လေး ပို့ပေးပါနော် 👉 {link}"
+   ],
+   "sold_out": "{so} ကတော့ ပြတ်နေပါတယ်၊ ပြန်ရောက်ရင် ပြောပေးပါမယ်ရှင့်"
+  }
+ }
+}
