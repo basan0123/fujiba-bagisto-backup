@@ -261,6 +261,36 @@ class Roll(Family):
         return self.finish(out, p, {'inverse_warp': m, 'min_exact_share': 0.15})
 
 
+class Hero(Family):
+    """6: 4:5 hero collage = close-up crops (family 3) + colour stack bands (family 5)."""
+    id, name = 6, 'hero'
+
+    def render(self, ctx, out):
+        p = ctx
+        self.begin(CREAM)
+        img = self.src(p['image'])
+        boxes = detail_boxes(img, 1, int(img.width * 0.62))           # hero ~1:1 photo scale
+        boxes += detail_boxes(img, 2, min(img.width, img.height) // 4)
+        self.text((60, 56), p['name'], 64, INK, 'serif')
+        self.text((W - 60, 66), f"¥{int(p['price']):,}", 52, INK, 'serif', 'r')
+        self.d.line((60, 160, W - 60, 160), fill=GOLD, width=3)
+        self.fabric(p['image'], boxes[0], (60, 186, 960, 560))
+        self.fabric(p['image'], boxes[1], (60, 766, 460, 225))
+        self.fabric(p['image'], boxes[2], (60, 1011, 460, 225))
+        mem = sorted(p['series_members'], key=lambda m: m['product_id'] != p['product_id'])
+        n, gap, y0, tot = len(mem), 10, 766, 470
+        bh = (tot - gap * (n - 1)) // n
+        for i, m in enumerate(mem):
+            mi = self.src(m['image'])
+            sh = round(mi.width * bh / 380)
+            y = y0 + i * (bh + gap)
+            self.fabric(m['image'], (0, (mi.height - sh) // 2, mi.width, sh), (560, y, 380, bh))
+            self.text((952, y + bh // 2 - 16), m['name'][-1], 32, INK, 'serif')
+        self.text((560, 1246), f"{n} colours in stock · approx. scale", 26, MUTED, 'sans')
+        self.material_size(p, 1250, 60, 26)
+        return self.finish(out, p, {'crop_boxes': boxes, 'members': [m['name'] for m in mem]})
+
+
 class NeedsModel(Family):
     enabled = False
 
@@ -276,7 +306,7 @@ class Garment(NeedsModel):
     id, name = 2, 'garment'
 
 
-REGISTRY = {f.id: f for f in (Worn, Garment, Closeup, Stack, Roll)}
+REGISTRY = {f.id: f for f in (Worn, Garment, Closeup, Stack, Roll, Hero)}
 ORDER = [1, 2, 3, 4, 5, 6]
 
 
