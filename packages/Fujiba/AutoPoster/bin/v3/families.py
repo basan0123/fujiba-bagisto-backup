@@ -14,7 +14,7 @@ from PIL import Image, ImageDraw
 
 HERE = os.path.dirname(os.path.abspath(__file__))
 sys.path.insert(0, os.path.join(os.path.dirname(HERE), 'v2'))
-from common import CREAM, GOLD, INK, cover, crop_box, draw_text, load, save_master, save_sidecar  # noqa: E402
+from common import CREAM, GOLD, INK, cover, crop_box, draw_text, gradient, load, save_master, save_sidecar, shadow  # noqa: E402
 
 W, H = 1080, 1350
 MUTED = (110, 104, 96)
@@ -132,6 +132,39 @@ class Closeup(Family):
         return self.finish(out, p, {'crop_boxes': boxes})
 
 
+class Stack(Family):
+    """5: same pattern, every in-stock colour, folded stack on a light gift background."""
+    id, name = 5, 'stack'
+
+    def render(self, ctx, out):
+        p = ctx
+        mem = sorted(p['series_members'], key=lambda m: m['product_id'] != p['product_id'])
+        self.begin((246, 241, 233))
+        self.canvas.paste(gradient(W, H, (251, 248, 242), (236, 228, 216)), (0, 0))
+        self.text((60, 64), p['series'], 64, INK, 'serif')
+        self.text((60, 150), f'{len(mem)} colours in stock · gift-ready folds', 30, MUTED, 'sans')
+        self.d.line((60, 200, W - 60, 200), fill=GOLD, width=3)
+        sw, top_h, band, gap = 680, 420, 190, 10
+        x = 70
+        total = top_h + gap + (len(mem) - 1) * (band + gap)
+        y = 250
+        shadow(self.canvas, (x, y, x + sw, y + total), radius=22, offset=(0, 16), opacity=70)
+        for i, m in enumerate(mem):
+            img = self.src(m['image'])
+            h = top_h if i == 0 else band
+            # band = a horizontal strip of the photo (as the folded edge would show it)
+            sh = round(img.width * h / sw)
+            sy = (img.height - sh) * (i + 1) // (len(mem) + 1)
+            self.fabric(m['image'], (0, sy, img.width, sh), (x, y, sw, h))
+            ty = y + h // 2 - 40
+            self.text((x + sw + 40, ty), m['name'], 40, INK, 'serif')
+            self.text((x + sw + 40, ty + 52), f"¥{int(m['price']):,}", 34, MUTED, 'serif')
+            y += h + gap
+        self.text((x, y + 30), 'approx. scale · real photo of each colour', 26, MUTED, 'sans')
+        self.material_size(p, y + 80, x)
+        return self.finish(out, p, {'members': [m['name'] for m in mem]})
+
+
 class NeedsModel(Family):
     enabled = False
 
@@ -147,7 +180,7 @@ class Garment(NeedsModel):
     id, name = 2, 'garment'
 
 
-REGISTRY = {f.id: f for f in (Worn, Garment, Closeup)}
+REGISTRY = {f.id: f for f in (Worn, Garment, Closeup, Stack)}
 ORDER = [1, 2, 3, 4, 5, 6]
 
 
