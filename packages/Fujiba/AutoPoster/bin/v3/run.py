@@ -70,6 +70,12 @@ def main():
         gate = json.loads(g.stdout)
         with open(base + '.gate.json', 'w') as f:
             json.dump(gate, f, ensure_ascii=False, indent=1)
+        inv = side.get('inverse_warp')
+        if inv is not None and not inv.get('pass'):
+            gate['passed'] = False                      # inverse-warp check is part of the gate for warped fabric
+            gate.setdefault('checks', []).append({'check': 'roll_inverse_warp', **inv})
+            with open(base + '.gate.json', 'w') as f:
+                json.dump(gate, f, ensure_ascii=False, indent=1)
         delivered = None
         if gate.get('passed'):
             dv = subprocess.run([sys.executable, os.path.join(BIN, 'v2', 'deliver.py'), master, base + '.gate.json', base + '.jpg'],
