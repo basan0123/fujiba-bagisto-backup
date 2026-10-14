@@ -55,12 +55,13 @@ def main():
     only = {int(a) for a in sys.argv[4:]}
     ctx = json.load(open(ctx_file))
     fam = families.get(fid)
+    tag = fam.name + (f'-{fam.variant}' if getattr(fam, 'variant', None) else '')
     rows = []
     for p in ctx['products']:
         if only and p['product_id'] not in only:
             continue
         t0 = time.time()
-        base = os.path.join(out_dir, f"F{fid}-{fam.name}-{p['name']}")
+        base = os.path.join(out_dir, f"F{fid}-{tag}-{p['name']}")
         master = base + '.png'
         side = fam.render(p, master)
         nonzero(master)
@@ -83,11 +84,11 @@ def main():
             delivered = json.loads(dv.stdout.strip().splitlines()[-1])
             nonzero(base + '.jpg')
         sbs = side_by_side(master, side, base)
-        rows.append({'product': p['name'], 'family': fam.name, 'passed': gate.get('passed'), 'summary': gate.get('summary'),
+        rows.append({'product': p['name'], 'family': tag, 'passed': gate.get('passed'), 'summary': gate.get('summary'),
                      'extra': side.get('inverse_warp'), 'delivered': delivered, 'sbs': sbs,
                      'seconds': round(time.time() - t0, 2)})
         print(json.dumps(rows[-1], ensure_ascii=False))
-    with open(os.path.join(out_dir, f'F{fid}.summary.json'), 'w') as f:
+    with open(os.path.join(out_dir, f"F{fid}{getattr(fam, 'variant', '')}.summary.json"), 'w') as f:
         json.dump(rows, f, ensure_ascii=False, indent=1)
     return 0 if rows and all(r['passed'] for r in rows) else 2
 

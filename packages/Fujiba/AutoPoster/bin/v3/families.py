@@ -402,3 +402,8 @@ def enabled_ids():
 
 def get(fid):
     return REGISTRY[int(fid)]()
+
+
+
+if 'fam_collection' not in sys.modules:   # family 8 registers itself (it subclasses Family from here)
+    import fam_collection  # noqa: E402,F401
