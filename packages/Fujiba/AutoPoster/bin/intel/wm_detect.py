@@ -16,6 +16,9 @@ Two styles exist in the catalogue, so two independent detectors (either => prese
     wm_detect.py detect <img> [...]
     wm_detect.py crop <img> --aspect 0.75     largest wm-free fabric rect (w/h)
     wm_detect.py build-template <B.jpg> <D.jpg>
+    wm_detect.py build-white-template <tenant product root>   (FV-82-C + FW-81-A)
+  3. white   – small white script (FV-82-C / FW-81-A style): NCC on a whiteness map
+               against wm_white_tpl.npz, multi-scale/angle.
 """
 import argparse, csv, difflib, io, json, subprocess, sys, tempfile
 import os
@@ -26,6 +29,24 @@ sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
 import heavy_guard  # noqa: E402
 
 TPL = '/var/www/bagisto/storage/app/intel/twin/wm_script_tpl.npz'
+# 2nd template family (2026-10-14 round 4): small WHITE script (FV-82-C on fabric next to the
+# grey backdrop tiles, FW-81-A larger). Matched on a "whiteness" map (bright AND unsaturated),
+# not on the high-pass residual (residual cross-photo NCC was only 0.07-0.09: fabric texture
+# dominates). Built by `build-white-template`, stored outside git next to TPL.
+WHITE_TPL = '/var/www/bagisto/storage/app/intel/twin/wm_white_tpl.npz'
+WHITE_SRC = {  # sku: (product-photo path suffix, box at WORK=2000 scale x,y,w,h)
+    'FV-82-C': ('1944/FV-82-C.jpeg', (440, 910, 250, 190)),
+    'FW-81-A': ('1898/FW-81-A.jpeg', (350, 1000, 440, 335)),
+}
+WHITE_WORK = 1000          # whiteness matching runs at half the script working size (speed)
+WHITE_SCALES = (0.5, 0.6, 0.7, 0.8, 0.9, 1.0, 1.15, 1.3, 1.5, 1.75, 2.0)
+WHITE_ANGLES = (-12, -6, 0, 6, 12)
+WHITE_THRESH = 0.60
+# 20-photo eval (storage/app/intel/twin/wm_eval.json): whiteness-NCC self-match FV-82-C 0.965 /
+# FW-81-A 0.992; all 10 negatives <= 0.49 (best 0.4915). This is IN-SAMPLE MEMORISATION:
+# cross-photo (leave-one-out) the FV-82-C template scores FW-81-A only 0.306 and vice versa
+# 0.309 — below several negatives — so on unseen photos of this style expect ~0 extra recall.
+# A masked-stroke variant (TM_CCORR_NORMED) did not separate either (FW-81-D 0.791 = FW-81-A).
 SCRIPT_THRESH = 0.25    # FV-89-B 0.55 / D 0.57 vs <= 0.064 on 40 wm-free / other-style photos
 SCRIPT_SCALES = (0.9, 1.0, 1.1)
 # OCR angle sweep widened to +-85 deg (2026-10-14): the FV-61-C mark (~-60 deg) was missed at +-30.
@@ -54,6 +75,58 @@ def _work(bgr):
 
 def residual(gray):
     return gray.astype(np.float32) - cv2.medianBlur(gray, 21).astype(np.float32)
+
+
+def whiteness(bgr):
+    hsv = cv2.cvtColor(bgr, cv2.COLOR_BGR2HSV)
+    v = (hsv[..., 2].astype(np.float32) - 150).clip(0, 105) / 105
+    sat = (80 - hsv[..., 1].astype(np.float32)).clip(0, 80) / 80
+    return v * sat
+
+
+_wtpl = None
+
+
+def _white_templates():
+    global _wtpl
+    if _wtpl is None:
+        d = np.load(WHITE_TPL)
+        _wtpl = [(k, d[k].astype(np.float32)) for k in d.files]
+    return _wtpl
+
+
+def detect_white(bgr, templates=None):
+    f = WHITE_WORK / max(bgr.shape[:2])
+    w = whiteness(cv2.resize(bgr, None, fx=f, fy=f, interpolation=cv2.INTER_AREA))
+    best = (-1.0, None, None)
+    for name, T in (templates or _white_templates()):
+        for s in WHITE_SCALES:
+            t = cv2.resize(T, None, fx=s, fy=s, interpolation=cv2.INTER_LINEAR)
+            if t.shape[0] < 24 or t.shape[0] >= w.shape[0] or t.shape[1] >= w.shape[1]:
+                continue
+            for ang in WHITE_ANGLES:
+                tt = t if ang == 0 else cv2.warpAffine(
+                    t, cv2.getRotationMatrix2D((t.shape[1] / 2, t.shape[0] / 2), ang, 1), (t.shape[1], t.shape[0]))
+                if tt.std() < 1e-3:
+                    continue
+                r = cv2.matchTemplate(w, tt, cv2.TM_CCOEFF_NORMED)
+                _, mv, _, ml = cv2.minMaxLoc(r)
+                if mv > best[0]:
+                    best = (float(mv), [ml[0] / f, ml[1] / f, tt.shape[1] / f, tt.shape[0] / f], name)
+    sc, box, name = best
+    hit = sc >= WHITE_THRESH
+    return {'score': round(sc, 4), 'threshold': WHITE_THRESH, 'hit': hit, 'template': name,
+            'box': [int(v) for v in box] if hit else None}
+
+
+def build_white_template(root):
+    out = {}
+    for sku, (suffix, (x, y, w, h)) in WHITE_SRC.items():
+        img = _work(cv2.imread(os.path.join(root, suffix)))[0]
+        t = whiteness(img)[y:y + h, x:x + w]
+        out[sku] = cv2.resize(t, None, fx=WHITE_WORK / WORK, fy=WHITE_WORK / WORK, interpolation=cv2.INTER_AREA)
+    np.savez_compressed(WHITE_TPL, **out)
+    return {'template': WHITE_TPL, 'skus': list(out)}
 
 
 def detect_script(bgr):
@@ -123,9 +196,10 @@ def detect_ocr(bgr):
 
 def detect(bgr, use_ocr=True):
     s = detect_script(bgr)
+    wt = detect_white(bgr)
     o = detect_ocr(bgr) if use_ocr else {'hit': False, 'box': None, 'reads': []}
-    boxes = [b for b in (s['box'], o['box']) if b]
-    return {'watermark_present': bool(boxes), 'boxes': boxes, 'script': s, 'ocr': o}
+    boxes = [b for b in (s['box'], wt['box'], o['box']) if b]
+    return {'watermark_present': bool(boxes), 'boxes': boxes, 'script': s, 'white': wt, 'ocr': o}
 
 
 def fabric_mask(bgr):
@@ -215,12 +289,15 @@ def build_template(b_path, d_path, box=(740, 990, 510, 400), dxy=(29, -5)):
 
 def main():
     ap = argparse.ArgumentParser()
-    ap.add_argument('mode', choices=['detect', 'crop', 'build-template'])
+    ap.add_argument('mode', choices=['detect', 'crop', 'build-template', 'build-white-template'])
     ap.add_argument('images', nargs='+')
     ap.add_argument('--aspect', type=float, default=1.0)
     ap.add_argument('--no-ocr', action='store_true')
     a = ap.parse_args()
     heavy_guard.acquire('wm_detect')
+    if a.mode == 'build-white-template':   # images[0] = tenant product image root
+        print(json.dumps(build_white_template(a.images[0])))
+        return 0
     if a.mode == 'build-template':
         print(json.dumps(build_template(*a.images[:2])))
         return 0

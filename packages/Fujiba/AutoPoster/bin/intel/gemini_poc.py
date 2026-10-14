@@ -32,11 +32,10 @@ MODELS = {
     # Nano Banana Pro — $2/M in, $12/M text+thinking out, $120/M image out (=$0.134 per 1K/2K image)
     'generate-pro': {'id': 'gemini-3-pro-image', 'in': 2.00, 'out_text': 12.00, 'out_img': 120.00,
                      'max_in_tokens': 6000, 'max_out_tokens': 8192, 'images': 1, 'per_image_usd': 0.134},
-    # Veo 3.1 Lite — $0.05/s at 720p (audio always on, included); predictLongRunning
-    'video': {'id': 'veo-3.1-lite-generate-preview', 'usd_per_s': 0.05, 'seconds': 8},
+    # Veo REMOVED 2026-10-14 (round 4): in round 3 (preview/2026-10-14-gemini-round3/c_veo_*)
+    # Veo 3.1 Lite redrew the fabric pattern within 4 s of the 8 s clip, so generated motion
+    # can never be trusted with real fabric. No 'video' mode, model id or endpoint remains.
 }
-VEO_API = 'https://generativelanguage.googleapis.com/v1beta/models/{m}:predictLongRunning'
-OP_API = 'https://generativelanguage.googleapis.com/v1beta/'
 
 ANALYSE_PROMPT = """You are analysing a product photo of a Japanese cotton kimono-print fabric.
 Describe ONLY what is visible. Return STRICT JSON, no markdown, with this shape:
@@ -103,8 +102,6 @@ def db_prior_jpy(outdir):
 
 
 def worst_case_jpy(m):
-    if 'usd_per_s' in m:
-        return m['usd_per_s'] * m['seconds'] * YEN_PER_USD
     usd = (m['max_in_tokens'] * m['in'] + m['max_out_tokens'] * m['out_text']) / 1e6
     usd += m['images'] * m['per_image_usd']
     return usd * YEN_PER_USD
@@ -135,7 +132,7 @@ def downscale_jpeg(path, size=1024):
 
 def main():
     ap = argparse.ArgumentParser()
-    ap.add_argument('mode', choices=['analyse', 'generate', 'generate-pro', 'video'])
+    ap.add_argument('mode', choices=['analyse', 'generate', 'generate-pro'])
     ap.add_argument('--source', required=True)
     ap.add_argument('--outdir', required=True)
     ap.add_argument('--prior-spend-jpy', type=float, default=0.0,
@@ -146,7 +143,7 @@ def main():
                     help='per-round cap: refuse if this outdir ledger spend + worst-case estimate > cap')
     ap.add_argument('--ref', action='append', default=[],
                     help='extra reference image(s) sent after --source (generate)')
-    ap.add_argument('--aspect', default='1:1', help='generate*/video aspect ratio')
+    ap.add_argument('--aspect', default='1:1', help='generate* aspect ratio')
     ap.add_argument('--product-id', type=int, default=None)
     a = ap.parse_args()
     heavy_guard.acquire('gemini_poc')
@@ -154,8 +151,6 @@ def main():
     m = MODELS[a.mode]
     img_b64 = downscale_jpeg(a.source)
     a.prior_spend_jpy = max(a.prior_spend_jpy, db_prior_jpy(a.outdir))
-    if a.mode == 'video':
-        return run_video(a, m, img_b64)
 
     body = {'contents': [{'role': 'user', 'parts': [
         {'inline_data': {'mime_type': 'image/jpeg', 'data': img_b64}},
@@ -252,79 +247,6 @@ def main():
         print(json.dumps(result))
         return 0 if entry['status'] == 'ok' else 6
     return 7
-
-
-def _budget_ok(a, est):
-    led = load_ledger(a.outdir)
-    round_spent = sum(e.get('cost_jpy_charged', 0) for e in led)
-    spent = a.prior_spend_jpy + round_spent
-    if spent + est > BUDGET_JPY or (a.round_cap_jpy is not None and round_spent + est > a.round_cap_jpy):
-        print(json.dumps({'refused': True, 'spent_jpy': spent, 'round_spent_jpy': round_spent,
-                          'estimate_jpy': est, 'round_cap_jpy': a.round_cap_jpy}))
-        return None
-    return spent
-
-
-def run_video(a, m, img_b64):
-    """ONE Veo image-to-video operation (no retries: each submit may bill)."""
-    key = read_key()
-    est = worst_case_jpy(m)
-    spent = _budget_ok(a, est)
-    if spent is None:
-        return 4
-    prompt = open(a.prompt_file, encoding='utf-8').read()
-    body = {'instances': [{'prompt': prompt,
-                           'image': {'bytesBase64Encoded': img_b64, 'mimeType': 'image/jpeg'}}],
-            'parameters': {'aspectRatio': a.aspect, 'resolution': '720p',
-                           'durationSeconds': m['seconds'], 'personGeneration': 'allow_adult'}}
-    entry = {'ts': datetime.datetime.now().isoformat(timespec='seconds'), 'mode': 'video',
-             'model': m['id'], 'attempt': 0, 'estimate_jpy': round(est, 4),
-             'spent_before_jpy': round(spent, 4), 'out_name': a.out_name, 'product_id': a.product_id}
-    led = load_ledger(a.outdir)
-    hdr = {'Content-Type': 'application/json', 'x-goog-api-key': key}
-    try:
-        req = urllib.request.Request(VEO_API.format(m=m['id']), data=json.dumps(body).encode(),
-                                     headers=hdr, method='POST')
-        with urllib.request.urlopen(req, timeout=120) as r:
-            op = json.loads(r.read())
-    except urllib.error.HTTPError as e:
-        msg = e.read().decode(errors='replace')[:600]
-        entry.update(status=f'http_{e.code}', error=msg, cost_jpy_charged=0.0 if 400 <= e.code < 500 else est)
-        led.append(entry); save_ledger(a.outdir, led)
-        print(json.dumps({'status': entry['status'], 'error': msg}))
-        return 5
-    entry['operation_name'] = op.get('name')
-    # charge worst case from submit on (a running op may bill even if we lose it)
-    entry.update(status='submitted', cost_jpy_charged=est)
-    led.append(entry); save_ledger(a.outdir, led)
-    t0 = time.time()
-    while not op.get('done'):
-        if time.time() - t0 > 900:
-            entry['status'] = 'poll_timeout'; save_ledger(a.outdir, led)
-            return 6
-        time.sleep(10)
-        with urllib.request.urlopen(urllib.request.Request(OP_API + op['name'], headers=hdr), timeout=60) as r:
-            op = json.loads(r.read())
-    if 'error' in op:
-        entry.update(status='op_error', error=json.dumps(op['error'])[:600])
-        save_ledger(a.outdir, led)
-        print(json.dumps({'status': 'op_error', 'error': op['error']}))
-        return 6
-    gvr = op.get('response', {}).get('generateVideoResponse', {})
-    samples = gvr.get('generatedSamples') or []
-    if not samples:
-        entry.update(status='no_video', error=json.dumps(gvr)[:600], cost_jpy_charged=0.0)
-        save_ledger(a.outdir, led)
-        print(json.dumps({'status': 'no_video', 'detail': gvr}))
-        return 6
-    out = os.path.join(a.outdir, a.out_name + '.mp4')
-    with urllib.request.urlopen(urllib.request.Request(samples[0]['video']['uri'], headers={'x-goog-api-key': key}),
-                                timeout=300) as r, open(out, 'wb') as f:
-        f.write(r.read())
-    entry.update(status='ok', video_seconds=m['seconds'], actual_jpy=round(est, 4), cost_jpy_charged=round(est, 4))
-    save_ledger(a.outdir, led)
-    print(json.dumps({'status': 'ok', 'model': m['id'], 'video': out, 'actual_jpy': round(est, 4)}))
-    return 0
 
 
 if __name__ == '__main__':
