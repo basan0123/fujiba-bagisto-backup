@@ -4,7 +4,7 @@ import tempfile
 import unittest
 
 import numpy as np
-from PIL import Image
+from PIL import Image, ImageDraw
 
 HERE = os.path.dirname(os.path.abspath(__file__))
 sys.path.insert(0, HERE)
@@ -52,7 +52,13 @@ class Geometry(unittest.TestCase):
 
     def test_fold_and_circle_gate(self):
         rng = np.random.default_rng(1)
-        photo = np.asarray(Image.fromarray(rng.integers(0, 255, (60, 80, 3), dtype=np.uint8)).resize((800, 600), Image.BICUBIC))
+        im = Image.new('RGB', (800, 600), (30, 30, 40))
+        dr = ImageDraw.Draw(im)
+        for _ in range(400):                                   # print-like motifs with corners
+            x, y, r = rng.integers(0, 800), rng.integers(0, 600), rng.integers(6, 30)
+            c = tuple(int(v) for v in rng.integers(60, 255, 3))
+            (dr.ellipse if rng.random() < .5 else dr.rectangle)((x - r, y - r, x + r, y + r), fill=c, outline=(250, 240, 200), width=2)
+        photo = np.asarray(im)
         with tempfile.TemporaryDirectory() as td:
             src = os.path.join(td, 'p.png')
             Image.fromarray(photo).save(src)
@@ -60,7 +66,7 @@ class Geometry(unittest.TestCase):
             fam.begin(C.PAPER)
             fam.crops, fam._pending_flaps = [], []
             fam.safe_rect = lambda path, aspect: (20, 20, 700, int(700 / aspect))
-            fam.folded(src, 60, 200, 330, 50, 240)
+            fam.folded(src, 60, 200, 330, 96, 194)
             fam.circle(src, (100, 100, 200, 200), 430, 220, 250)
             out = os.path.join(td, 'm.png')
             inv = fam.verify_flaps(os.path.join(td, 'm'))

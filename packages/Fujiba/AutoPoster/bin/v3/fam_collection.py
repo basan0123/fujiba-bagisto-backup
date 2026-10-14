@@ -120,7 +120,7 @@ def fonts_sample(out):
 class Collection(F.Family):
     """8: series collection poster (folded pieces + circle zoom-ins + catalog colour names)."""
     id, name = 8, 'collection'
-    FLAP_INSET = 0.07      # top edge of the flap is 7% narrower each side (receding)
+    FLAP_INSET = 0.05      # top edge of the flap is 5% narrower each side (receding)
 
     def __init__(self, layout=None):
         self.variant = (layout or os.environ.get('V3_LAYOUT') or 'A').upper()
@@ -165,7 +165,7 @@ class Collection(F.Family):
         """Folded piece = perspective top flap (unchecked + inverse-warp verified) + 4px fold
         gap (paper, non-fabric) + flat face (gated). Returns its bbox."""
         import cv2
-        flap_flat = int(round(flap_h * 1.8))            # foreshortened: flat flap is taller
+        flap_flat = int(round(flap_h * 1.15))           # mild foreshortening (stays inverse-verifiable)
         cx, cy, cw, ch = self.safe_rect(path, w / (flap_flat + face_h))
         fh_src = round(ch * flap_flat / (flap_flat + face_h))
         flap_src = (cx, cy, cw, fh_src)
@@ -302,8 +302,8 @@ class Collection(F.Family):
         y = 236
         for i, m in enumerate(mem):
             x = 60 + i * (w + gap)
-            shadow(self.canvas, (x, y, x + w, y + 64 + 380), radius=16, offset=(0, 10), opacity=55)
-            self.folded(m['image'], x, y, w, 60, 380)
+            shadow(self.canvas, (x, y, x + w, y + 104 + 340), radius=16, offset=(0, 10), opacity=55)
+            self.folded(m['image'], x, y, w, 100, 340)
             self.chip(x, y + 460, m, w, center=True)
         d = min(230, w - 40)
         for i, m in enumerate(mem):
@@ -313,7 +313,7 @@ class Collection(F.Family):
 
     def layout_B(self, p, mem):
         """Cascading stack (back = top-left, front = bottom-right) + one big circle on the right."""
-        w, flap, face, dx, dy = 380, 60, 400, 130, 210
+        w, flap, face, dx, dy = 380, 100, 360, 130, 230
         x0, y0 = 60, 236
         boxes = [(x0 + i * dx, y0 + i * dy) for i in range(len(mem))]
         for bx, by in boxes:
@@ -340,8 +340,8 @@ class Collection(F.Family):
         rowh, y = 312, 222
         for m in mem:
             x = 60
-            shadow(self.canvas, (x, y, x + 330, y + 50 + 4 + 240), radius=14, offset=(0, 8), opacity=50)
-            self.folded(m['image'], x, y, 330, 50, 240)
+            shadow(self.canvas, (x, y, x + 330, y + 96 + 4 + 194), radius=14, offset=(0, 8), opacity=50)
+            self.folded(m['image'], x, y, 330, 96, 194)
             d = 250
             self.circle(m['image'], self.circle_box(m['image'], 5), 430, y + 22, d)
             self.chip(720, y + 50, m, 300)
