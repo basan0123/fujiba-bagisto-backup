@@ -274,10 +274,9 @@ def run_video(a, m, img_b64):
         return 4
     prompt = open(a.prompt_file, encoding='utf-8').read()
     body = {'instances': [{'prompt': prompt,
-                           'image': {'inlineData': {'mimeType': 'image/jpeg', 'data': img_b64}}}],
+                           'image': {'bytesBase64Encoded': img_b64, 'mimeType': 'image/jpeg'}}],
             'parameters': {'aspectRatio': a.aspect, 'resolution': '720p',
-                           'durationSeconds': m['seconds'], 'personGeneration': 'allow_adult',
-                           'numberOfVideos': 1}}
+                           'durationSeconds': m['seconds'], 'personGeneration': 'allow_adult'}}
     entry = {'ts': datetime.datetime.now().isoformat(timespec='seconds'), 'mode': 'video',
              'model': m['id'], 'attempt': 0, 'estimate_jpy': round(est, 4),
              'spent_before_jpy': round(spent, 4), 'out_name': a.out_name, 'product_id': a.product_id}
