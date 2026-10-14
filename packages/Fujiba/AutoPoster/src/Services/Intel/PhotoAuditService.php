@@ -16,7 +16,7 @@ use Illuminate\Support\Facades\Log;
  */
 class PhotoAuditService
 {
-    public const ANALYSIS_VERSION = 'm1';
+    public const ANALYSIS_VERSION = 'm2';   // m2: local watermark_present detector
 
     /**
      * @return array{analysed:int,cache_hits:int,reshoot:int}
@@ -63,7 +63,7 @@ class PhotoAuditService
                 'fabric_visibility'       => $result['fabric_visibility'],
                 'background_quality'      => $result['background_quality'],
                 'perspective_quality'     => $result['perspective_quality'],
-                'watermark_detected'      => $result['watermark_detected'],
+                'watermark_detected'      => $result['watermark_present'] ?? $result['watermark_detected'],
                 'packaging_obstruction'   => $result['packaging_obstruction'],
                 'photo_quality_score'     => $result['photo_quality_score'],
                 'reshoot_required'        => $result['reshoot_required'],

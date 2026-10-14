@@ -3,7 +3,7 @@
 M — Product photography intelligence.
 
 Everything here is MEASURED locally (cv2 + numpy). No AI call, no network, so
-it is a fact rather than an inference. Vision-model checks (watermark text,
+it is a fact rather than an inference. Watermark text is detected locally (wm_detect.py); vision-model checks (
 packaging) are reported as null + 'needs_vision' rather than guessed.
 
     photo_audit.py <image> [<image> ...] [--json]
@@ -24,10 +24,14 @@ import sys
 import cv2
 import numpy as np
 
+sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
+import wm_detect  # noqa: E402
+
 DEFAULTS = {
     'min_long_side': 1600,
     'min_sharpness': 100.0,
     'min_fabric_visibility': 0.60,
+    'watermark_ocr': True,   # OCR path ~10-20s/image; template path is ~1s
 }
 
 
@@ -138,7 +142,11 @@ def audit(path, cfg):
         - 0.20 * expo,
         0.0, 1.0))
 
+    wm = wm_detect.detect(bgr, use_ocr=bool(cfg.get('watermark_ocr', True)))
+
     reasons = []
+    if wm['watermark_present']:
+        reasons.append('watermark text baked into photo (crops/ads must avoid it; reshoot clean)')
     if long_side < cfg['min_long_side']:
         reasons.append(f'low resolution ({w}x{h}, long side < {cfg["min_long_side"]}px)')
     if sharp < cfg['min_sharpness']:
@@ -168,10 +176,13 @@ def audit(path, cfg):
         'fabric_visibility': round(vis, 4),
         'background_quality': round(bg, 4),
         'perspective_quality': round(persp, 4),
-        # Need a vision model; reported honestly rather than guessed.
-        'watermark_detected': None,
+        # Local detector (wm_detect.py: template NCC + tesseract OCR), not a vision model.
+        'watermark_present': wm['watermark_present'],
+        'watermark_detected': wm['watermark_present'],
+        'watermark_boxes': wm['boxes'],
+        'watermark_script_score': wm['script']['score'],
         'packaging_obstruction': None,
-        'needs_vision': ['watermark_detected', 'packaging_obstruction'],
+        'needs_vision': ['packaging_obstruction'],
         'photo_quality_score': round(score, 4),
         'reshoot_required': bool(reasons),
         'reshoot_reason': '; '.join(reasons) or None,

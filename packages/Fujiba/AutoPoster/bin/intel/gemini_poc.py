@@ -118,6 +118,10 @@ def main():
                     help='gemini spend already recorded in fi_ai_usage outside this ledger')
     ap.add_argument('--prompt-file', help='generate: prompt text file (default GENERATE_PROMPT)')
     ap.add_argument('--out-name', default='raw_generated', help='generate: output basename')
+    ap.add_argument('--round-cap-jpy', type=float, default=None,
+                    help='per-round cap: refuse if this outdir ledger spend + worst-case estimate > cap')
+    ap.add_argument('--ref', action='append', default=[],
+                    help='extra reference image(s) sent after --source (generate)')
     a = ap.parse_args()
     heavy_guard.acquire('gemini_poc')
     os.makedirs(a.outdir, exist_ok=True)
@@ -126,6 +130,7 @@ def main():
 
     body = {'contents': [{'role': 'user', 'parts': [
         {'inline_data': {'mime_type': 'image/jpeg', 'data': img_b64}},
+        *[{'inline_data': {'mime_type': 'image/jpeg', 'data': downscale_jpeg(r)}} for r in a.ref],
         {'text': ANALYSE_PROMPT if a.mode == 'analyse' else (open(a.prompt_file, encoding='utf-8').read() if a.prompt_file else GENERATE_PROMPT)}]}]}
     if a.mode == 'analyse':
         body['generationConfig'] = {'responseMimeType': 'application/json',
@@ -138,10 +143,15 @@ def main():
     key = read_key()
     for attempt in range(MAX_RETRIES + 1):
         led = load_ledger(a.outdir)
-        spent = a.prior_spend_jpy + sum(e.get('cost_jpy_charged', 0) for e in led)
+        round_spent = sum(e.get('cost_jpy_charged', 0) for e in led)
+        spent = a.prior_spend_jpy + round_spent
         est = worst_case_jpy(m)
         if spent + est > BUDGET_JPY:
             print(json.dumps({'refused': True, 'spent_jpy': spent, 'estimate_jpy': est}))
+            return 4
+        if a.round_cap_jpy is not None and round_spent + est > a.round_cap_jpy:
+            print(json.dumps({'refused': True, 'reason': 'round cap', 'round_spent_jpy': round_spent,
+                              'estimate_jpy': est, 'round_cap_jpy': a.round_cap_jpy}))
             return 4
         entry = {'ts': datetime.datetime.now().isoformat(timespec='seconds'), 'mode': a.mode,
                  'model': m['id'], 'attempt': attempt, 'estimate_jpy': round(est, 4),
