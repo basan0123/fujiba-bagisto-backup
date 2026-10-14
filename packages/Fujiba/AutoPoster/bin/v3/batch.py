@@ -390,7 +390,18 @@ def main():
         log(f"{pid} {p['name']} img={man['family']} ({len(attempts)} try) video={vid.get('passed')} {man['seconds']}s")
 
     write_summary(sc, skips, t_start)
+    refresh_library()
     return 0
+
+
+def refresh_library():
+    """Re-index the private creative library after a run; never affects the batch result."""
+    try:
+        import subprocess
+        subprocess.run([sys.executable, os.path.join(os.path.dirname(os.path.abspath(__file__)), 'library.py')],
+                       timeout=600, check=False, capture_output=True)
+    except Exception as exc:  # noqa: BLE001
+        log('library refresh failed', repr(exc))
 
 
 def write_summary(sc, skips, t_start):
