@@ -116,6 +116,8 @@ def main():
     ap.add_argument('--outdir', required=True)
     ap.add_argument('--prior-spend-jpy', type=float, default=0.0,
                     help='gemini spend already recorded in fi_ai_usage outside this ledger')
+    ap.add_argument('--prompt-file', help='generate: prompt text file (default GENERATE_PROMPT)')
+    ap.add_argument('--out-name', default='raw_generated', help='generate: output basename')
     a = ap.parse_args()
     heavy_guard.acquire('gemini_poc')
     os.makedirs(a.outdir, exist_ok=True)
@@ -124,7 +126,7 @@ def main():
 
     body = {'contents': [{'role': 'user', 'parts': [
         {'inline_data': {'mime_type': 'image/jpeg', 'data': img_b64}},
-        {'text': ANALYSE_PROMPT if a.mode == 'analyse' else GENERATE_PROMPT}]}]}
+        {'text': ANALYSE_PROMPT if a.mode == 'analyse' else (open(a.prompt_file, encoding='utf-8').read() if a.prompt_file else GENERATE_PROMPT)}]}]}
     if a.mode == 'analyse':
         body['generationConfig'] = {'responseMimeType': 'application/json',
                                     'maxOutputTokens': m['max_out_tokens']}
@@ -194,7 +196,7 @@ def main():
             else:
                 d = imgs[0].get('inlineData') or imgs[0].get('inline_data')
                 ext = '.png' if 'png' in d.get('mimeType', d.get('mime_type', '')) else '.jpg'
-                out = os.path.join(a.outdir, 'raw_generated' + ext)
+                out = os.path.join(a.outdir, a.out_name + ext)
                 with open(out, 'wb') as f:
                     f.write(base64.b64decode(d['data']))
                 result['raw_image'] = out
