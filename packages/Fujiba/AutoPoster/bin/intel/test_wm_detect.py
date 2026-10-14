@@ -11,7 +11,8 @@ import wm_detect  # noqa: E402
 
 ROOT = '/var/www/bagisto/storage/app/public/tenants/1/1bd1181f-fcd5-4238-a12d-a207d6ea4006/product'
 POS = {'FV-89-B': f'{ROOT}/2075/FV-89-B.jpeg', 'FV-89-C': f'{ROOT}/2108/FV-89-C.jpeg',
-       'FV-89-D': f'{ROOT}/2077/FV-89-D.jpeg'}
+       'FV-89-D': f'{ROOT}/2077/FV-89-D.jpeg',
+       'FV-61-C': f'{ROOT}/2195/FV-61-C.jpeg'}   # faint blue mark at ~-60 deg
 # known watermark-free fabric windows inside those photos (x, y, w, h)
 NEG = {'FV-89-B': (980, 1400, 620, 480), 'FV-89-D': (1000, 1450, 600, 450)}
 

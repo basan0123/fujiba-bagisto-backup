@@ -28,8 +28,11 @@ import heavy_guard  # noqa: E402
 TPL = '/var/www/bagisto/storage/app/intel/twin/wm_script_tpl.npz'
 SCRIPT_THRESH = 0.25    # FV-89-B 0.55 / D 0.57 vs <= 0.064 on 40 wm-free / other-style photos
 SCRIPT_SCALES = (0.9, 1.0, 1.1)
+# OCR angle sweep widened to +-85 deg (2026-10-14): the FV-61-C mark (~-60 deg) was missed at +-30.
+# 20-photo eval (10 P / 10 N): precision 1.0, recall 0.8 (was 0.7). Known misses: FV-82-C
+# (script on grey backdrop) and FW-81-A (small white script) - need a 2nd script template.
 WORDS = ('fujiba', 'elegance', 'emporium')
-OCR_ANGLES = range(-30, 31, 5)
+OCR_ANGLES = (*range(-30, 31, 5), *range(-35, -86, -5), *range(35, 86, 5))  # FV-61-C mark runs ~-60 deg
 WORK = 2000
 _tpl = None
 
