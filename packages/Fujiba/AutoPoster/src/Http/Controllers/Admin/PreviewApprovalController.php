@@ -37,7 +37,7 @@ class PreviewApprovalController extends Controller
     public function media(string $dir, string $file)
     {
         abort_unless(preg_match(self::DIR_RX, $dir) && preg_match(self::KEY_RX, $file), 404);
-        abort_unless(preg_match('/\.(jpg|mp4|gatemask\.png)$/', $file), 404);
+        abort_unless(preg_match('/\.(jpg|mp4|gatemask\.png|sbs\d+\.png|roll-inverse\.sbs\.png)$/', $file), 404);
         $path = realpath($this->root().'/'.$dir.'/'.$file);
         abort_unless($path && str_starts_with($path, realpath($this->root()).DIRECTORY_SEPARATOR) && is_file($path), 404);
 
@@ -112,6 +112,10 @@ class PreviewApprovalController extends Controller
                 'delivery' => $delivery,
                 'video' => $delivery && str_ends_with($delivery, '.mp4'),
                 'mask' => is_file("{$base}/{$key}.gatemask.png") ? "{$key}.gatemask.png" : null,
+                'sbs' => array_values(array_map('basename', array_filter(
+                    array_merge(glob("{$base}/{$key}.sbs*.png") ?: [], glob("{$base}/{$key}.roll-inverse.sbs.png") ?: []),
+                    fn ($f) => preg_match('/\.(sbs\d+|roll-inverse\.sbs)\.png$/', $f) && basename($f, '.png') !== $key
+                ))),
                 'drift' => $side['delivery_drift_deltaE00'] ?? null,
                 'decision' => $decisions[$key] ?? null,
             ];

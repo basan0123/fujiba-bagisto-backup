@@ -55,6 +55,15 @@
                             <tr><td>Delivery drift ΔE00</td><td>{{ $a['drift'] ?? '–' }}</td></tr>
                         </table>
 
+                        @if (! empty($a['sbs']))
+                            <div style="display:flex;flex-direction:column;gap:6px;margin:6px 0">
+                                @foreach ($a['sbs'] as $sbs)
+                                    @php($sbsSrc = route('admin.autoposter.previews.media', [$dir, $sbs]))
+                                    <a href="{{ $sbsSrc }}" target="_blank" title="{{ $sbs }}"><img src="{{ $sbsSrc }}" alt="{{ $sbs }}" loading="lazy" style="width:100%;border:1px solid #ddd"></a>
+                                    <span style="font-size:11px;color:#666">{{ $sbs }}</span>
+                                @endforeach
+                            </div>
+                        @endif
                         @if ($a['mask'])
                             <a href="{{ route('admin.autoposter.previews.media', [$dir, $a['mask']]) }}" target="_blank" style="font-size:13px">Show verified-fabric mask</a>
                         @endif
