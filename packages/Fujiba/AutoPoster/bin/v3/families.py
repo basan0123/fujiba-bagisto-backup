@@ -291,6 +291,92 @@ class Hero(Family):
         return self.finish(out, p, {'crop_boxes': boxes, 'members': [m['name'] for m in mem]})
 
 
+class Showcase(Family):
+    """7: showcase collage = long vertical strip + folded piece + 3 zoom crops + small roll.
+    All fabric is real product-photo pixels. The roll is warped -> unchecked_regions with an
+    inverse-warp check (same metrics/thresholds as family 4) and a roll-inverse side-by-side."""
+    id, name = 7, 'showcase'
+    R, TMAX, VERIFY = 118, np.radians(70), np.radians(45)
+
+    def render(self, ctx, out):
+        import cv2
+        sys.path.insert(0, os.path.join(os.path.dirname(HERE), 'intel'))
+        import fabric_gate as fg
+        p = ctx
+        self.begin(CREAM)
+        img = self.src(p['image'])
+        iw, ih = img.width, img.height
+        self.text((60, 56), p['name'], 64, INK, 'serif')
+        self.text((W - 60, 66), f"¥{int(p['price']):,}", 52, INK, 'serif', 'r')
+        self.d.line((60, 160, W - 60, 160), fill=GOLD, width=3)
+        # 1) long vertical strip: full photo height, centred column
+        sx, sy, sw, sh = 60, 190, 300, 980
+        cw = min(iw, round(ih * sw / sh))
+        shadow(self.canvas, (sx, sy, sx + sw, sy + sh), radius=16, offset=(0, 10), opacity=55)
+        self.fabric(p['image'], ((iw - cw) // 2, 0, cw, ih), (sx, sy, sw, sh))
+        # 2) folded piece: top panel + lower folded-back panel (fold line is a non-fabric shadow band)
+        fx, fy, fw = 390, 190, 630
+        shadow(self.canvas, (fx, fy, fx + fw, fy + 330), radius=16, offset=(0, 10), opacity=55)
+        th1 = 200
+        bh1 = round(iw * th1 / fw)
+        self.fabric(p['image'], (0, ih // 4, iw, bh1), (fx, fy, fw, th1))
+        self.d.rectangle((fx, fy + th1, fx + fw - 1, fy + th1 + 9), fill=(196, 186, 168))
+        th2 = 120
+        bh2 = round(iw * th2 / (fw - 40))
+        self.fabric(p['image'], (0, ih // 4 + bh1, iw, bh2), (fx + 20, fy + th1 + 10, fw - 40, th2))
+        # 3) three zoom crops
+        cs, cg, cy = 200, 15, 560
+        boxes = detail_boxes(img, 3, min(iw, ih) // 5)
+        for i, b in enumerate(boxes):
+            x = fx + i * (cs + cg)
+            self.d.rectangle((x - 3, cy - 3, x + cs + 2, cy + cs + 2), fill=(232, 222, 200))
+            self.fabric(p['image'], b, (x, cy, cs, cs))
+        zoom = cs / boxes[0][2] if boxes else 1
+        self.text((fx, cy + cs + 12), f'close-ups ~{zoom:.1f}x photo scale', 26, MUTED, 'sans')
+        # 4) small roll (warped, inverse-checked) with a short flat sheet hanging from it
+        L, x0, y0 = 600, fx + 15, 840
+        k = L / iw
+        A = int(round(2 * self.R * self.TMAX))
+        a_src = round(A / k)
+        ry = max(0, ih - a_src - round(110 / k))
+        roll_box = (0, ry, iw, a_src)
+        flat = np.asarray(cover(crop_box(img, roll_box), L, A))
+        warped, shade, th = roll_warp(flat, self.R, self.TMAX)
+        hv = warped.shape[0]
+        sh_h = 1170 - y0 - hv
+        shadow(self.canvas, (x0, y0 + 14, x0 + L, y0 + hv + sh_h), radius=18, offset=(0, 12), opacity=55)
+        for cx in (x0 - 4, x0 + L + 4):
+            self.d.ellipse((cx - 16, y0 + hv / 2 - 28, cx + 16, y0 + hv / 2 + 28), fill=(196, 170, 128), outline=(160, 136, 100), width=2)
+            self.d.ellipse((cx - 7, y0 + hv / 2 - 13, cx + 7, y0 + hv / 2 + 13), fill=(120, 100, 76))
+        self.canvas.paste(Image.fromarray(warped), (x0, y0))
+        ins = 30
+        if sh_h > 0:
+            self.fabric(p['image'], (round(ins / k), ry + a_src, round((L - 2 * ins) / k), round(sh_h / k)),
+                        (x0 + ins, y0 + hv, L - 2 * ins, sh_h))
+        back = roll_unwarp(np.asarray(self.canvas)[y0:y0 + hv, x0:x0 + L], shade, th, self.R, self.TMAX, A)
+        b0, b1 = int(round((self.TMAX - self.VERIFY) * self.R)), int(round((self.TMAX + self.VERIFY) * self.R))
+        exp = cv2.cvtColor(flat[b0:b1], cv2.COLOR_RGB2BGR)
+        got = cv2.cvtColor(back[b0:b1], cv2.COLOR_RGB2BGR)
+        cfg = {**fg.DEFAULTS, **fg.MASTER_DEFAULTS}
+        m = fg.measure_region(exp, got, np.ones(exp.shape[:2], bool), cfg, cfg['blur_sigma'])
+        m['pass'] = not m['fails']
+        m['band_deg'] = round(float(np.degrees(self.VERIFY)), 1)
+        base = os.path.splitext(out)[0]
+        sbs = Image.new('RGB', (L * 2 + 20, b1 - b0), (255, 255, 255))
+        sbs.paste(Image.fromarray(flat[b0:b1]), (0, 0))
+        sbs.paste(Image.fromarray(back[b0:b1]), (L + 20, 0))
+        sbs.save(base + '.roll-inverse.sbs.png')
+        self.unchecked.append({'kind': 'roll_cylinder', 'src': p['image'], 'src_box': list(roll_box),
+                               'out_box': [x0, y0, L, hv], 'warp': {'type': 'cylinder_orthographic', 'R': self.R,
+                               'theta_max_deg': 70, 'flat_size': [L, A]},
+                               'shade': '0.5 + 0.5*cos(theta), multiplicative (declared)',
+                               'inverse_warp': m, 'sbs': os.path.basename(base + '.roll-inverse.sbs.png')})
+        # footer (outside fabric): scale note + material (catalog Fabric only) + size/no-tape note
+        self.text((60, 1190), 'approx. scale · real photo of this fabric', 26, MUTED, 'sans')
+        self.material_size(p, 1232, 60, 28)
+        return self.finish(out, p, {'crop_boxes': boxes, 'inverse_warp': m, 'min_exact_share': 0.15})
+
+
 class NeedsModel(Family):
     enabled = False
 
@@ -306,8 +392,8 @@ class Garment(NeedsModel):
     id, name = 2, 'garment'
 
 
-REGISTRY = {f.id: f for f in (Worn, Garment, Closeup, Stack, Roll, Hero)}
-ORDER = [1, 2, 3, 4, 5, 6]
+REGISTRY = {f.id: f for f in (Worn, Garment, Closeup, Stack, Roll, Hero, Showcase)}
+ORDER = [1, 2, 3, 4, 5, 6, 7]
 
 
 def enabled_ids():
